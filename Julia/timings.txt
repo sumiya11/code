@@ -1,0 +1,102 @@
+
+
+# Timings 
+# chandran 9
+#
+#   nb vars 9
+#   dimension 256
+#   nb primes (27 bit) 1282
+#   ZP computations 27 bits
+# computation time over Q : 15 sec (24)
+
+# chandran 10
+#
+#   nb vars 10
+#   dimension 512
+#   nb primes (27 bit) 2560
+#   ZP computations 27 bits
+# computation time over Q : 154 sec (374)
+
+# chandran 11
+#
+#   nb vars 11
+#   dimension 1024
+#   nb primes (27 bit) 
+#   ZP computations 27 bits
+# computation time over Q :  sec ()
+
+# eco 11 
+#   nb vars 11
+#   dimension 512
+#   size of coeffs in param over Q : 330
+#   ZP computations 27 bits
+#   computation time over Q : 17 sec (35)
+
+# eco 12 
+#   nb vars 12
+#   dimension 1024
+#   size of coeffs in param over Q : 530
+#   ZP computations 27 bits
+# computation time over Q : 227 sec (516)
+
+# eco 13
+#   nb vas : 13
+#   dimension : 2048 
+#   size coeffs param in Q : 1200 31 bit primes 
+#   ZP computations 27 bits
+# computation time over Q : 3131 sec
+
+# henrion6
+#   nb vas : 6
+#   dimension : 720 
+#   size coeffs param in Q : 612 31 bit primes 
+#   ZP computations 27 bits
+#
+# estimate computation time over Q : 31 sec (95)
+
+# katsura 11
+#   nb vas : 11
+#   dimension : 1024 
+#   size coeffs param in Q : 400 31 bit primes 
+#   ZP computations 27 bits
+#
+#   computation time over Q : 250 sec (195)
+
+# katsura 12
+#   nb vas : 12
+#   dimension : 2048 
+#   size coeffs param in Q : 850 31 bit primes 
+#   ZP computations 31 bits
+#
+# estimate computation time over Q : 4300 sec
+
+# Noon7 
+#   nb vas : 8
+#   dimension : 2173 
+#   size coeffs param in Q : 1300 31 bit primes 
+#   ZP computations 27 bits
+#
+#   computation time over Q : 4137 sec (1804)
+
+# Reimer6 (non shape position)
+# estimate computation time over Q : sec
+
+# phuoc-1 (non cyclic)
+#   nb vas : 8
+#   dimension : 4022
+#   size coeffs param in Q : 753 31 bit primes 
+#   ZP computations 27 bits
+#
+#     Groebner learn : 1.9  sec
+#     Kbase :  0.4 sec
+#     table learn : 0.04 sec
+#     table prepare : 0.1 sec
+#
+#     Groebner Apply : 0.9
+#     Table apply : 0.04
+#     Minpoly : 8.9
+#
+# estimate computation time over Q : 8000 sec
+
+
+

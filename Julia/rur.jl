@@ -1,0 +1,702 @@
+import AbstractAlgebra,Nemo,Primes
+
+#####################################################
+# Add on to AbstractAlgebra
+#####################################################
+
+function convert_sys_to_sys_z(sys::Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}})
+   sys_z=AbstractAlgebra.Generic.MPoly{BigInt}[]
+   for p in sys
+	 push!(sys_z,AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.ZZ,p*lcm(map(denominator,collect(AbstractAlgebra.coefficients(p))))))
+   end
+   return(sys_z)
+end
+
+function convert_to_mpol_UInt32(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32)
+   sys_Int32=AbstractAlgebra.Generic.MPoly{AbstractAlgebra.GFElem{Int64}}[]
+   for p in sys_z push!(sys_Int32,AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.GF(Int64(pr)),p)) end
+   return(sys_Int32)
+end
+
+function extract_raw_data(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}})
+    expvecs=Vector{Vector{PP}}()
+    cfs_zz=Vector{Vector{BigInt}}()
+    for i in 1:length(sys_z)
+        push!(expvecs, map(PP,collect(AbstractAlgebra.exponent_vectors(sys_z[i]))))
+        push!(cfs_zz, map(BigInt,collect(AbstractAlgebra.coefficients(sys_z[i]))))
+    end
+    return expvecs,cfs_zz
+ end
+
+#####################################################
+# internal polynomials
+#####################################################
+
+struct PP
+    data::Vector{Int32}
+    function PP(v::Vector{T}) where {T}
+        new(Vector{Int32}(v))
+    end
+end
+
+struct PolUInt32
+   exp::Vector{PP}
+   co::Vector{UInt32}
+end
+
+function monomial(p::PolUInt32,i::Int32)::PP
+    return(p.exp[i])
+end
+
+function coeff(p::PolUInt32,i::Int32)::UInt32
+    return(p.co[i])
+end
+
+mutable struct StackVect
+   pos::Int32
+   mon::PP
+   prev::Int32
+   var::Int32
+end
+
+function coeff_mod_p(x::BigInt,pr::UInt32)
+    if (x<0) return(pr-UInt32((-x)%pr))
+    elseif return(UInt32(x%pr)) end
+end
+
+function total_degree(pp::PP)::Int64
+    sum(pp.data)
+end
+
+## tests if pp1 is divisible by pp2
+## then returns the greatest variable
+## that appear in the divisor
+
+function divides(pp1::PP,pp2::PP)
+    tmp=pp1.data-pp2.data
+    i=1
+    var=0
+    while ((i<=length(tmp)) && (tmp[i]>=0))
+        if (tmp[i]>0) var=i end
+        i=i+1
+    end
+    return((i>length(tmp)),var)
+end
+
+# Interface with AbstractAlgebra
+#####################################################
+
+function coeff_mod_p(x::AbstractAlgebra.GFElem{Int32},pr::UInt32)::UInt32
+    return(UInt32(AbstractAlgebra.data(x)))
+end
+
+function coeff_mod_p(x::AbstractAlgebra.GFElem{Int64},pr::UInt32)::UInt32
+    return(UInt32(AbstractAlgebra.data(x)))
+end
+
+function sys_mod_p(sys::Vector{AbstractAlgebra.Generic.MPoly{T}},pr::UInt32)::Vector{PolUInt32} where {T}
+    res=PolUInt32[]
+    for p in sys
+        push!(res,PolUInt32(map(u->PP(u),collect(AbstractAlgebra.exponent_vectors(p))),map(u->coeff_mod_p(u,pr),collect(AbstractAlgebra.coefficients(p)))))
+    end
+    return(res)
+end
+
+
+#####################################################
+# Multiplication Matrices
+#####################################################
+
+
+#test if a monomial is already in the
+#border and, if not, try to find a
+#divisor of total degree -1
+#the function supposes that it does not belong to
+#the quotient
+#variant where we look for the smallest divisor
+function find_in_border(m::PP,
+                        t_xw::Vector{StackVect})
+   pos=length(t_xw)
+   res_flag=0
+   res_dd=0
+   res_pos=0
+   # On y va par degrÃ©s dÃ©croissants pour limiter
+   # le nombre de tests
+   tm=total_degree(m)
+   while (pos>0)
+      mm=t_xw[pos].mon
+      tmm=total_degree(mm)
+      if (tmm==tm)
+         if (m==mm) return(1,m,pos) end
+      elseif (tmm==tm-1)
+            #test if mm is not in the quotient basis
+            if (!((t_xw[pos].prev>0) && (t_xw[pos].var==0))) 
+               flag,dd=divides(m,mm)
+               if (flag)
+                  res_flag=2 
+                  res_dd=dd
+                  res_pos=pos
+               end
+            end
+      else
+            #the total degree is to high to find a predecessor
+            if (res_flag>0) 
+               return(res_flag,res_dd,res_pos)
+            else
+               print("\nError find in border : ",tm," ",tmm)
+               return(0,0,0)
+            end
+      end
+      pos=pos-1
+   end
+   if (res_flag>0)
+      return(res_flag,res_dd,res_pos)
+   else 
+      print("\n\nError in finding a predecessor")
+      return(0,0,0)
+   end
+end
+
+function mul_pp_by_var!(m::PP,v_index::Int64)
+    mm=PP(m.data)
+    mm.data[v_index]=mm.data[v_index]+1
+    return(mm)
+end
+
+function prepare_table_mxi(ltg::Vector{PP},
+                           kb::Vector{PP})
+   nbv=length(ltg[1].data)
+   tablex=[[Int32(0) for i=1:length(kb)] for j=1:nbv]
+   general_stack=Vector{StackVect}()
+   nb_stack=0    
+   for j in eachindex(kb)
+          m=PP(kb[j].data)
+          for ii in 1:nbv
+              i=nbv-ii+1   
+	          nm=mul_pp_by_var!(m,i)
+	          pos=findfirst(item -> item.data == nm.data, kb)
+	          if isnothing(pos)
+	  	         pos=findfirst(item -> item.data == nm.data, ltg)
+     	         if isnothing(pos)
+	               flag,v,prec=find_in_border(nm,general_stack)
+	               if (flag==1) tablex[i][j]=Int32(prec)
+		           elseif (flag==2)
+		             nb_stack=nb_stack+1
+	                 tablex[i][j]=Int32(nb_stack)
+                         push!(general_stack,StackVect(nb_stack,PP(nm.data),Int32(prec),Int32(v)))
+	             else print("\n*** Error search table ***\n") end
+	         else
+		     #nm is a leading monomial of an element of the Gb
+		     #we insert it with the flags prev=0 and var=pos in the gb
+                     prev=findlast(item-> item.mon.data==nm.data,general_stack)
+                     if isnothing(prev)
+		                 nb_stack=nb_stack+1
+		                 tablex[i][j]=Int32(nb_stack)
+		                push!(general_stack,StackVect(nb_stack,PP(ltg[pos].data),Int32(0),Int32(pos)))
+                     else tablex[i][j]=Int32(prev) end
+		     end
+	         else
+		          #nm is a element of the quotient basis
+		          #we insert it with the flags prev=pos and var=0
+                  prev=findlast(item-> item.mon.data==nm.data,general_stack)
+                  if isnothing(prev)
+                        nb_stack=nb_stack+1
+        		        tablex[i][j]=Int32(nb_stack)
+        		        push!(general_stack,StackVect(nb_stack,PP(kb[pos].data),Int32(pos),Int32(0)))
+                  else tablex[i][j]=Int32(prev) end
+             end
+          end
+   end
+   return(tablex,general_stack)
+end
+
+# stuff
+########################################
+
+function reduce_mod_p(
+    cfs_zz::Vector{Vector{BigInt}},
+    prime::UInt32
+)
+    prime_zz = BigInt(prime)
+    cfs_zp=[Vector{UInt32}(undef, length(cfs_zz[i])) for i in 1:length(cfs_zz)]
+    @inbounds for i in 1:length(cfs_zz)
+        cfs_zz_i = cfs_zz[i]
+        for j in 1:length(cfs_zz_i)
+            cfs_zp[i][j] = UInt32(mod(cfs_zz_i[j], prime_zz))
+        end
+        # if lead vanishes
+        iszero(cfs_zp[i][1]) && error("beda beda ogorchenie!")
+    end
+    cfs_zp
+end
+
+# vectors add-ons
+########################################
+
+
+#@timeit tmr "addmul" 
+function add_mul!(vres::Vector{UInt64},a::UInt32,v::Vector{UInt32})
+    @fastmath @inbounds @simd  ivdep for i in eachindex(vres)
+        vres[i]+=UInt64(a)*UInt64(v[i])
+    end
+end
+
+#@timeit tmr "modulo" 
+function reduce_mod!(vres::Vector{UInt64},pr::UInt32,arithm)
+   @fastmath @inbounds @simd ivdep for i in eachindex(vres)
+      vres[i]=Groebner.mod_p(vres[i],arithm)
+   end
+end
+
+
+function vectorize_pol_gro(p::PolUInt32,
+                           kb::Vector{PP},
+                           pr::UInt32,
+                           arithm)
+   res=zeros(UInt32, length(kb))
+   pos=length(kb)
+   @inbounds for i in 2:length(p.co)
+      m=monomial(p,Int32(i))
+      while ((pos>0) && (kb[pos].data!=m.data)) pos=pos-1 end
+      if (pos<1) print("\nError vectorisation ",pos," ",m)
+      else
+         res[pos]=pr-coeff(p,Int32(i))
+      end
+   end
+   return(res)
+end
+
+# elements of the quotient basis
+# are represented by a vector of length 1
+# whose entry is the place of the element in the quotient basis
+
+function compute_fill_quo_gb!(t_xw::Vector{StackVect},
+                              gro::Vector{PolUInt32},
+                              quo::Vector{PP},
+                              pr::UInt32,
+                              arithm)
+   t_v=[Vector{UInt32}() for i=1:length(t_xw)]
+   @inbounds for i in eachindex(t_xw)
+      #print("\n",t_xw[i])
+      if ((t_xw[i].var>0) && (t_xw[i].prev==0))
+         #var>0 and prev=0 => groebner basis element at position var in the list gro
+         t_v[i]=vectorize_pol_gro(gro[t_xw[i].var],quo,pr,arithm)
+      elseif ((t_xw[i].var==0) && (t_xw[i].prev>0))
+         #var=0 (and prev>0 )=> quotient element at position prev in the list quo
+          t_v[i]=[t_xw[i].prev]
+      end
+   end
+   return(t_v)
+end
+
+#@timeit tmr "mul_var" 
+function _mul_var_quo_UInt32(v::Vector{UInt32},
+                        ii::Int32,
+                        t_v::Vector{Vector{UInt32}},
+                        i_xw::Vector{Vector{Int32}},
+                        pr::UInt32,
+                        arithm)
+    dim=length(v)
+    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
+    vv=zeros(UInt64, dim)
+    continuer=true
+    @inbounds for j=1:dim
+        iszero(v[j]) && continue
+        if (length(t_v[i_xw[ii][j]])>1)
+            add_mul!(vv,v[j],t_v[i_xw[ii][j]])
+            if j%pack==0
+                reduce_mod!(vv,pr,arithm)
+            end
+        elseif (length(t_v[i_xw[ii][j]])==1)
+            kk=t_v[i_xw[ii][j]][1]
+            vv[kk]=Groebner.mod_p(vv[kk]+UInt64(v[j]), arithm)
+        else
+            continuer=false
+            break;
+        end
+    end
+    return continuer,reduce_mod(vv,pr,arithm)
+end
+
+function mul_var_quo_UInt32(v::Vector{UInt32},
+                        ii::Int32,
+                        t_v::Vector{Vector{UInt32}},
+                        i_xw::Vector{Vector{Int32}},
+                        pr::UInt32,
+                        arithm)
+    f,r= _mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm)
+    return(r)
+end
+
+function learn_compute_table!(t_v::Vector{Vector{UInt32}},
+                              t_xw::Vector{StackVect},
+                              i_xw::Vector{Vector{Int32}},
+                              quo::Vector{PP},
+                              pr::UInt32,
+                              arithm)
+   nb=1
+   t_learn=Int32[]
+   while (nb>0)
+      nb=0
+      for i in eachindex(t_xw)
+         #test if already computed
+         if (length(t_v[i])==0)
+            continuer=false
+            #test if the ancestor is computed
+            if (length(t_v[t_xw[i].prev])>0)
+                continuer,vv= _mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm)
+                if (continuer) 
+                    t_v[i]=vv
+                    push!(t_learn,i)
+                    nb=nb+1
+                end
+            end
+         end
+      end
+   end
+   return(t_learn)
+end
+
+
+function apply_compute_table!(t_v::Vector{Vector{UInt32}},
+                              t_learn::Vector{Int32},
+                              t_xw::Vector{StackVect},
+                              i_xw::Vector{Vector{Int32}},
+                              quo::Vector{PP},
+                              pr::UInt32,
+                              arithm)
+   @inbounds for i in t_learn
+      if (length(t_v[i])==0)
+          t_v[i]=mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm)
+      end
+   end
+end
+
+
+function reduce_mod(v::Vector{UInt64},pr::UInt32,arithm)
+   vres=Vector{UInt32}(undef, length(v))
+    @fastmath @inbounds @simd for i in eachindex(vres)
+      vres[i]=Groebner.mod_p(v[i], arithm)%UInt32
+   end
+   return(vres)
+end
+
+
+
+############################################
+#learn_zdim
+############################################
+
+function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm)
+#   pr=UInt32(Primes.prevprime(2^27-1));
+#   @timeit tmr "convert" 
+   sys_Int32=convert_to_mpol_UInt32(sys,pr)
+# @timeit tmr "groebner learn"  
+   graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
+# @timeit tmr "kbase" 
+   quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+   g=sys_mod_p(gro,pr);
+   gb_expvecs=map(poly->poly.exp,g)
+   ltg=map(u->u.exp[1],g);
+   q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+# @timeit tmr "prepare table" 
+   i_xw,t_xw=prepare_table_mxi(ltg,q);
+   t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
+# @timeit tmr "learn table"  
+   t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
+   return(graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs)
+end
+
+function apply_zdim_quo!(graph,
+                         t_learn::Vector{Int32},
+                         q::Vector{PP},
+                         i_xw::Vector{Vector{Int32}},
+                         t_xw::Vector{StackVect},
+                         pr::UInt32,
+                         arithm,
+                         gb_expvecs::Vector{Vector{PP}},
+                         cfs_zp::Vector{Vector{UInt32}})
+#   @timeit tmr "convert" 
+    # sys_Int32=convert_to_mpol_UInt32(sys,pr);
+#   @timeit tmr "groebner" 
+    # f,gro=Groebner.groebner_apply!(graph,sys_Int32);
+    success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
+    if (success)
+#   @timeit tmr "gro mod p" 
+    # g=sys_mod_p(gro,pr);
+        g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+#   @timeit tmr "fill"
+        t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
+#  @timeit tmr "table" 
+        apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
+        return(success,t_v)
+    else
+        print("\n*** Bad prime detected in apply_zdim ***\n")
+        return(success,nothing)
+    end
+end
+
+
+function zdim_mx(t_v::Vector{Vector{Int32}},
+                 i_xw::Vector{Vector{Int32}},
+                 i::Int32,d::Int32)
+    res=Vector{Int32}[]
+    for j=1:d
+        push!(res,t_v[i_xw[i][j]])
+    end
+    return(res)
+end
+
+############################################
+# Rational Parameterization
+############################################
+#first non null element of a reduced row stored at position i 
+#in the gred is at position i+1 to simulate that
+#gred[0]is not stored
+#this element is the opposite element of the true pivot
+#rows are normalized
+
+#@timeit tmr "gred"  
+function gauss_reduct(
+        v::Vector{UInt32},
+        gred::Vector{Vector{UInt32}},
+        dg::Int32,
+        dv::Int32,
+        paquet::Int32,
+        pr::UInt32,
+        arithm)
+    i=Int32(0)
+    j=Int32(0)
+    last_nn=Int32(-1)
+    pivot=UInt32(0)
+    b=[UInt64(v[i]) for i=1:dv]     # This call is not inlined
+    @inbounds for i in 1:(dg-1)
+        b[i+1]=Groebner.mod_p(b[i+1], arithm)
+        iszero(b[i+1]) && continue
+        if (length(gred[i])==0)
+            last_nn=i%Int32
+            break
+        end
+        
+        pivot=Groebner.mod_p((UInt64(pr)-b[i+1]),arithm)%UInt32;
+        add_mul!(b,pivot,gred[i]);
+        b[i+1]=pivot;
+        if (j<paquet)
+            j+=Int32(1);
+        else
+            reduce_mod!(b,pr,arithm);
+            j=Int32(0);
+        end
+    end
+    if (j>0) 
+        @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
+    else 
+        @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
+    end
+    if (last_nn==-1)
+        @inbounds for ii in dg:(dv-1)
+            if (v[ii+1]!=0)
+                last_nn=ii%Int32;
+                break;
+            end
+        end
+    end
+    if last_nn==-1
+        return dv
+    else
+        return last_nn
+    end
+end
+
+#@timeit tmr "first variable" 
+
+function normalize_row!(v::Vector{UInt32},tmp::UInt32,pr::UInt32,arithm)
+     @fastmath @inbounds @simd for i in eachindex(v)
+        v[i]=Groebner.mod_p((v[i]%UInt64)*(tmp%UInt64), arithm)%UInt32
+     end
+end
+
+function first_variable(t_v::Vector{Vector{UInt32}},
+                        i_xw::Vector{Vector{Int32}},
+                        ii::Int32,pr::UInt32,
+                        arithm)
+    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
+    d=Int32(length(i_xw[1])) 
+    if (length(t_v[i_xw[ii][1]])>1)
+        v=t_v[i_xw[ii][1]]
+    else
+        v = zeros(UInt32, d)
+        v[t_v[i_xw[ii][1]][1]]=UInt32(1)
+    end
+    # index[deg]=pos (pos=position in the gred with the convention that 0 is not stored)
+    index=[Int32(i) for i=1:d];
+    # normalization values
+    hom=[UInt32(1) for i=1:d];
+    gred=[Vector{UInt32}() for i=1:d];
+    i=Int32(2);continuer=1;dg=Int32(1);new_i=Int32(1);deg=Int32(0);
+    while ((i<d) && (v[i]==0)) i+=1; end
+    if (v[i]!=1) print("\n **** WARNING POSSIBLE NORMALIZATION PROBLEM ****\n") end
+    gred[i-1]=Vector{UInt32}(v)
+    if (gred[i-1][1]!=0) gred[i-1][1]=pr-gred[i-1][1]; end
+    #T^0 is stored at gred[0] virtually
+    index[1]=i-1;
+    #gred[dg+i] not used i=0..d-dg
+    dg=Int32(i);
+    #we are now going to compute T^2
+    deg=Int32(2);
+    w=Vector{UInt32}(undef,d)
+    @inbounds while (continuer==1)
+        v=mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm)
+        w=Vector{UInt32}(v)
+        #reduce with gred[0]
+        if (w[1]!=0) w[1]=pr-w[1]; end
+        #reduce with gred[i] i=1..dg-1
+        #new_i = possible position to store the reduced vector in gred
+        new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+        if (new_i<d)
+            gred[new_i]=Vector{UInt32}(w);
+            if (!(new_i<dg)) dg=Int32(new_i+1); end;
+            index[deg]=Int32(new_i);
+            hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
+            normalize_row!(gred[new_i],hom[new_i],pr,arithm)
+            deg+=Int32(1);
+        else
+            continuer=0;
+        end;
+    end
+    #set v[i] cofficient of T^(i-1) in the min poly
+    v=Vector{UInt32}(undef,deg)
+    v[1]=w[1];
+#old    @inbounds for i in 2:deg v[i]=w[index[i-1]+1]; end;
+    @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
+    return(v,gred,index,dg,hom)
+end
+
+function biv_shape_lemma(t_v::Vector{Vector{UInt32}},   
+                         i_xw::Vector{Vector{Int32}},
+                         deg::Int32,
+                         gred::Vector{Vector{UInt32}},
+                         index::Vector{Int32},
+                         hom::Vector{UInt32},
+                         dg::Int32,ii::Int32,pr::UInt32, arithm)
+    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
+    d=Int32(length(gred))
+    w=zeros(UInt32, d)
+    if (length(t_v[i_xw[ii][1]])>1)
+        w=t_v[i_xw[ii][1]]
+    else
+        w[t_v[i_xw[ii][1]][1]]=UInt32(1)
+    end
+    if (w[1]!=0) w[1]=pr-w[1]; end
+    new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+    if (new_i<d)
+        print("Not in shape position")
+    end
+    v=Vector{UInt32}(undef,deg)
+    v[1]=w[1];
+    @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
+    return(v);
+end
+
+# @timeit tmr "zdim param" 
+function coeff_mod_p(x::Nemo.fpFieldElem,pr::UInt32)::Int32
+    return(Int32(Nemo.data(x)))
+end
+
+function zdim_parameterization(t_v::Vector{Vector{UInt32}},
+                               i_xw::Vector{Vector{Int32}},
+                               pr::UInt32,
+                               arithm)
+    res=Vector{Vector{UInt32}}()
+    ii=Int32(length(i_xw))
+    v,gred,index,dg,hom=first_variable(t_v,i_xw,ii,pr,arithm)
+    push!(res,v);
+    C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
+    f=C(v)+_Z^(length(v));
+    push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
+    ifp=Nemo.derivative(f)
+    flag=true;
+    if length(v)==length(gred)
+        @inbounds for j in 1:(ii-1)
+            v1=biv_shape_lemma(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
+            n1=Nemo.mulmod(ifp,-C(v1),f);
+            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
+        end
+    else 
+        print("Not in shape position");
+        flag=false;
+    end
+    return(flag,res)
+end
+
+function zz_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{BigInt}}
+    zzm=Vector{Vector{BigInt}}(undef,length(zpm))
+    @inbounds for i in eachindex(zpm)
+        zzm[i]=[BigInt(0) for j=1:length(zpm[i])]
+    end
+    return(zzm)
+end
+
+function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{BigInt}}}
+    zzm=Vector{Vector{Rational{BigInt}}}(undef,length(zpm))
+    @inbounds for i in eachindex(zpm)
+        zzm[i]=[Rational{BigInt}(0) for j=1:length(zpm[i])]
+    end
+    return(zzm)
+end
+
+function test_param(sys_z, nn)::Vector{Vector{Rational{BigInt}}}
+    qq_m=Vector{Vector{Rational{BigInt}}}()
+    t_pr=Vector{UInt32}();
+    t_param=Vector{Vector{Vector{UInt32}}}();
+    pr=UInt32(Primes.prevprime(2^nn-1));
+    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm);
+    expvecs,cfs_zz=extract_raw_data(sys_z)
+    continuer=true
+    bloc_p=Int32(2)
+    lift_level=0
+    kk=Int32(0)
+    while(continuer)
+        kk+=1
+        pr=UInt32(Primes.prevprime(pr-1))
+        arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+        cfs_zp=reduce_mod_p(cfs_zz,pr)
+        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp);
+        if (success) 
+            flag,zp_param=zdim_parameterization(t_v,i_xw,pr,arithm);
+            if (flag)
+                push!(t_pr,UInt32(pr));
+                push!(t_param,zp_param);
+                if (kk==bloc_p)
+                   print("[",kk,",",length(t_pr),"]");
+                   zz_p=BigInt(1);
+                   if (lift_level==0) 
+                       print("(",0,")");
+                       zz_m=zz_mat_same_dims([t_param[1][1]]);
+                       qq_m=qq_mat_same_dims([t_param[1][1]]);
+                       tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
+                       Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
+                       aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
+                       if (aa) lift_level=1 end
+                   end
+                   if (lift_level==1)
+                       print("(",1,")");
+                       zz_m=zz_mat_same_dims(t_param[1]);
+                       qq_m=qq_mat_same_dims(t_param[1]);
+                       Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
+                       continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
+                   end
+                   #bloc_p=Int32(2^(Int32(floor(max(log(length(t_pr)/10)/log(2),2)))))
+                   bloc_p=Int32(max(floor(length(t_pr)/10),2)) 
+                   kk=0
+                end
+            else
+                print("\n*** bad prime for RUR detected ***\n")
+            end
+        else
+            print("\n*** bad prime for Gbasis detected ***\n")
+        end
+    end;
+    return(qq_m);
+end
