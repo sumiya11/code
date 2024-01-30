@@ -17,7 +17,8 @@ pkg"status"
 
 ###
 
-using Primes,HostCPUFeatures,AbstractAlgebra
+using Primes,HostCPUFeatures,AbstractAlgebra,TimerOutputs
+using BenchmarkTools
 include("C:\\data\\projects\\gbgb\\Groebner.jl\\src\\Groebner.jl")
 
 include((@__DIR__)*"/../Julia/rur.jl")
@@ -35,13 +36,59 @@ end
 ###
 
 nn=27;
-sys = Groebner.eco10(ordering=:degrevlex)
-include("../Data/Systems/eco10.jl")
+# tmr = TimerOutputs.TimerOutput()
+sys = Groebner.chandran(8, ordering=:degrevlex)
+include("../Data/Systems/henrion6.jl")
 sys_z = convert_sys_to_sys_z(sys)
 
-@time rur = test_param(sys_z, nn);
+begin
+    # reset_timer!(tmr)
+    _gauss_reduct_jam[] = true
+    @time rur_jam = test_param(sys_z, nn);
+    # tmr
+end;
+begin
+    # reset_timer!(tmr)
+    _gauss_reduct_jam[] = false
+    @time rur = test_param(sys_z, nn);
+    # tmr
+end;
+rur == rur_jam
 
-@profview test_param(sys_z, nn);
+###########################################
+###########################################
+
+function foo!(x,a1,v1,a2,v2)
+    add_mul!(x,a1,v1)
+    add_mul!(x,a2,v2)
+end
+function woo!(x,a1,v1,a2,v2)
+    add_mul_jam2!(x,a1,v1,a2,v2)
+end
+
+n = 5_000
+@btime foo!(x,a1,v1,a2,v2) setup=begin
+    x = rand(UInt64, $n)
+    a1 = rand(UInt32)
+    v1 = rand(UInt32, $n)
+    a2 = rand(UInt32)
+    v2 = rand(UInt32, $n)
+end
+#  1.700 μs (0 allocations: 0 bytes)
+
+@btime woo!(x,a1,v1,a2,v2) setup=begin
+    x = rand(UInt64, $n)
+    a1 = rand(UInt32)
+    v1 = rand(UInt32, $n)
+    a2 = rand(UInt32)
+    v2 = rand(UInt32, $n)
+end
+#  1.280 μs (0 allocations: 0 bytes)
+
+###########################################
+###########################################
+
+@my_profview test_param(sys_z, nn);
 
 ###
   

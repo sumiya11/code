@@ -235,9 +235,37 @@ end
 
 
 #@timeit tmr "addmul" 
-function add_mul!(vres::Vector{UInt64},a::UInt32,v::Vector{UInt32})
-    @fastmath @inbounds @simd  ivdep for i in eachindex(vres)
+@inline function add_mul!(vres::Vector{UInt64},a::UInt32,v::Vector{UInt32})
+    @fastmath @inbounds @simd ivdep for i in eachindex(vres)
         vres[i]+=UInt64(a)*UInt64(v[i])
+    end
+end
+
+@inline function add_mul_jam2!(
+        vres::Vector{UInt64},
+        a1::UInt32,v1::Vector{UInt32},
+        a2::UInt32,v2::Vector{UInt32})
+    @fastmath @inbounds @simd ivdep for i in 1:length(vres)
+        s=vres[i]
+        s=s+UInt64(a1)*UInt64(v1[i])
+        s=s+UInt64(a2)*UInt64(v2[i])
+        vres[i]=s
+    end
+end
+
+@inline function add_mul_jam4!(
+        vres::Vector{UInt64},
+        a1::UInt32,v1::Vector{UInt32},
+        a2::UInt32,v2::Vector{UInt32},
+        a3::UInt32,v3::Vector{UInt32},
+        a4::UInt32,v4::Vector{UInt32})
+    @fastmath @inbounds @simd ivdep for i in 1:length(vres)
+        s=vres[i]
+        s=s+UInt64(a1)*UInt64(v1[i])
+        s=s+UInt64(a2)*UInt64(v2[i])
+        s=s+UInt64(a3)*UInt64(v3[i])
+        s=s+UInt64(a4)*UInt64(v4[i])
+        vres[i]=s
     end
 end
 
@@ -456,7 +484,10 @@ end
 #this element is the opposite element of the true pivot
 #rows are normalized
 
-#@timeit tmr "gred"  
+# Run "_gauss_reduct_jam[] = false" to disable jamming
+const _gauss_reduct_jam = Ref{Bool}(true)
+
+# @timeit tmr "gred" 
 function gauss_reduct(
         v::Vector{UInt32},
         gred::Vector{Vector{UInt32}},
@@ -465,11 +496,14 @@ function gauss_reduct(
         paquet::Int32,
         pr::UInt32,
         arithm)
+    if paquet > 1 && _gauss_reduct_jam[]
+        return gauss_reduct_jam2(v,gred,dg,dv,paquet,pr,arithm)
+    end
     i=Int32(0)
     j=Int32(0)
     last_nn=Int32(-1)
     pivot=UInt32(0)
-    b=[UInt64(v[i]) for i=1:dv]     # This call is not inlined
+    b=[UInt64(v[i]) for i=1:dv]
     @inbounds for i in 1:(dg-1)
         b[i+1]=Groebner.mod_p(b[i+1], arithm)
         iszero(b[i+1]) && continue
@@ -477,8 +511,7 @@ function gauss_reduct(
             last_nn=i%Int32
             break
         end
-        
-        pivot=Groebner.mod_p((UInt64(pr)-b[i+1]),arithm)%UInt32;
+        pivot=(UInt64(pr)-b[i+1])%UInt32;
         add_mul!(b,pivot,gred[i]);
         b[i+1]=pivot;
         if (j<paquet)
@@ -492,6 +525,247 @@ function gauss_reduct(
         @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
     else 
         @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
+    end
+    if (last_nn==-1)
+        @inbounds for ii in dg:(dv-1)
+            if (v[ii+1]!=0)
+                last_nn=ii%Int32;
+                break;
+            end
+        end
+    end
+    if last_nn==-1
+        return dv
+    else
+        return last_nn
+    end
+end
+
+function gauss_reduct_jam2(
+        v::Vector{UInt32},
+        gred::Vector{Vector{UInt32}},
+        dg::Int32,
+        dv::Int32,
+        paquet::Int32,
+        pr::UInt32,
+        arithm)
+    @assert paquet > 1
+    j=Int32(0)
+    last_nn=Int32(-1)
+    pivot=UInt32(0)
+    b=[UInt64(v[i]) for i=1:dv]
+    ub2 = (dg-1) & xor(typemax(Int), 1)
+    k = 1
+    @inbounds while k <= ub2
+        w1, w2 = gred[k], gred[k+1]
+        b[k+1]=Groebner.mod_p(b[k+1], arithm)
+        if isempty(w1)
+            if !iszero(b[k+1])
+                last_nn=k%Int32
+                break
+            end
+            # Go for a single iteration with w2
+            b[k+2]=Groebner.mod_p(b[k+2], arithm)
+            if iszero(b[k+2])
+                k += 2
+                continue
+            end
+            if isempty(w2)
+                last_nn=(k+1)%Int32
+                break
+            end
+            pivot=(UInt64(pr)-b[k+2])%UInt32;
+            add_mul!(b,pivot,w2);
+            b[k+2]=pivot;
+            if (j<paquet)
+                j+=Int32(1);
+            else
+                reduce_mod!(b,pr,arithm);
+                j=Int32(0);
+            end
+            k += 2
+            continue
+        end
+        # from this point, w1 is non-empty
+        if isempty(w2)
+            # Go for a single iteration with w1
+            pivot=(UInt64(pr)-b[k+1])%UInt32;
+            add_mul!(b,pivot,w1);
+            b[k+1]=pivot;
+            if (j<paquet)
+                j+=Int32(1);
+            else
+                reduce_mod!(b,pr,arithm);
+                j=Int32(0);
+            end
+            b[k+2]=Groebner.mod_p(b[k+2], arithm)
+            if !iszero(b[k+2])
+                last_nn=(k+1)%Int32
+                break
+            end
+            k+=2
+            continue
+        end
+        # from this point, w1 and w2 are non-empty
+        pivot1=(UInt64(pr)-b[k+1])%UInt32;
+        b[k+2]=Groebner.mod_p(b[k+2], arithm)
+        pivot2=(UInt64(pr)-Groebner.mod_p(b[k+2]+UInt64(pivot1)*w1[k+2], arithm))%UInt32;
+        add_mul_jam2!(b, pivot1, w1, pivot2, w2) 
+        b[k+1]=Groebner.mod_p(UInt64(pivot1)+UInt64(pivot2)*UInt64(w2[k+1]), arithm)%UInt32;
+        b[k+2]=pivot2;
+        if (j<paquet)
+            j+=Int32(2);
+        else
+            reduce_mod!(b,pr,arithm);
+            j=Int32(0);
+        end
+        k+=2
+    end
+
+    if last_nn == -1
+        @inbounds for i in (k):(dg-1)
+            b[i+1]=Groebner.mod_p(b[i+1], arithm)
+            iszero(b[i+1]) && continue
+            if (length(gred[i])==0)
+                last_nn=i%Int32
+                break
+            end
+            pivot=(UInt64(pr)-b[i+1])%UInt32;
+            add_mul!(b,pivot,gred[i]);
+            b[i+1]=pivot;
+            if (j<paquet)
+                j+=Int32(1);
+            else
+                reduce_mod!(b,pr,arithm);
+                j=Int32(0);
+            end
+        end
+    end
+
+    if (j>0) 
+        @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
+    else 
+        @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
+    end
+    if (last_nn==-1)
+        @inbounds for ii in dg:(dv-1)
+            if (v[ii+1]!=0)
+                last_nn=ii%Int32;
+                break;
+            end
+        end
+    end
+    if last_nn==-1
+        return dv
+    else
+        return last_nn
+    end
+end
+
+function gauss_reduct_jam4(
+        v::Vector{UInt32},
+        gred::Vector{Vector{UInt32}},
+        dg::Int32,
+        dv::Int32,
+        paquet::Int32,
+        pr::UInt32,
+        arithm)
+    @assert paquet > 3
+    j=Int32(0)
+    last_nn=Int32(-1)
+    pivot=UInt32(0)
+    b=[UInt64(v[i]) for i=1:dv]
+    ub4 = (dg-1) & xor(typemax(Int), 3)
+    k = 1
+    @inbounds while k <= ub4
+        # Find the non-empty reducers
+        k1 = k
+        while k1 <= ub4 && isempty(gred[k1])
+            k1 += 1
+        end
+        k1 > ub4 && break
+        #
+        k2 = k1+1
+        while k2 <= ub4 && isempty(gred[k2])# && iszero(b[k2+1])
+            k2 += 1
+        end
+        k2 > ub4 && break
+        #
+        k3 = k2+1
+        while k3 <= ub4 && isempty(gred[k3])# && iszero(b[k3+1])
+            k3 += 1
+        end
+        k3 > ub4 && break
+        #
+        k4 = k3+1
+        while k4 <= ub4 && isempty(gred[k4])# && iszero(b[k4+1])
+            k4 += 1
+        end
+        k4 > ub4 && break
+        # @assert 1 <= k1 < k2 < k3 < k4 <= ub4 
+        # From this point, w1, w2, w3, w4 are non-empty.
+        w1, w2, w3, w4 = gred[k1], gred[k2], gred[k3], gred[k4]
+        b[k1+1]=Groebner.mod_p(b[k1+1], arithm)
+        b[k2+1]=Groebner.mod_p(b[k2+1], arithm)
+        b[k3+1]=Groebner.mod_p(b[k3+1], arithm)
+        b[k4+1]=Groebner.mod_p(b[k4+1], arithm)
+        pivot1=(UInt64(pr)-b[k1+1])%UInt32;
+        pivot2=(UInt64(pr)-Groebner.mod_p(
+            b[k2+1] + UInt64(pivot1)*w1[k2+1], arithm))%UInt32;
+        pivot3=(UInt64(pr)-Groebner.mod_p(
+            b[k3+1] + UInt64(pivot1)*w1[k3+1] + UInt64(pivot2)*w2[k3+1], arithm))%UInt32;
+        pivot4=(UInt64(pr)-Groebner.mod_p(
+            b[k4+1] + UInt64(pivot1)*w1[k4+1] + UInt64(pivot2)*w2[k4+1] + UInt64(pivot3)*w3[k4+1], arithm))%UInt32;
+        # Jam!
+        add_mul_jam4!(b, pivot1, w1, pivot2, w2, pivot3, w3, pivot4, w4)
+        b[k1+1]=Groebner.mod_p(
+            UInt64(pivot1) + UInt64(pivot4)*UInt64(w4[k1+1]) + UInt64(pivot3)*UInt64(w3[k1+1]) + UInt64(pivot2)*UInt64(w2[k1+1]), arithm)%UInt32;
+        b[k2+1]=Groebner.mod_p(
+            UInt64(pivot2) + UInt64(pivot4)*UInt64(w4[k2+1]) + UInt64(pivot3)*UInt64(w3[k2+1]), arithm)%UInt32
+        b[k3+1]=Groebner.mod_p(
+            UInt64(pivot3) + UInt64(pivot4)*UInt64(w4[k3+1]), arithm)%UInt32
+        b[k4+1]=pivot4
+        if (j<paquet)
+            j+=Int32(4);
+        else
+            reduce_mod!(b,pr,arithm);
+            j=Int32(0);
+        end
+        k=k4+1
+    end
+
+    if last_nn == -1
+        @inbounds for i in (k):(dg-1)
+            b[i+1]=Groebner.mod_p(b[i+1], arithm)
+            iszero(b[i+1]) && continue
+            if (length(gred[i])==0)
+                last_nn=i%Int32;
+                break
+            end
+            pivot=Groebner.mod_p((UInt64(pr)-b[i+1]),arithm)%UInt32;
+            add_mul!(b,pivot,gred[i]);
+            b[i+1]=pivot;
+            if (j<paquet)
+                j+=Int32(1);
+            else
+                reduce_mod!(b,pr,arithm);
+                j=Int32(0);
+            end
+        end
+    end
+
+    if (j>0) 
+        @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
+    else 
+        @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
+    end
+    if (last_nn==-1)
+        @inbounds for ii in 1:(dg-1)
+            if isempty(gred[ii]) && (v[ii+1]!=0)
+                last_nn=ii%Int32;
+                break;
+            end
+        end
     end
     if (last_nn==-1)
         @inbounds for ii in dg:(dv-1)
