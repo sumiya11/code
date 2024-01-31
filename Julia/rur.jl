@@ -974,3 +974,53 @@ function test_param(sys_z, nn)::Vector{Vector{Rational{BigInt}}}
     end;
     return(qq_m);
 end
+
+function prepare_system(sys_z, nn,R)
+    ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
+    C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
+    lls=AbstractAlgebra.gens(C)
+    sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
+    lc=map(u->BigInt(u%31+1),rand(Int, length(lls)-1));
+    lf=lls[length(lls)]
+    sep=Vector{BigInt}()
+    for i in eachindex(lc)
+        lf+=C(lc[i])*lls[i]
+        sep=push!(sep,lc[i])
+    end
+    push!(sys,lf)
+    pr=UInt32(Primes.prevprime(2^nn-1));
+    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+    sys_Int32=convert_to_mpol_UInt32(sys,pr)
+    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+    quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+    g=sys_mod_p(gro,pr);
+    ltg=map(u->u.exp[1],g);
+    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+    i_xw,t_xw=prepare_table_mxi(ltg,q);
+    t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
+    t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
+    ii=Int32(length(i_xw))
+    v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
+    dd=length(v)
+    print("\nSeparating vector ",dd,"(",length(gred),")")
+    ii-=1
+    while (ii>0)
+        v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
+        if (dd==length(v)) 
+            print("\nvariable ",ii," is separating ",length(v))
+            break;
+        else
+            print("\nvariable ",ii," is NOT separating ",length(v))
+        end
+        ii-=1
+    end
+    if (ii>0)
+        ls3=Vector{Symbol}()
+        for i in 1:(ii-1) push!(ls3,ls[i]) end
+        for i in (ii+1):(length(ls)-1) push!(ls3,ls[i]) end
+        push!(ls3,ls[ii])
+        C,ls=polynomial_ring(AbstractAlgebra.ZZ,ls3,ordering=:degrevlex)
+        sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
+    end
+    return(dd,length(gred),sys)
+end

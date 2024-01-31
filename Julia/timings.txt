@@ -92,8 +92,18 @@
 #
 #   computation time over Q : 4137 sec - 2602 jam2 (1804)
 
-# Reimer6 (non shape position)
-# estimate computation time over Q : sec
+# Reimer6 (non shape position but cyclic)
+#   nb vas : 6
+#   dimension : 579
+#   
+# estimate computation time over Q : 12.5 sec (35)
+
+# Reimer7 (non shape position but cyclic)
+#   nb vas : 7
+#   dimension : 2880
+#   Nb primes (28 bit) :
+#   Zp Compputations 28 bit
+# estimate computation time over Q :  sec ()
 
 # phuoc-1 (non cyclic)
 #   nb vas : 8
