@@ -809,9 +809,13 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     gred=[Vector{UInt32}() for i=1:d];
     i=Int32(2);continuer=1;dg=Int32(1);new_i=Int32(1);deg=Int32(0);
     while ((i<d) && (v[i]==0)) i+=1; end
-    if (v[i]!=1) print("\n **** WARNING POSSIBLE NORMALIZATION PROBLEM ****\n") end
     gred[i-1]=Vector{UInt32}(v)
     if (gred[i-1][1]!=0) gred[i-1][1]=pr-gred[i-1][1]; end
+    if (gred[i-1][i]!=1)
+        print("Warning : normalization of _Z ")
+        hom[i-1]=invmod(gred[i-1][i],pr)%UInt32
+        normalize_row!(gred[i-1],hom[i-1],pr,arithm)
+    end
     #T^0 is stored at gred[0] virtually
     index[1]=i-1;
     #gred[dg+i] not used i=0..d-dg
@@ -867,7 +871,7 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
         print("Not in shape position")
     end
     v=Vector{UInt32}(undef,deg)
-    v[1]=w[1];
+    v[1]=w[1]
     @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
     return(v);
 end
