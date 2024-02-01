@@ -879,22 +879,22 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
     return(v);
 end
 
-function biv_general_case(t_v::Vector{Vector{UInt32}},   
+function biv_general(t_v::Vector{Vector{UInt32}},   
                          i_xw::Vector{Vector{Int32}},
                          deg::Int32,
                          gred::Vector{Vector{UInt32}},
                          index::Vector{Int32},
                          hom::Vector{UInt32},
                          dg::Int32,
-                         ii::Int32,    # index of X var.
+                         ii::Int32,
                          pr::UInt32,
-                         arithm)
-    # sepvar is the index of T var.
+                         arithm,
+                         f0)
     sepvar = length(i_xw) % Int32
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
     d=Int32(length(gred))
     v=zeros(UInt32, d)
-    @info "" pack deg d dg ii pr sepvar
+    @info "In biv_general:" deg d dg ii sepvar
     # v = \bar X^1
     if (length(t_v[i_xw[ii][1]])>1)
         v=t_v[i_xw[ii][1]]
@@ -903,13 +903,15 @@ function biv_general_case(t_v::Vector{Vector{UInt32}},
     end
     vv = Vector{Vector{UInt32}}()
     continuer=1;
-    v_copy = copy(v)
+    u = copy(v)
+    R = Nemo.parent(f0)
+    fk = f0
     k = 0
     # Enumerates \bar T^i X^k, where k = 1..D, i = D-k.
     @inbounds while (continuer==1)
         k += 1
         i = 0
-        v = copy(v_copy)
+        v = copy(u)
         while i <= (d-k)
             print("k = $k, i = $i  =>  ")
             w=copy(v)
@@ -921,6 +923,7 @@ function biv_general_case(t_v::Vector{Vector{UInt32}},
             if (new_i<d)
                 println("No relation") 
                 gred[new_i]=Vector{UInt32}(w);
+                if (!(new_i<dg)) dg=Int32(new_i+1); end;
                 index[deg]=Int32(new_i);
                 hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
                 normalize_row!(gred[new_i],hom[new_i],pr,arithm)
@@ -928,15 +931,26 @@ function biv_general_case(t_v::Vector{Vector{UInt32}},
                 # v = \bar T^(i+1) X^k
                 v=mul_var_quo_UInt32(v,sepvar,t_v,i_xw,pr,arithm)
             else
-                println("Relation!") 
+                println("Relation found!") 
                 rel=Vector{UInt32}(undef,deg)
                 rel[1]=w[1]
                 for ell in 2:deg 
                     rel[ell]=Groebner.mod_p((w[index[ell-1]+1]%UInt64)*(hom[index[ell-1]]%UInt64), arithm)%UInt32
                 end;
-                # save the new relation
                 push!(vv, rel)
-                # if X^k is in the staircase
+
+                # Certify
+                # akk = R(...)
+                # fk = Nemo.divexact(fk, gcd(fk, akk))
+                # for h in 0:(k-1)
+                #     akh = R(...)
+                #     akp1 = R(...)
+                #     if k*(k-h)*mod(akk * akh, fk)//(h+1) != mod(akk * akhp1, fk)
+                #         return false, vv
+                #     end
+                # end
+                
+                # X^k is in the staircase, full stop.
                 if i == 0
                     continuer = 0
                 end
@@ -944,12 +958,10 @@ function biv_general_case(t_v::Vector{Vector{UInt32}},
             end;
             i += 1
         end
-        if continuer == 1
-            # v = \bar X^(k+1)
-            v_copy=mul_var_quo_UInt32(v_copy,ii,t_v,i_xw,pr,arithm)
-        end
+        # u = \bar X^(k+1)
+        u=mul_var_quo_UInt32(u,ii,t_v,i_xw,pr,arithm)
     end
-    return vv
+    return true, vv
 end
 
 # @timeit tmr "zdim param" 
@@ -963,7 +975,6 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                                arithm)
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
-    @info "" ii
     v,gred,index,dg,hom=first_variable(t_v,i_xw,ii,pr,arithm)
     push!(res,v);
     C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
@@ -979,15 +990,13 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
         end
     else 
         @inbounds for j in 1:(ii-1)
-            vv=biv_general_case(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
-            flag2 = certify_separating_elem(vv)
-            println(length(vv))
-            println("biv_general_case =\n$vv")
-
-            v1 = vv[1]
-            n1=Nemo.mulmod(ifp,-C(v1),f);
-            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
-
+            flag,vv=biv_general(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm,f)
+            if !flag
+                error("Certification failed")
+                # TODO: go for another separating element..
+            end
+            # n1=Nemo.mulmod(ifp,-C(v1),f);
+            # push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
         end
     end
     return(flag,res)

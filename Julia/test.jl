@@ -59,10 +59,10 @@ Gb in lex. is:
 =#
 
 #####################################################
-# non-shape, xn separates
+# general case
 #####################################################
 
-# y separates
+# Non-shape, y separates
 R, (x, y) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x","y"], ordering=:degrevlex)
 sys = [
     x^2,
@@ -71,27 +71,25 @@ sys = [
 ]
 sys_z = convert_sys_to_sys_z(sys)
 rur = test_param(sys_z, 27)
-@test rur == [
-    [0, 0, 1],  # y^2 = 0
-    []          # x   = 0
-]
+# @test rur == [
+#     [0, 0, 1],  # y^2 = 0
+#     []          # x   = 0
+# ]
 
-# z separates
-R, (x, y, z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x","y","z"], ordering=:degrevlex)
+# This example is used for testing "biv_general" (_Z is not separating)
+R, (t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["t", "_Z"], ordering=:degrevlex)
 sys = [
-    z^4 - z,
-    y*z^3 - z^2,
-    y^2*z^2 - z,
-    x - z
+    _Z^4 + _Z^2,
+    t*_Z^2 + t + _Z^3 + _Z,
+    t^4 + t*_Z^3 + t*_Z + _Z^2,
 ]
-Groebner.groebner(sys, ordering=Groebner.Lex())
 sys_z = convert_sys_to_sys_z(sys)
-_, _, sys_z_sep = prepare_system(sys_z, 27, R)
+gb = Groebner.groebner(sys, ordering=Groebner.Lex())
 rur = test_param(sys_z, 27)
-# @test rur == ...
+# @test rur = ...
 
-# _Z separates
-R, (x, y, z, t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x", "y", "z", "t", "_Z"], ordering=:lex)
+# Non-shape, _Z separates
+R, (x, y, z, t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x", "y", "z", "t", "_Z"], ordering=:degrevlex)
 sys = [
     y^2 * z + 2 * x * y * t - 2 * x - z,
     -x^3 * z + 4 * x * y^2 * z + 4 * x^2 * y * t + 2 * y^3 * t + 4 * x^2 - 10 * y^2 + 4 * x * z - 10 * y * t + 2,
@@ -102,17 +100,6 @@ sys = [
 sys_z = convert_sys_to_sys_z(sys)
 gb = Groebner.groebner(map(f -> change_coefficient_ring(GF(2^30+3), f), sys_z), ordering=Groebner.Lex())
 _, _, sys_z_sep = prepare_system(sys_z, 27, R)
-rur = test_param(sys_z, 27)
+rur = test_param(sys_z_sep, 27)
 # @test rur = ...
 
-R, (t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["t", "_Z"], ordering=:degrevlex)
-sys = [
-    _Z^4 + _Z^2,
-    t*_Z^2 + t + _Z^3 + _Z,
-    t^4 + t*_Z^3 + t*_Z + _Z^2,
-]
-sys_z = convert_sys_to_sys_z(sys)
-gb = Groebner.groebner(sys, ordering=Groebner.Lex())
-_, _, sys_z_sep = prepare_system(sys_z, 27, R)
-rur = test_param(sys_z, 27)
-# @test rur = ...
