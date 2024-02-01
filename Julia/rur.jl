@@ -856,7 +856,10 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
                          gred::Vector{Vector{UInt32}},
                          index::Vector{Int32},
                          hom::Vector{UInt32},
-                         dg::Int32,ii::Int32,pr::UInt32, arithm)
+                         dg::Int32,
+                         ii::Int32,
+                         pr::UInt32,
+                         arithm)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
     d=Int32(length(gred))
     w=zeros(UInt32, d)
@@ -876,6 +879,79 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
     return(v);
 end
 
+function biv_general_case(t_v::Vector{Vector{UInt32}},   
+                         i_xw::Vector{Vector{Int32}},
+                         deg::Int32,
+                         gred::Vector{Vector{UInt32}},
+                         index::Vector{Int32},
+                         hom::Vector{UInt32},
+                         dg::Int32,
+                         ii::Int32,    # index of X var.
+                         pr::UInt32,
+                         arithm)
+    # sepvar is the index of T var.
+    sepvar = length(i_xw) % Int32
+    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
+    d=Int32(length(gred))
+    v=zeros(UInt32, d)
+    @info "" pack deg d dg ii pr sepvar
+    # v = \bar X^1
+    if (length(t_v[i_xw[ii][1]])>1)
+        v=t_v[i_xw[ii][1]]
+    else
+        v[t_v[i_xw[ii][1]][1]]=UInt32(1)
+    end
+    vv = Vector{Vector{UInt32}}()
+    continuer=1;
+    v_copy = copy(v)
+    k = 0
+    # Enumerates \bar T^i X^k, where k = 1..D, i = D-k.
+    @inbounds while (continuer==1)
+        k += 1
+        i = 0
+        v = copy(v_copy)
+        while i <= (d-k)
+            print("k = $k, i = $i  =>  ")
+            w=copy(v)
+            #reduce with gred[0]
+            if (w[1]!=0) w[1]=pr-w[1]; end
+            #reduce with gred[i] i=1..dg-1
+            #new_i = possible position to store the reduced vector in gred
+            new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+            if (new_i<d)
+                println("No relation") 
+                gred[new_i]=Vector{UInt32}(w);
+                index[deg]=Int32(new_i);
+                hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
+                normalize_row!(gred[new_i],hom[new_i],pr,arithm)
+                deg+=Int32(1);
+                # v = \bar T^(i+1) X^k
+                v=mul_var_quo_UInt32(v,sepvar,t_v,i_xw,pr,arithm)
+            else
+                println("Relation!") 
+                rel=Vector{UInt32}(undef,deg)
+                rel[1]=w[1]
+                for ell in 2:deg 
+                    rel[ell]=Groebner.mod_p((w[index[ell-1]+1]%UInt64)*(hom[index[ell-1]]%UInt64), arithm)%UInt32
+                end;
+                # save the new relation
+                push!(vv, rel)
+                # if X^k is in the staircase
+                if i == 0
+                    continuer = 0
+                end
+                break
+            end;
+            i += 1
+        end
+        if continuer == 1
+            # v = \bar X^(k+1)
+            v_copy=mul_var_quo_UInt32(v_copy,ii,t_v,i_xw,pr,arithm)
+        end
+    end
+    return vv
+end
+
 # @timeit tmr "zdim param" 
 function coeff_mod_p(x::Nemo.fpFieldElem,pr::UInt32)::Int32
     return(Int32(Nemo.data(x)))
@@ -887,6 +963,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                                arithm)
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
+    @info "" ii
     v,gred,index,dg,hom=first_variable(t_v,i_xw,ii,pr,arithm)
     push!(res,v);
     C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
@@ -901,8 +978,17 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
             push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
         end
     else 
-        print("Not in shape position");
-        flag=false;
+        @inbounds for j in 1:(ii-1)
+            vv=biv_general_case(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
+            flag2 = certify_separating_elem(vv)
+            println(length(vv))
+            println("biv_general_case =\n$vv")
+
+            v1 = vv[1]
+            n1=Nemo.mulmod(ifp,-C(v1),f);
+            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
+
+        end
     end
     return(flag,res)
 end
