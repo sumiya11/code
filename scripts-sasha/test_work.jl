@@ -19,14 +19,14 @@ pkg"status"
 
 using Primes,HostCPUFeatures,AbstractAlgebra,TimerOutputs
 using BenchmarkTools
-include("C:\\data\\projects\\gbgb\\Groebner.jl\\src\\Groebner.jl")
+include("../../Groebner.jl/src/Groebner.jl")
 
 include((@__DIR__)*"/../Julia/rur.jl")
 # include((@__DIR__)*"/rur_old.jl")
 
 macro my_profview(ex)
     :((VSCodeServer.Profile).clear();
-        VSCodeServer.Profile.init(n=10^8, delay=0.0001);
+        VSCodeServer.Profile.init(n=10^8, delay=0.01);
     VSCodeServer.Profile.start_timer();
         $ex;
     VSCodeServer.Profile.stop_timer();
@@ -37,10 +37,9 @@ end
 
 nn=27;
 # tmr = TimerOutputs.TimerOutput()
-sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
-# include("../Data/Systems/eco10.jl");
+# sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
+include("../Data/Systems/eco11.jl");
 sys_z = convert_sys_to_sys_z(sys);
-
 
 _gauss_reduct_jam[] = true
 @time rur_jam = test_param(sys_z, nn);
