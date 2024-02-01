@@ -5,7 +5,7 @@ pkg"status"
 using TimerOutputs
 tmr = TimerOutputs.TimerOutput()
 
-include("C:\\data\\projects\\gbgb\\Groebner.jl\\src\\Groebner.jl")
+include("../../Groebner.jl/src/Groebner.jl")
 include("rur.jl")
 
 using AbstractAlgebra

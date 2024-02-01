@@ -8,7 +8,7 @@ noon6
 noon7 (processing...)
   27-bit primes:    - 
   Julia:            - sec
-  Maple zds:        - sec
+  Maple zds:        4959 sec
 
 katsura11
   27-bit primes:    455

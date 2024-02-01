@@ -495,8 +495,8 @@ end
 #this element is the opposite element of the true pivot
 #rows are normalized
 
-# Run "_gauss_reduct_jam[] = false" to disable jamming
-const _gauss_reduct_jam = Ref{Bool}(true)
+# Run "_gauss_reduct_jam[] = 1" to disable jamming
+const _gauss_reduct_jam = Ref{Int}(4)
 
 # @timeit tmr "gred" 
 function gauss_reduct(
@@ -507,7 +507,9 @@ function gauss_reduct(
         paquet::Int32,
         pr::UInt32,
         arithm)
-    if paquet > 1 && _gauss_reduct_jam[]
+    if paquet > 3 && _gauss_reduct_jam[] == 4
+        return gauss_reduct_jam4(v,gred,dg,dv,paquet,pr,arithm)
+    elseif  paquet > 1 && _gauss_reduct_jam[] == 2
         return gauss_reduct_jam2(v,gred,dg,dv,paquet,pr,arithm)
     end
     i=Int32(0)
@@ -686,36 +688,38 @@ function gauss_reduct_jam4(
     last_nn=Int32(-1)
     pivot=UInt32(0)
     b=[UInt64(v[i]) for i=1:dv]
+    # the largest number not greater than (dg-1) and divisible by 4
     ub4 = (dg-1) & xor(typemax(Int), 3)
     k = 1
+    # k repeatedly increases by exactly 4
     @inbounds while k <= ub4
-        # Find the non-empty reducers
-        k1 = k
-        while k1 <= ub4 && isempty(gred[k1])
-            k1 += 1
+        k1,k2,k3,k4 = k,k+1,k+2,k+3
+        w1,w2,w3,w4 = gred[k1],gred[k2],gred[k3],gred[k4]
+        # If any of the reducers are empty, then default to scalar iteration
+        if isempty(w1) || isempty(w2) || isempty(w3) || isempty(w4)
+            for ki in k:(k+3)
+                b[ki+1]=Groebner.mod_p(b[ki+1], arithm)
+                iszero(b[ki+1]) && continue
+                if (length(gred[ki])==0)
+                    last_nn=ki%Int32;
+                    break
+                end
+                pivot=Groebner.mod_p((UInt64(pr)-b[ki+1]),arithm)%UInt32;
+                add_mul!(b,pivot,gred[ki]);
+                b[ki+1]=pivot;
+                if (j<paquet)
+                    j+=Int32(1);
+                else
+                    reduce_mod!(b,pr,arithm);
+                    j=Int32(0);
+                end
+            end
+            (last_nn != -1) && break    # new pivot found, break out
+            k=k+4
+            continue
         end
-        k1 > ub4 && break
-        #
-        k2 = k1+1
-        while k2 <= ub4 && isempty(gred[k2])# && iszero(b[k2+1])
-            k2 += 1
-        end
-        k2 > ub4 && break
-        #
-        k3 = k2+1
-        while k3 <= ub4 && isempty(gred[k3])# && iszero(b[k3+1])
-            k3 += 1
-        end
-        k3 > ub4 && break
-        #
-        k4 = k3+1
-        while k4 <= ub4 && isempty(gred[k4])# && iszero(b[k4+1])
-            k4 += 1
-        end
-        k4 > ub4 && break
-        # @assert 1 <= k1 < k2 < k3 < k4 <= ub4 
         # From this point, w1, w2, w3, w4 are non-empty.
-        w1, w2, w3, w4 = gred[k1], gred[k2], gred[k3], gred[k4]
+        # Jam!
         b[k1+1]=Groebner.mod_p(b[k1+1], arithm)
         b[k2+1]=Groebner.mod_p(b[k2+1], arithm)
         b[k3+1]=Groebner.mod_p(b[k3+1], arithm)
@@ -727,7 +731,6 @@ function gauss_reduct_jam4(
             b[k3+1] + UInt64(pivot1)*w1[k3+1] + UInt64(pivot2)*w2[k3+1], arithm))%UInt32;
         pivot4=(UInt64(pr)-Groebner.mod_p(
             b[k4+1] + UInt64(pivot1)*w1[k4+1] + UInt64(pivot2)*w2[k4+1] + UInt64(pivot3)*w3[k4+1], arithm))%UInt32;
-        # Jam!
         add_mul_jam4!(b, pivot1, w1, pivot2, w2, pivot3, w3, pivot4, w4)
         b[k1+1]=Groebner.mod_p(
             UInt64(pivot1) + UInt64(pivot4)*UInt64(w4[k1+1]) + UInt64(pivot3)*UInt64(w3[k1+1]) + UInt64(pivot2)*UInt64(w2[k1+1]), arithm)%UInt32;
@@ -742,9 +745,10 @@ function gauss_reduct_jam4(
             reduce_mod!(b,pr,arithm);
             j=Int32(0);
         end
-        k=k4+1
+        k=k+4
     end
 
+    # the scalar tail. At most 3 iterations.
     if last_nn == -1
         @inbounds for i in (k):(dg-1)
             b[i+1]=Groebner.mod_p(b[i+1], arithm)
@@ -769,14 +773,6 @@ function gauss_reduct_jam4(
         @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
     else 
         @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
-    end
-    if (last_nn==-1)
-        @inbounds for ii in 1:(dg-1)
-            if isempty(gred[ii]) && (v[ii+1]!=0)
-                last_nn=ii%Int32;
-                break;
-            end
-        end
     end
     if (last_nn==-1)
         @inbounds for ii in dg:(dv-1)
