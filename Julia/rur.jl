@@ -72,15 +72,26 @@ end
 ## then returns the greatest variable
 ## that appear in the divisor
 
-function divides(pp1::PP,pp2::PP)
-    tmp=pp1.data-pp2.data
-    i=1
-    var=0
-    while ((i<=length(tmp)) && (tmp[i]>=0))
-        if (tmp[i]>0) var=i end
-        i=i+1
+@inline function divides(pp1::PP,pp2::PP)
+    # tmp=pp1.data-pp2.data
+    # i=1
+    # var=0
+    # while ((i<=length(tmp)) && (tmp[i]>=0))
+    #     if (tmp[i]>0) var=i end
+    #     i=i+1
+    # end
+    # return((i>length(tmp)),var)
+    a, b = pp1.data, pp2.data
+    var = 0
+    @inbounds for j in 1:length(a)
+        if a[j] > b[j]
+            var = j
+        end
+        if a[j] < b[j]
+            return false, var
+        end
     end
-    return((i>length(tmp)),var)
+    return true, var
 end
 
 # Interface with AbstractAlgebra
