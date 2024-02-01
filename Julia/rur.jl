@@ -812,7 +812,7 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     gred[i-1]=Vector{UInt32}(v)
     if (gred[i-1][1]!=0) gred[i-1][1]=pr-gred[i-1][1]; end
     if (gred[i-1][i]!=1)
-        print("Warning : normalization of _Z ")
+        print("\nWarning : normalization of _Z ")
         hom[i-1]=invmod(gred[i-1][i],pr)%UInt32
         normalize_row!(gred[i-1],hom[i-1],pr,arithm)
     end
