@@ -45,11 +45,6 @@ sys_z = convert_sys_to_sys_z(sys);
 _gauss_reduct_jam[] = true
 @time rur_jam = test_param(sys_z, nn);
 
-sys_lex = Groebner.eco7(k=QQ, ordering=:lex);
-gb_lex = Groebner.groebner(sys_lex);
-gb_drl = Groebner.groebner(sys_lex, ordering=Groebner.DegRevLex());
-Groebner.normalform(gb_drl, gb_lex[1], ordering=Groebner.DegRevLex())
-
 begin
     # reset_timer!(tmr)
     _gauss_reduct_jam[] = false
