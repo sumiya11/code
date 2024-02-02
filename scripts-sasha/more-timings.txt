@@ -1,0 +1,57 @@
+
+henrion6
+  scalar        35 sec
+  jam2          34 sec
+  jam4          35 sec
+
+noon6
+  scalar        71 sec
+  jam2          66 sec
+  jam4          62 sec
+
+noon7
+  killed
+
+katsura10
+  scalar        28 sec
+  jam2          27 sec
+  jam4          29 sec
+
+katsura11
+  scalar        590 sec
+  jam2          445 sec
+  jam4          444 sec
+
+cp_d_3_n_6_p_6
+  scalar        155 sec
+  jam2          140 sec
+  jam4          132 sec
+
+cp_d_3_n_6_p_2
+  scalar        214 sec
+  jam2          217 sec
+  jam4          211 sec
+
+chandra9
+  scalar        29 sec
+  jam2          26 sec
+  jam4          25 sec
+
+chandra10
+  scalar        214 sec
+  jam2          231 sec
+  jam4          217 sec
+
+Julia Version 1.9.3
+Commit bed2cd540a1 (2023-08-24 14:43 UTC)
+Build Info:
+  Official https://julialang.org/ release
+Platform Info:
+  OS: Linux (x86_64-linux-gnu)
+  CPU: 8 × Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-14.0.6 (ORCJIT, skylake)
+  Threads: 1 on 8 virtual cores
+Environment:
+  LD_LIBRARY_PATH = :/usr/local/lib:/usr/local/lib

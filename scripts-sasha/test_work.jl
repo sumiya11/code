@@ -19,6 +19,7 @@ pkg"status"
 
 using Primes,HostCPUFeatures,AbstractAlgebra,TimerOutputs
 using BenchmarkTools
+# using JET
 include("../../Groebner.jl/src/Groebner.jl")
 
 include((@__DIR__)*"/../Julia/rur.jl")
@@ -26,7 +27,7 @@ include((@__DIR__)*"/../Julia/rur.jl")
 
 macro my_profview(ex)
     :((VSCodeServer.Profile).clear();
-        VSCodeServer.Profile.init(n=10^8, delay=0.01);
+        VSCodeServer.Profile.init(n=10^8, delay=0.0001);
     VSCodeServer.Profile.start_timer();
         $ex;
     VSCodeServer.Profile.stop_timer();
@@ -36,51 +37,95 @@ end
 ###
 
 nn=27;
-# tmr = TimerOutputs.TimerOutput()
-# sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
-include("../Data/Systems/eco11.jl");
+tmr = TimerOutputs.TimerOutput()
+sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
+#include("../Data/Systems/henrion6.jl");
 sys_z = convert_sys_to_sys_z(sys);
 
-_gauss_reduct_jam[] = true
+_gauss_reduct_jam[] = 4
+# s = @report_opt target_modules=(Main,) test_param(sys_z, nn)
+
 @time rur_jam = test_param(sys_z, nn);
+@my_profview rur_jam = test_param(sys_z, nn);
 
 begin
-    # reset_timer!(tmr)
-    _gauss_reduct_jam[] = false
+    reset_timer!(tmr)
+    _gauss_reduct_jam[] = 4
+    @time rur_jam_4 = test_param(sys_z, nn);
+    tmr
+end
+begin
+    reset_timer!(tmr)
+    _gauss_reduct_jam[] = 2
+    @time rur_jam_2 = test_param(sys_z, nn);
+    tmr
+end
+begin
+    reset_timer!(tmr)
+    _gauss_reduct_jam[] = 1
     @time rur = test_param(sys_z, nn);
-    # tmr
-end;
-rur == rur_jam
+    tmr
+end
+rur == rur_jam_2 == rur_jam_4
 
 ###########################################
 ###########################################
 
-function foo!(x,a1,v1,a2,v2)
+function foo!(x,a1,v1,a2,v2,a3,v3,a4,v4)
     add_mul!(x,a1,v1)
     add_mul!(x,a2,v2)
+    add_mul!(x,a3,v3)
+    add_mul!(x,a4,v4)
 end
-function woo!(x,a1,v1,a2,v2)
-    add_mul_jam2!(x,a1,v1,a2,v2)
+function woo!(x,a1,v1,a2,v2,a3,v3,a4,v4)
+    add_mul_jam4!(x,a1,v1,a2,v2,a3,v3,a4,v4)
 end
 
-n = 5_000
-@btime foo!(x,a1,v1,a2,v2) setup=begin
+n = 1_000_000
+@btime foo!(x,a1,v1,a2,v2,a3,v3,a4,v4) setup=begin
     x = rand(UInt64, $n)
     a1 = rand(UInt32)
     v1 = rand(UInt32, $n)
     a2 = rand(UInt32)
     v2 = rand(UInt32, $n)
+    a3 = rand(UInt32)
+    v3 = rand(UInt32, $n)
+    a4 = rand(UInt32)
+    v4 = rand(UInt32, $n)
 end
 #  1.700 μs (0 allocations: 0 bytes)
 
-@btime woo!(x,a1,v1,a2,v2) setup=begin
+@btime woo!(x,a1,v1,a2,v2,a3,v3,a4,v4) setup=begin
     x = rand(UInt64, $n)
     a1 = rand(UInt32)
     v1 = rand(UInt32, $n)
     a2 = rand(UInt32)
     v2 = rand(UInt32, $n)
+    a3 = rand(UInt32)
+    v3 = rand(UInt32, $n)
+    a4 = rand(UInt32)
+    v4 = rand(UInt32, $n)
 end
 #  1.280 μs (0 allocations: 0 bytes)
+
+x = rand(UInt64, n)
+a1 = rand(UInt32)
+v1 = rand(UInt32, n)
+a2 = rand(UInt32)
+v2 = rand(UInt32, n)
+a3 = rand(UInt32)
+v3 = rand(UInt32, n)
+a4 = rand(UInt32)
+v4 = rand(UInt32, n)
+
+io = open((@__DIR__)*"/add_mul_jam4_llvm.txt", "w")
+code_llvm(io, add_mul_jam4!, map(typeof, (x,a1,v1,a2,v2,a3,v3,a4,v4)), debuginfo=:none)
+close(io)
+
+io = open((@__DIR__)*"/add_mul_jam4_native.txt", "w")
+code_native(io, add_mul_jam4!, map(typeof, (x,a1,v1,a2,v2,a3,v3,a4,v4)), debuginfo=:none)
+close(io)
+
 
 ###########################################
 ###########################################
