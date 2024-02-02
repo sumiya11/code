@@ -796,17 +796,20 @@ function first_variable(t_v::Vector{Vector{UInt32}},
                         arithm)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
     d=Int32(length(i_xw[1])) 
+    free_set=[append!([UInt32(1)],[UInt32(0) for i=2:d])]
     if (length(t_v[i_xw[ii][1]])>1)
         v=t_v[i_xw[ii][1]]
     else
         v = zeros(UInt32, d)
         v[t_v[i_xw[ii][1]][1]]=UInt32(1)
     end
+    push!(free_set,v)
     # index[deg]=pos (pos=position in the gred with the convention that 0 is not stored)
     index=[Int32(i) for i=1:d];
     # normalization values
     hom=[UInt32(1) for i=1:d];
     gred=[Vector{UInt32}() for i=1:d];
+
     i=Int32(2);continuer=1;dg=Int32(1);new_i=Int32(1);deg=Int32(0);
     while ((i<d) && (v[i]==0)) i+=1; end
     gred[i-1]=Vector{UInt32}(v)
@@ -832,6 +835,7 @@ function first_variable(t_v::Vector{Vector{UInt32}},
         #new_i = possible position to store the reduced vector in gred
         new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
         if (new_i<d)
+            push!(free_set,v)
             gred[new_i]=Vector{UInt32}(w);
             if (!(new_i<dg)) dg=Int32(new_i+1); end;
             index[deg]=Int32(new_i);
@@ -847,8 +851,99 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     v[1]=w[1];
 #old    @inbounds for i in 2:deg v[i]=w[index[i-1]+1]; end;
     @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
-    return(v,gred,index,dg,hom)
+    return(v,gred,index,dg,hom,free_set)
 end
+
+function biv_lex(t_v::Vector{Vector{UInt32}},
+                 i_xw::Vector{Vector{Int32}},
+                 gred::Vector{Vector{UInt32}},
+                 index::Vector{Int32},
+                 dg::Int32,
+                 hom::Vector{UInt32},
+                 free_set::Vector{Vector{UInt32}},
+                 ii::Int32,
+                 pr::UInt32,
+                 arithm)
+    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
+    d=Int32(length(i_xw[1])) 
+    print("\n Dimension : ",d);
+    new_free_set=copy(free_set);
+    deg=length(free_set);
+    new_generators=Vector{Vector{Int32}}()
+    new_monomial_free_set=[[Int32(i-1),Int32(0)] for i=1:deg]
+    new_monomial_basis=copy(new_monomial_free_set);
+    new_leading_monomials=Vector{Vector{Int32}}()
+    while (length(new_free_set)>0)
+        tmp_set=Vector{Vector{UInt32}}()
+        tmp_mon_set=Vector{Vector{Int32}}()
+        @inbounds for j in eachindex(new_free_set)
+            curr_mon=copy(new_monomial_free_set[j])
+            curr_mon[2]+=Int32(1)
+            v=mul_var_quo_UInt32(new_free_set[j],ii,t_v,i_xw,pr,arithm) 
+            w=Vector{UInt32}(v)
+            new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+            if (new_i<d)
+                push!(tmp_set,v)
+                push!(tmp_mon_set,curr_mon);
+                gred[new_i]=Vector{UInt32}(w);
+                if (!(new_i<dg)) dg=Int32(new_i+1); end;
+                index[deg]=Int32(new_i);
+                hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
+                normalize_row!(gred[new_i],hom[new_i],pr,arithm)
+                deg+=Int32(1);
+            else
+                v=Vector{UInt32}(undef,deg)
+                v[1]=w[1];
+                @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
+                push!(new_generators,copy(v))
+                push!(new_leading_monomials,copy(curr_mon));
+                break;
+            end;
+        end;
+        new_free_set=copy(tmp_set)
+        new_monomial_free_set=copy(tmp_mon_set)
+        append!(new_monomial_basis,copy(tmp_mon_set))
+    end
+    return(new_monomial_basis,new_leading_monomials,new_generators);
+end
+
+
+function convert_biv_lex_2_biv_pol(n_g,m_b,lt_g,pr)
+    l_base=Vector{Vector{Vector{Int32}}}()
+    for kk in eachindex(_n_g)
+         pp=_n_g[kk]
+         p_mat=Vector{Vector{UInt32}}()
+         ldeg2=Int32(0)
+         lco=[UInt32(0) for i=1:length(m_b)]
+         for i in eachindex(pp)
+                deg2=_m_b[i][2]
+                if deg2>ldeg2
+                    push!(p_mat,lco)
+                    for j in (ldeg2+1):(deg2-1)
+                        push!(p_math,Vector{UInt32}())
+                    end
+                    lco=[UInt32(0) for j=1:length(m_b)]
+                    ldeg2=deg2
+                end
+                lco[_m_b[i][1]+1]=pp[i]
+         end
+         deg2=lt_g[kk][2]
+         if (deg2==ldeg2) 
+            lco[lt_g[kk][1]+1]=UInt32(1)
+         else 
+            push!(p_mat,lco);
+            for i in (ldeg2+1):(deg2-1)
+                        push!(p_math,Vector{UInt32}())
+            end
+            lco=[UInt32(0) for i=1:length(m_b)]
+            lco[lt_g[kk][1]+1]=UInt32(1)
+         end
+         push!(p_mat,lco);
+         push!(l_base,p_mat)
+    end
+    return(l_base)
+end
+
 
 function biv_shape_lemma(t_v::Vector{Vector{UInt32}},   
                          i_xw::Vector{Vector{Int32}},
@@ -975,12 +1070,13 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                                arithm)
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
-    v,gred,index,dg,hom=first_variable(t_v,i_xw,ii,pr,arithm)
+    v,gred,index,dg,hom,free_set=first_variable(t_v,i_xw,ii,pr,arithm)
     push!(res,v);
     C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
     f=C(v)+_Z^(length(v));
-    push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
     ifp=Nemo.derivative(f)
+    f=f/Nemo.gcd(f,ifp)
+    push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
     flag=true;
     if length(v)==length(gred)
         @inbounds for j in 1:(ii-1)
@@ -1121,5 +1217,5 @@ function prepare_system(sys_z, nn,R)
         C,ls=polynomial_ring(AbstractAlgebra.ZZ,ls3,ordering=:degrevlex)
         sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
     end
-    return(dd,length(gred),sys)
+    return(dd,length(gred),sys,AbstractAlgebra.symbols(C))
 end
