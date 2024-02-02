@@ -19,6 +19,7 @@ pkg"status"
 
 using Primes,HostCPUFeatures,AbstractAlgebra,TimerOutputs
 using BenchmarkTools
+# using JET
 include("../../Groebner.jl/src/Groebner.jl")
 
 include((@__DIR__)*"/../Julia/rur.jl")
@@ -38,10 +39,12 @@ end
 nn=27;
 tmr = TimerOutputs.TimerOutput()
 sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
-include("../Data/Systems/henrion6.jl");
+#include("../Data/Systems/henrion6.jl");
 sys_z = convert_sys_to_sys_z(sys);
 
 _gauss_reduct_jam[] = 4
+# s = @report_opt target_modules=(Main,) test_param(sys_z, nn)
+
 @time rur_jam = test_param(sys_z, nn);
 @my_profview rur_jam = test_param(sys_z, nn);
 
