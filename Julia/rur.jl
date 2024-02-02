@@ -496,7 +496,7 @@ end
 #rows are normalized
 
 # Run "_gauss_reduct_jam[] = 1" to disable jamming
-const _gauss_reduct_jam = Ref{Int}(4)
+const _gauss_reduct_jam = Ref{Int}(1)
 
 # @timeit tmr "gred" 
 function gauss_reduct(
@@ -873,7 +873,6 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
                  arithm)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
     d=Int32(length(i_xw[1])) 
-    print("\n Dimension : ",d);
     new_free_set=copy(free_set);
     deg=length(free_set);
     new_generators=Vector{Vector{Int32}}()
@@ -917,13 +916,13 @@ end
 
 function convert_biv_lex_2_biv_pol(n_g,m_b,lt_g,pr)
     l_base=Vector{Vector{Vector{Int32}}}()
-    for kk in eachindex(_n_g)
-         pp=_n_g[kk]
+    for kk in eachindex(n_g)
+         pp=n_g[kk]
          p_mat=Vector{Vector{UInt32}}()
          ldeg2=Int32(0)
          lco=[UInt32(0) for i=1:length(m_b)]
          for i in eachindex(pp)
-                deg2=_m_b[i][2]
+                deg2=m_b[i][2]
                 if deg2>ldeg2
                     push!(p_mat,lco)
                     for j in (ldeg2+1):(deg2-1)
@@ -932,7 +931,7 @@ function convert_biv_lex_2_biv_pol(n_g,m_b,lt_g,pr)
                     lco=[UInt32(0) for j=1:length(m_b)]
                     ldeg2=deg2
                 end
-                lco[_m_b[i][1]+1]=pp[i]
+                lco[m_b[i][1]+1]=pp[i]
          end
          deg2=lt_g[kk][2]
          if (deg2==ldeg2) 
@@ -981,91 +980,6 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
     return(v);
 end
 
-function biv_general(t_v::Vector{Vector{UInt32}},   
-                         i_xw::Vector{Vector{Int32}},
-                         deg::Int32,
-                         gred::Vector{Vector{UInt32}},
-                         index::Vector{Int32},
-                         hom::Vector{UInt32},
-                         dg::Int32,
-                         ii::Int32,
-                         pr::UInt32,
-                         arithm,
-                         f0)
-    sepvar = length(i_xw) % Int32
-    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
-    d=Int32(length(gred))
-    v=zeros(UInt32, d)
-    @info "In biv_general:" deg d dg ii sepvar
-    # v = \bar X^1
-    if (length(t_v[i_xw[ii][1]])>1)
-        v=t_v[i_xw[ii][1]]
-    else
-        v[t_v[i_xw[ii][1]][1]]=UInt32(1)
-    end
-    vv = Vector{Vector{UInt32}}()
-    continuer=1;
-    u = copy(v)
-    R = Nemo.parent(f0)
-    fk = f0
-    k = 0
-    # Enumerates \bar T^i X^k, where k = 1..D, i = D-k.
-    @inbounds while (continuer==1)
-        k += 1
-        i = 0
-        v = copy(u)
-        while i <= (d-k)
-            print("k = $k, i = $i  =>  ")
-            w=copy(v)
-            #reduce with gred[0]
-            if (w[1]!=0) w[1]=pr-w[1]; end
-            #reduce with gred[i] i=1..dg-1
-            #new_i = possible position to store the reduced vector in gred
-            new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
-            if (new_i<d)
-                println("No relation") 
-                gred[new_i]=Vector{UInt32}(w);
-                if (!(new_i<dg)) dg=Int32(new_i+1); end;
-                index[deg]=Int32(new_i);
-                hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
-                normalize_row!(gred[new_i],hom[new_i],pr,arithm)
-                deg+=Int32(1);
-                # v = \bar T^(i+1) X^k
-                v=mul_var_quo_UInt32(v,sepvar,t_v,i_xw,pr,arithm)
-            else
-                println("Relation found!") 
-                rel=Vector{UInt32}(undef,deg)
-                rel[1]=w[1]
-                for ell in 2:deg 
-                    rel[ell]=Groebner.mod_p((w[index[ell-1]+1]%UInt64)*(hom[index[ell-1]]%UInt64), arithm)%UInt32
-                end;
-                push!(vv, rel)
-
-                # Certify
-                # akk = R(...)
-                # fk = Nemo.divexact(fk, gcd(fk, akk))
-                # for h in 0:(k-1)
-                #     akh = R(...)
-                #     akp1 = R(...)
-                #     if k*(k-h)*mod(akk * akh, fk)//(h+1) != mod(akk * akhp1, fk)
-                #         return false, vv
-                #     end
-                # end
-                
-                # X^k is in the staircase, full stop.
-                if i == 0
-                    continuer = 0
-                end
-                break
-            end;
-            i += 1
-        end
-        # u = \bar X^(k+1)
-        u=mul_var_quo_UInt32(u,ii,t_v,i_xw,pr,arithm)
-    end
-    return true, vv
-end
-
 # @timeit tmr "zdim param" 
 function coeff_mod_p(x::Nemo.fpFieldElem,pr::UInt32)::Int32
     return(Int32(Nemo.data(x)))
@@ -1078,30 +992,45 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
     v,gred,index,dg,hom,free_set=first_variable(t_v,i_xw,ii,pr,arithm)
-    push!(res,v);
     C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
     f=C(v)+_Z^(length(v));
     ifp=Nemo.derivative(f)
     f=f/Nemo.gcd(f,ifp)
+    ifp=Nemo.derivative(f)
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
     flag=true;
-    if length(v)==length(gred)
+#    if length(v)==length(gred)
+#        @inbounds for j in 1:(ii-1)
+#            v1=biv_shape_lemma(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
+#            n1=Nemo.mulmod(ifp,-C(v1),f);
+#            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
+#        end
+#    else 
+    
         @inbounds for j in 1:(ii-1)
-            v1=biv_shape_lemma(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
-            n1=Nemo.mulmod(ifp,-C(v1),f);
-            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
-        end
-    else 
-        @inbounds for j in 1:(ii-1)
-            flag,vv=biv_general(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm,f)
-            if !flag
-                error("Certification failed")
-                # TODO: go for another separating element..
+            m_b,lt_b,n_g=biv_lex(t_v,i_xw,copy(gred),copy(index),copy(dg),copy(hom),copy(free_set),Int32(j),pr,arithm);
+            bl=convert_biv_lex_2_biv_pol(n_g,m_b,lt_b,pr)
+            s1=C([Int32(0)])
+            s0=C([Int32(0)])
+            pro=C([Int32(1)])
+            ft=C(f)
+            @inbounds for i in 1:length(bl)
+                d1=length(bl[i])-1
+                lc1=-d1*C(bl[i][d1+1])
+                co0=C(bl[i][d1])
+                f2=Nemo.gcd(ft,lc1)
+                f1=f/f2
+                s1+=Nemo.mulmod(lc1,pro,f)
+                s0+=Nemo.mulmod(co0,pro,f)
+                pro*=f1
+                ft=f2
             end
-            # n1=Nemo.mulmod(ifp,-C(v1),f);
-            # push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
+            is1=Nemo.invmod(s1,f)
+            s0=Nemo.mulmod(s0,is1,f)
+            s0=Nemo.mulmod(s0,ifp,f)
+            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(s0))))
         end
-    end
+#    end
     return(flag,res)
 end
 

@@ -88,7 +88,7 @@
 #   size coeffs param in Q : 400 31 bit primes 
 #   ZP computations 27 bits
 #
-#   computation time over Q : 250 sec  - 212 jam2 (195) [252]
+#   computation time over Q : 250 sec  - 212 jam2 (180 *) [252]
 
 # katsura 12
 #   Shape position
@@ -130,7 +130,7 @@
 #   dimension : 4022
 #   size coeffs param in Q : 753 31 bit primes 
 #   ZP computations 27 bits
-# computation time over Q : 8000 sec () [1730]
+# computation time over Q : 8000 sec (2793) [1730]
 
 
 #Name           ZDS           
