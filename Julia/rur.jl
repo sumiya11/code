@@ -334,10 +334,14 @@ function _mul_var_quo_UInt32(v::Vector{UInt32},
                         t_v::Vector{Vector{UInt32}},
                         i_xw::Vector{Vector{Int32}},
                         pr::UInt32,
-                        arithm)
+                        arithm,
+                        vv::Vector{UInt64})  # buffer
     dim=length(v)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
-    vv=zeros(UInt64, dim)
+    resize!(vv, dim)
+    @inbounds for i in 1:dim
+        vv[i] = zero(UInt64)
+    end
     continuer=true
     @inbounds for j=1:dim
         iszero(v[j]) && continue
@@ -362,8 +366,9 @@ function mul_var_quo_UInt32(v::Vector{UInt32},
                         t_v::Vector{Vector{UInt32}},
                         i_xw::Vector{Vector{Int32}},
                         pr::UInt32,
-                        arithm)
-    f,r= _mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm)
+                        arithm,
+                        vv::Vector{UInt64})
+    f,r= _mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm,vv)
     return(r)
 end
 
@@ -375,6 +380,7 @@ function learn_compute_table!(t_v::Vector{Vector{UInt32}},
                               arithm)
    nb=1
    t_learn=Int32[]
+   buf = Vector{UInt64}()
    while (nb>0)
       nb=0
       for i in eachindex(t_xw)
@@ -383,7 +389,7 @@ function learn_compute_table!(t_v::Vector{Vector{UInt32}},
             continuer=false
             #test if the ancestor is computed
             if (length(t_v[t_xw[i].prev])>0)
-                continuer,vv= _mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm)
+                continuer,vv= _mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf)
                 if (continuer) 
                     t_v[i]=vv
                     push!(t_learn,i)
@@ -404,9 +410,10 @@ function apply_compute_table!(t_v::Vector{Vector{UInt32}},
                               quo::Vector{PP},
                               pr::UInt32,
                               arithm)
-   @inbounds for i in t_learn
+    buf = Vector{UInt64}()
+    @inbounds for i in t_learn
       if (length(t_v[i])==0)
-          t_v[i]=mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm)
+          t_v[i]=mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf)
       end
    end
 end
@@ -506,17 +513,22 @@ function gauss_reduct(
         dv::Int32,
         paquet::Int32,
         pr::UInt32,
-        arithm)
+        arithm,
+        b::Vector{UInt64})   # buffer
     if paquet > 3 && _gauss_reduct_jam[] == 4
-        return gauss_reduct_jam4(v,gred,dg,dv,paquet,pr,arithm)
+        return gauss_reduct_jam4(v,gred,dg,dv,paquet,pr,arithm,b)
     elseif  paquet > 1 && _gauss_reduct_jam[] == 2
-        return gauss_reduct_jam2(v,gred,dg,dv,paquet,pr,arithm)
+        return gauss_reduct_jam2(v,gred,dg,dv,paquet,pr,arithm,b)
     end
     i=Int32(0)
     j=Int32(0)
     last_nn=Int32(-1)
     pivot=UInt32(0)
-    b=[UInt64(v[i]) for i=1:dv]
+    resize!(b, dv)
+    @inbounds for ell in 1:dv
+        b[ell] = UInt64(v[ell])
+    end
+    # b=[UInt64(v[i]) for i=1:dv]
     @inbounds for i in 1:(dg-1)
         b[i+1]=Groebner.mod_p(b[i+1], arithm)
         iszero(b[i+1]) && continue
@@ -561,12 +573,17 @@ function gauss_reduct_jam2(
         dv::Int32,
         paquet::Int32,
         pr::UInt32,
-        arithm)
+        arithm,
+        b::Vector{UInt64})
     @assert paquet > 1
     j=Int32(0)
     last_nn=Int32(-1)
     pivot=UInt32(0)
-    b=[UInt64(v[i]) for i=1:dv]
+    resize!(b, dv)
+    @inbounds for ell in 1:dv
+        b[ell] = UInt64(v[ell])
+    end
+    # b=[UInt64(v[i]) for i=1:dv]
     ub2 = (dg-1) & xor(typemax(Int), 1)
     k = 1
     @inbounds while k <= ub2
@@ -682,12 +699,17 @@ function gauss_reduct_jam4(
         dv::Int32,
         paquet::Int32,
         pr::UInt32,
-        arithm)
+        arithm,
+        b::Vector{UInt64})      # buffer
     @assert paquet > 3
     j=Int32(0)
     last_nn=Int32(-1)
     pivot=UInt32(0)
-    b=[UInt64(v[i]) for i=1:dv]
+    resize!(b, dv)
+    @inbounds for ell in 1:dv
+        b[ell] = UInt64(v[ell])
+    end
+    # b=[UInt64(v[i]) for i=1:dv]
     # the largest number not greater than (dg-1) and divisible by 4
     ub4 = (dg-1) & xor(typemax(Int), 3)
     k = 1
@@ -833,17 +855,23 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     #we are now going to compute T^2
     deg=Int32(2);
     w=Vector{UInt32}(undef,d)
+    buf1=Vector{UInt64}(undef,d)
+    buf2=Vector{UInt64}(undef,d)
     @inbounds while (continuer==1)
-        v=mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm)
-        w=Vector{UInt32}(v)
+        v=mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm,buf1)
+        # w=Vector{UInt32}(v)
+        resize!(w, length(v))
+        for ell in 1:length(v)
+            w[ell] = v[ell]
+        end
         #reduce with gred[0]
         if (w[1]!=0) w[1]=pr-w[1]; end
         #reduce with gred[i] i=1..dg-1
         #new_i = possible position to store the reduced vector in gred
-        new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+        new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm,buf2);
         if (new_i<d)
             push!(free_set,v)
-            gred[new_i]=Vector{UInt32}(w);
+            gred[new_i]=copy(w);
             if (!(new_i<dg)) dg=Int32(new_i+1); end;
             index[deg]=Int32(new_i);
             hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
@@ -879,15 +907,17 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
     new_monomial_free_set=[[Int32(i-1),Int32(0)] for i=1:deg]
     new_monomial_basis=copy(new_monomial_free_set);
     new_leading_monomials=Vector{Vector{Int32}}()
+    buf1=Vector{UInt64}()
+    buf2=Vector{UInt64}()
     while (length(new_free_set)>0)
         tmp_set=Vector{Vector{UInt32}}()
         tmp_mon_set=Vector{Vector{Int32}}()
         @inbounds for j in eachindex(new_free_set)
             curr_mon=copy(new_monomial_free_set[j])
             curr_mon[2]+=Int32(1)
-            v=mul_var_quo_UInt32(new_free_set[j],ii,t_v,i_xw,pr,arithm) 
+            v=mul_var_quo_UInt32(new_free_set[j],ii,t_v,i_xw,pr,arithm,buf1) 
             w=Vector{UInt32}(v)
-            new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+            new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm,buf2);
             if (new_i<d)
                 push!(tmp_set,v)
                 push!(tmp_mon_set,curr_mon);
@@ -970,7 +1000,8 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
         w[t_v[i_xw[ii][1]][1]]=UInt32(1)
     end
     if (w[1]!=0) w[1]=pr-w[1]; end
-    new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm);
+    buf=Vector{UInt64}(undef,d)
+    new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm,buf);
     if (new_i<d)
         print("Not in shape position")
     end
