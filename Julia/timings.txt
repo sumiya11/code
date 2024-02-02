@@ -1,5 +1,4 @@
 
-
 # Timings 
 # chandran 9
 #   Shape position
@@ -7,7 +6,7 @@
 #   dimension 256
 #   nb primes (27 bit) 1282
 #   ZP computations 27 bits
-# computation time over Q : 15 sec (24)
+# computation time over Q : 15 sec (24) [34]
 
 # chandran 10
 #   Shape position
@@ -15,7 +14,7 @@
 #   dimension 512
 #   nb primes (27 bit) 2560
 #   ZP computations 27 bits
-# computation time over Q : 154 sec - 123 jam2 (374)
+# computation time over Q : 123 jam2 (374) [305]
 
 # chandran 11
 #   Shape position
@@ -31,7 +30,7 @@
 #   dimension 720
 #   nb primes 28 bits : 1174
 #   Zp computations 28 bits
-#computation time over Q : 128 sec jam2 ()
+#computation time over Q : 128 sec jam2 (138) [191]
 
 # cp_d_3_n_6_p_6
 #   Shape position
@@ -39,7 +38,7 @@
 #   dimension 729
 #   nb primes 28 bits : 884
 #   Zp computations 28 bits
-#computation time over Q : 86 sec jam2 ()
+#computation time over Q : 86 sec jam2 (98) [124]
 
 # eco 11 
 #   Shape position
@@ -47,7 +46,7 @@
 #   dimension 512
 #   size of coeffs in param over Q : 330
 #   ZP computations 27 bits
-#   computation time over Q : 17 sec (35)
+#   computation time over Q : 17 sec (35) [26]
 
 # eco 12 
 #   Shape position
@@ -55,7 +54,7 @@
 #   dimension 1024
 #   size of coeffs in param over Q : 530
 #   ZP computations 27 bits
-# computation time over Q : 227 sec - 206 - jam2 (516)
+# computation time over Q : 227 sec - 206 - jam2 (516) [268]
 
 # eco 13
 #   Shape position
@@ -65,6 +64,14 @@
 #   ZP computations 27 bits
 # computation time over Q : 2821 sec jam2 sec (7697)
 
+# Fab 4
+#   General
+#   Nb vars : 4
+#   Dimension : 1120(1296)
+#   Nb Primes (31 bit) : 1025
+#   ZP computations 27 bits
+#   computation time over Q : sec (361) [533]
+
 # henrion6
 #   Shape position
 #   nb vas : 6
@@ -72,7 +79,7 @@
 #   size coeffs param in Q : 612 31 bit primes 
 #   ZP computations 27 bits
 #
-# estimate computation time over Q : 31 sec - 21 - Jam2 (95)
+# estimate computation time over Q : 31 sec - 21 - Jam2 (95) [25]
 
 # katsura 11
 #   Shape position
@@ -81,7 +88,7 @@
 #   size coeffs param in Q : 400 31 bit primes 
 #   ZP computations 27 bits
 #
-#   computation time over Q : 250 sec  - 212 jam2 (195)
+#   computation time over Q : 250 sec  - 212 jam2 (195) [252]
 
 # katsura 12
 #   Shape position
@@ -90,7 +97,7 @@
 #   size coeffs param in Q : 850 31 bit primes 
 #   ZP computations 28 bits
 #
-#   computation time over Q : 4148 sec jam2 (2708)
+#   computation time over Q : 4148 sec jam2 (2708) [3374]
 
 # Noon7 
 #   Shape position
@@ -98,30 +105,44 @@
 #   dimension : 2173 
 #   size coeffs param in Q : 1300 31 bit primes 
 #   ZP computations 27 bits
-#
-#   computation time over Q : 4137 sec - 2602 jam2 (1804)
+#   Nb primes (28 bit) :
+#   Zp Compputations 28 bit
+#   computation time over Q : 4137 sec - 2602 jam2 (1804) [2436]
 
 # Reimer6 
 #   Cyclic 
 #   nb vas : 6
 #   dimension : 579
-#   
-#   computation time over Q : 12.5 sec (35)
+#   Nb primes (28 bit) : 259
+#   computation time over Q : 14.5 sec jam2 (35) [23]
 
 # Reimer7 
 #   Cyclic
 #   nb vas : 7
 #   dimension : 2880
-#   Nb primes (28 bit) :
+#   Nb primes (28 bit) : 1403
 #   Zp Compputations 28 bit
-#   computation time over Q :  sec ()
+#   computation time over Q : 5620 sec jam2 (29825) []
 
 # phuoc-1 
+#   Cyclic
 #   nb vas : 8
 #   dimension : 4022
 #   size coeffs param in Q : 753 31 bit primes 
 #   ZP computations 27 bits
-# estimate computation time over Q : 8000 sec
+# computation time over Q : 8000 sec () [1730]
 
 
-
+#Name           ZDS           
+#
+#Eco10		    2.8    
+#Eco11 	       26.3    
+#Eco12        268.4    
+#Katsura11    252.8   
+#Katsura12   3374.9   
+#Noon7       2436.5   
+#Henrion6      25.0    
+#phuoc1      1730.4   
+#cp_3_6_2     191.3   
+#cp_4_4_3      14.9      
+#cp_3_6_6     124.3 
