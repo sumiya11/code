@@ -39,8 +39,15 @@ end
 nn=27;
 tmr = TimerOutputs.TimerOutput()
 sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
+
+d = 1000
+R, (x,y) = polynomial_ring(QQ, ["x","y"], ordering=:degrevlex)
+sys = [sum(y^i * rand(1:1) for i in 1:d), x - sum(y^i * rand(1:2) for i in 1:div(d,2))]
 #include("../Data/Systems/henrion6.jl");
 sys_z = convert_sys_to_sys_z(sys);
+# _, _, sys_T = prepare_system(sys_z, nn, R)
+rur = test_param(sys_z, nn);
+
 
 _gauss_reduct_jam[] = 4
 # s = @report_opt target_modules=(Main,) test_param(sys_z, nn)
