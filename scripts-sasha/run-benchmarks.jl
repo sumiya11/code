@@ -17,22 +17,22 @@ nn = 27
 
 timings = Dict()
 systems = Dict(
-    "chandra8" => Groebner.chandran(8, ordering=:degrevlex),
-    "chandra9" => Groebner.chandran(9, ordering=:degrevlex),
-    # "chandra10" => Groebner.chandran(10, ordering=:degrevlex),
-    "henrion6" => Groebner.henrion6(ordering=:degrevlex),
+    # "chandra8" => Groebner.chandran(8, ordering=:degrevlex),
+    # "chandra9" => Groebner.chandran(9, ordering=:degrevlex),
+    "chandra10" => Groebner.chandran(10, ordering=:degrevlex),
+    # "henrion6" => Groebner.henrion6(ordering=:degrevlex),
 )
 for name in [
-    (@__DIR__)*"/../Data/Systems/kat10.jl", 
-    (@__DIR__)*"/../Data/Systems/katsura11.jl", 
-    # (@__DIR__)*"/../Data/Systems/katsura12.jl", 
-    (@__DIR__)*"/../Data/Systems/noon6.jl",
-    # (@__DIR__)*"/../Data/Systems/noon7.jl",
-    (@__DIR__)*"/../Data/Systems/eco10.jl",
-    (@__DIR__)*"/../Data/Systems/eco11.jl",
-    # (@__DIR__)*"/../Data/Systems/eco12.jl",
-    (@__DIR__)*"/../Data/Systems/cp_d_3_n_6_p_2.jl",
-    (@__DIR__)*"/../Data/Systems/cp_d_3_n_6_p_6.jl",
+    # (@__DIR__)*"/../Data/Systems/kat10.jl", 
+    # (@__DIR__)*"/../Data/Systems/katsura11.jl", 
+    (@__DIR__)*"/../Data/Systems/katsura12.jl", 
+    # (@__DIR__)*"/../Data/Systems/noon6.jl",
+    (@__DIR__)*"/../Data/Systems/noon7.jl",
+    # (@__DIR__)*"/../Data/Systems/eco10.jl",
+    # (@__DIR__)*"/../Data/Systems/eco11.jl",
+    (@__DIR__)*"/../Data/Systems/eco12.jl",
+    # (@__DIR__)*"/../Data/Systems/cp_d_3_n_6_p_2.jl",
+    # (@__DIR__)*"/../Data/Systems/cp_d_3_n_6_p_6.jl",
     ]
     include("$name")
     systems[String(last(split(name, "/")))] = sys
@@ -117,7 +117,7 @@ msg = String(take!(buf))
 
 println(msg)
 
-io = open((@__DIR__)*"/server_timings.txt", "w")
+io = open((@__DIR__)*"/server_timings_2.txt", "w")
 println(io, msg)
 println(io)
 versioninfo(io)

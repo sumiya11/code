@@ -19,7 +19,8 @@ pkg"status"
 
 using Primes,HostCPUFeatures,AbstractAlgebra,TimerOutputs
 using BenchmarkTools
-# using JET
+using JET
+# using Traceur
 include("../../Groebner.jl/src/Groebner.jl")
 
 include((@__DIR__)*"/../Julia/rur.jl")
@@ -27,7 +28,7 @@ include((@__DIR__)*"/../Julia/rur.jl")
 
 macro my_profview(ex)
     :((VSCodeServer.Profile).clear();
-        VSCodeServer.Profile.init(n=10^8, delay=0.0001);
+        VSCodeServer.Profile.init(n=10^8, delay=0.001);
     VSCodeServer.Profile.start_timer();
         $ex;
     VSCodeServer.Profile.stop_timer();
@@ -38,16 +39,29 @@ end
 
 nn=27;
 tmr = TimerOutputs.TimerOutput()
-sys = Groebner.eco7(k=QQ, ordering=:degrevlex);
+sys = Groebner.eco11(k=QQ, ordering=:degrevlex);
+include("../Data/Systems/eco11.jl");
+sys_z = convert_sys_to_sys_z(sys);
+dm,Dq,sys_T,_vars=prepare_system(sys_z, 27,R);
+@time rur_jam = test_param(sys_T, nn);
+@report_opt target_modules=(Main,) rur_jam = test_param(sys_T, nn);
+@profview_allocs rur_jam = test_param(sys_T, nn);
 
-d = 1000
+d = 200
+R, (x,y) = polynomial_ring(QQ, ["x","y"], ordering=:degrevlex)
+sys = [sum(y^i * rand(1:1) for i in 1:d), x - sum(y^i * rand(1:1) for i in 1:div(d,2))]
+#include("../Data/Systems/henrion6.jl");
+gb = Groebner.groebner(sys, loglevel=0);
+
+d = 500
 R, (x,y) = polynomial_ring(QQ, ["x","y"], ordering=:degrevlex)
 sys = [sum(y^i * rand(1:1) for i in 1:d), x - sum(y^i * rand(1:2) for i in 1:div(d,2))]
 #include("../Data/Systems/henrion6.jl");
+# gb = Groebner.groebner(sys, loglevel=-3);
 sys_z = convert_sys_to_sys_z(sys);
 # _, _, sys_T = prepare_system(sys_z, nn, R)
 rur = test_param(sys_z, nn);
-
+@my_profview test_param(sys_z, nn);
 
 _gauss_reduct_jam[] = 4
 # s = @report_opt target_modules=(Main,) test_param(sys_z, nn)
