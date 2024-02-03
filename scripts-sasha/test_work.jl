@@ -22,6 +22,7 @@ using BenchmarkTools
 using JET
 # using Traceur
 include("../../Groebner.jl/src/Groebner.jl")
+Groebner.invariants_enabled() = true
 
 include((@__DIR__)*"/../Julia/rur.jl")
 # include((@__DIR__)*"/rur_old.jl")
@@ -37,15 +38,13 @@ end
 
 ###
 
-nn=27;
+nn=Int32(29);
 tmr = TimerOutputs.TimerOutput()
-sys = Groebner.eco11(k=QQ, ordering=:degrevlex);
-include("../Data/Systems/eco11.jl");
+sys = Groebner.eco10(k=QQ, ordering=:degrevlex);
+include("../Data/Systems/fab_4.jl");
 sys_z = convert_sys_to_sys_z(sys);
-dm,Dq,sys_T,_vars=prepare_system(sys_z, 27,R);
+dm,Dq,sys_T,_vars=prepare_system(sys_z, nn,R);
 @time rur_jam = test_param(sys_T, nn);
-@report_opt target_modules=(Main,) rur_jam = test_param(sys_T, nn);
-@profview_allocs rur_jam = test_param(sys_T, nn);
 
 d = 200
 R, (x,y) = polynomial_ring(QQ, ["x","y"], ordering=:degrevlex)
