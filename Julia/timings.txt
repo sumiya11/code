@@ -70,7 +70,7 @@
 #   Dimension : 1120(1296)
 #   Nb Primes (31 bit) : 1025
 #   ZP computations 27 bits
-#   computation time over Q : sec (361) [533]
+#   computation time over Q : 385 jam2 sec (361) [533]
 
 # henrion6
 #   Shape position
@@ -110,14 +110,14 @@
 #   computation time over Q : 4137 sec - 2602 jam2 (1804) [2436]
 
 # Reimer6 
-#   Cyclic 
+#   Cyclic - var
 #   nb vas : 6
 #   dimension : 579
 #   Nb primes (28 bit) : 259
 #   computation time over Q : 14.5 sec jam2 (35) [23]
 
 # Reimer7 
-#   Cyclic
+#   Cyclic - var
 #   nb vas : 7
 #   dimension : 2880
 #   Nb primes (28 bit) : 1403
@@ -125,7 +125,7 @@
 #   computation time over Q : 5620 sec jam2 (29825) []
 
 # phuoc-1 
-#   Cyclic
+#   Cyclic - var
 #   nb vas : 8
 #   dimension : 4022
 #   size coeffs param in Q : 753 31 bit primes 

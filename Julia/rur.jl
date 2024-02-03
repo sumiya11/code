@@ -1158,7 +1158,7 @@ function prepare_system(sys_z, nn,R)
     C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
     lls=AbstractAlgebra.gens(C)
     sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
-    lc=map(u->BigInt(u%31+1),rand(_rur_rng[], Int, length(lls)-1));
+    lc=map(u->BigInt(u%83),rand(_rur_rng[], Int, length(lls)-1));
     lf=lls[length(lls)]
     sep=Vector{BigInt}()
     for i in eachindex(lc)
@@ -1179,16 +1179,25 @@ function prepare_system(sys_z, nn,R)
     t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
     ii=Int32(length(i_xw))
     v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
-    dd=length(v)
+    U, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
+    
+    f=U(v)+_Z^(length(v));
+    ifp=Nemo.derivative(f)
+    f=f/Nemo.gcd(f,ifp)
+    
+    dd=Nemo.degree(f)
     print("\nSeparating vector ",dd,"(",length(gred),")")
     ii-=1
     while (ii>0)
         v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
-        if (dd==length(v)) 
-            print("\nvariable ",ii," is separating ",length(v))
+        f=U(v)+_Z^(length(v));
+        ifp=Nemo.derivative(f)
+        f=f/Nemo.gcd(f,ifp)
+        if (dd==Nemo.degree(f)) 
+            print("\nvariable ",ii," is separating ",Nemo.degree(f))
             break;
         else
-            print("\nvariable ",ii," is NOT separating ",length(v))
+           print("\nvariable ",ii," is NOT separating ",Nemo.degree(f))
         end
         ii-=1
     end
