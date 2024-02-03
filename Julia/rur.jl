@@ -1,4 +1,4 @@
-import AbstractAlgebra,Nemo,Primes
+import AbstractAlgebra,Nemo,Primes,Random
 
 #####################################################
 # Add on to AbstractAlgebra
@@ -236,9 +236,9 @@ function reduce_mod_p(
             cfs_zp[i][j] = UInt32(mod(cfs_zz_i[j], prime_zz))
         end
         # if lead vanishes
-        iszero(cfs_zp[i][1]) && error("beda beda ogorchenie!")
+        iszero(cfs_zp[i][1]) && return false, cfs_zp
     end
-    cfs_zp
+    true, cfs_zp
 end
 
 # vectors add-ons
@@ -1012,8 +1012,8 @@ function biv_shape_lemma(t_v::Vector{Vector{UInt32}},
 end
 
 # @timeit tmr "zdim param" 
-function coeff_mod_p(x::Nemo.fpFieldElem,pr::UInt32)::Int32
-    return(Int32(Nemo.data(x)))
+function coeff_mod_p(x::Nemo.fpFieldElem,pr::UInt32)
+    return(UInt32(Nemo.data(x)))
 end
 
 function zdim_parameterization(t_v::Vector{Vector{UInt32}},
@@ -1097,52 +1097,62 @@ function test_param(sys_z, nn)::Vector{Vector{Rational{BigInt}}}
         kk+=1
         pr=UInt32(Primes.prevprime(pr-1))
         arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-        cfs_zp=reduce_mod_p(cfs_zz,pr)
-        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp);
-        if (success) 
-            flag,zp_param=zdim_parameterization(t_v,i_xw,pr,arithm);
-            if (flag)
-                push!(t_pr,UInt32(pr));
-                push!(t_param,zp_param);
-                if (kk==bloc_p)
-                   print("[",kk,",",length(t_pr),"]");
-                   zz_p=BigInt(1);
-                   if (lift_level==0) 
-                       print("(",0,")");
-                       zz_m=zz_mat_same_dims([t_param[1][1]]);
-                       qq_m=qq_mat_same_dims([t_param[1][1]]);
-                       tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
-                       Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
-                       aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
-                       if (aa) lift_level=1 end
-                   end
-                   if (lift_level==1)
-                       print("(",1,")");
-                       zz_m=zz_mat_same_dims(t_param[1]);
-                       qq_m=qq_mat_same_dims(t_param[1]);
-                       Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
-                       continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
-                   end
-                   #bloc_p=Int32(2^(Int32(floor(max(log(length(t_pr)/10)/log(2),2)))))
-                   bloc_p=Int32(max(floor(length(t_pr)/10),2)) 
-                   kk=0
-                end
-            else
-                print("\n*** bad prime for RUR detected ***\n")
-            end
-        else
-            print("\n*** bad prime for Gbasis detected ***\n")
+        redflag,cfs_zp=reduce_mod_p(cfs_zz,pr)
+        if !redflag
+            print("\n*** bad prime for lead detected ***\n")
+            continue
         end
+        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp);
+        if !success
+            print("\n*** bad prime for Gbasis detected ***\n")
+            continue
+        end
+        flag,zp_param=zdim_parameterization(t_v,i_xw,pr,arithm);
+        if !flag
+            print("\n*** bad prime for RUR detected ***\n")
+            continue
+        end
+        length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
+        # From this point, we assume that the prime is OK
+        push!(t_pr,UInt32(pr));
+        push!(t_param,zp_param);
+        kk != bloc_p && continue
+        # Attempt reconstruction
+        print("[",kk,",",length(t_pr),"]");
+        kk=0
+        zz_p=BigInt(1);
+        if (lift_level==0)
+            print("(",0,")");
+            zz_m=zz_mat_same_dims([t_param[1][1]]);
+            qq_m=qq_mat_same_dims([t_param[1][1]]);
+            tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
+            Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
+            aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
+            if (aa) lift_level=1 end
+        end
+        if (lift_level==1)
+            print("(",1,")");
+            zz_m=zz_mat_same_dims(t_param[1]);
+            qq_m=qq_mat_same_dims(t_param[1]);
+            Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
+            continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
+        end
+        #bloc_p=Int32(2^(Int32(floor(max(log(length(t_pr)/10)/log(2),2)))))
+        bloc_p=Int32(max(floor(length(t_pr)/10),2))
     end;
-    return(qq_m);
+    return qq_m;
 end
+
+# Fix the random number generator for better reproducibility
+const _rur_rng = Ref{Random.Xoshiro}(Random.Xoshiro(42))
 
 function prepare_system(sys_z, nn,R)
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
-    C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
+    # C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
+    C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
     lls=AbstractAlgebra.gens(C)
     sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
-    lc=map(u->BigInt(u%31+1),rand(Int, length(lls)-1));
+    lc=map(u->BigInt(u%31+1),rand(_rur_rng[], Int, length(lls)-1));
     lf=lls[length(lls)]
     sep=Vector{BigInt}()
     for i in eachindex(lc)
