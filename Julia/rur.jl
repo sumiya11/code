@@ -503,7 +503,7 @@ end
 #rows are normalized
 
 # Run "_gauss_reduct_jam[] = 1" to disable jamming
-const _gauss_reduct_jam = Ref{Int}(1)
+const _gauss_reduct_jam = Ref{Int}(2)
 
 # @timeit tmr "gred" 
 function gauss_reduct(
@@ -917,6 +917,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
             curr_mon[2]+=Int32(1)
             v=mul_var_quo_UInt32(new_free_set[j],ii,t_v,i_xw,pr,arithm,buf1) 
             w=Vector{UInt32}(v)
+            if (w[1]!=0) w[1]=pr-w[1]; end
             new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm,buf2);
             if (new_i<d)
                 push!(tmp_set,v)
@@ -1047,18 +1048,23 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
             ft=C(f)
             @inbounds for i in 1:length(bl)
                 d1=length(bl[i])-1
-                lc1=-d1*C(bl[i][d1+1])
+                lc1=C(bl[i][d1+1])
                 co0=C(bl[i][d1])
                 f2=Nemo.gcd(ft,lc1)
-                f1=f/f2
-                s1+=Nemo.mulmod(lc1,pro,f)
-                s0+=Nemo.mulmod(co0,pro,f)
-                pro*=f1
-                ft=f2
+                f1=ft/f2           
+                # in some non radical case
+                if (Nemo.degree(f1)>0)
+                  #lc1=Nemo.mod(-d1*lc1,f1)
+                  s1+=Nemo.mulmod(d1*lc1,pro,f)
+                  #co0=Nemo.mod(co0,f1)
+                  s0+=Nemo.mulmod(co0,pro,f)
+                  pro=pro*f1
+                end
+                ft=C(f2)
             end
             is1=Nemo.invmod(s1,f)
             s0=Nemo.mulmod(s0,is1,f)
-            s0=Nemo.mulmod(s0,ifp,f)
+            s0=-Nemo.mulmod(s0,ifp,f)
             push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(s0))))
         end
 #    end
