@@ -1019,7 +1019,7 @@ end
 
 function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                                i_xw::Vector{Vector{Int32}},
-                               pr::UInt32,
+                               pr::UInt32,dd::Int32,
                                arithm)
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
@@ -1030,7 +1030,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     f=f/Nemo.gcd(f,ifp)
     ifp=Nemo.derivative(f)
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
-    flag=true;
+    flag=(Int32(Nemo.degree(f))==dd)
 #    if length(v)==length(gred)
 #        @inbounds for j in 1:(ii-1)
 #            v1=biv_shape_lemma(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
@@ -1038,7 +1038,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
 #            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
 #        end
 #    else 
-    
+    if (flag)    
         @inbounds for j in 1:(ii-1)
             m_b,lt_b,n_g=biv_lex(t_v,i_xw,copy(gred),copy(index),copy(dg),copy(hom),copy(free_set),Int32(j),pr,arithm);
             bl=convert_biv_lex_2_biv_pol(n_g,m_b,lt_b,pr)
@@ -1067,6 +1067,9 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
             s0=-Nemo.mulmod(s0,ifp,f)
             push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(s0))))
         end
+    else 
+        print("Bad prime number for parameterization ",Int32(Nemo.degree(f)),"(",dd,")")
+    end
 #    end
     return(flag,res)
 end
@@ -1087,7 +1090,7 @@ function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{B
     return(zzm)
 end
 
-function test_param(sys_z, nn)::Vector{Vector{Rational{BigInt}}}
+function general_param(sys_z, nn, dd)::Vector{Vector{Rational{BigInt}}}
     qq_m=Vector{Vector{Rational{BigInt}}}()
     t_pr=Vector{UInt32}();
     t_param=Vector{Vector{Vector{UInt32}}}();
@@ -1113,7 +1116,7 @@ function test_param(sys_z, nn)::Vector{Vector{Rational{BigInt}}}
             print("\n*** bad prime for Gbasis detected ***\n")
             continue
         end
-        flag,zp_param=zdim_parameterization(t_v,i_xw,pr,arithm);
+        flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),arithm);
         if !flag
             print("\n*** bad prime for RUR detected ***\n")
             continue
@@ -1210,4 +1213,12 @@ function prepare_system(sys_z, nn,R)
         sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
     end
     return(dd,length(gred),sys,AbstractAlgebra.symbols(C))
+end
+
+function zdim_parameterization(sys)
+    nn=Int32(28)
+    sys_z=convert_sys_to_sys_z(sys);
+    dm,Dq,sys_T,_vars=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]));
+    qq_m=general_param(sys_T,nn,dm);
+    return(qq_m)
 end

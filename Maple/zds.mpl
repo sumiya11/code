@@ -4,11 +4,10 @@ option package;
 export
      rur,isolate:
 local
-     tri_sep_restrict_zp,tri_split_zp,tri_lin_extract_zp,biv_test_sep_gblex_zp,
-     biv_lin_extract_gblex_zp,test_sep_gblex_zp,lin_extract_gblex_zp,
+     tri_sep_restrict_zp,biv_test_sep_gblex_zp,test_sep_gblex_zp,lin_extract_gblex_zp,
      param_shape_lemma_radicalize_zp,find_sep_elt,param_general_zp,pack_compute_seq,
      param_zerodim_internal_mm,param_zerodim,isolate_zerodim,
-     gb_drl_zp,gb_lex_zp,gb_lex_2_biv:
+     gb_drl_zp,gb_lex_2_biv,gb_lex_zp,tri_split_zp,tri_lin_extract_zp,biv_lin_extract_gblex_zp:
 
 # ******************************************************************************
 # Groebner Engine: direct call to the limgb package 
@@ -34,7 +33,7 @@ end:
 
 # univ(x),tri(x,y) is a triangular set 
 # lazy partial factorization of univ
-# in a part above which y is separated
+# in a part above which y is separating
 # and a part above which it is not
 
 tri_sep_restrict_zp:=proc(univ,tri,pr)
@@ -120,7 +119,7 @@ biv_lin_extract_gblex_zp:=proc(gl,vars,pr)
   pp:=gl[1]:
   prod:=1:
   pp0:=Quo(pp,(Gcd(pp,diff(pp,vu)) mod pr),vu) mod pr:
-  pp:=pp0:
+  pp:=pp0:                        
   bp:=0:
   for i from 2 to nops(gl) do
       pp,tr:=tri_lin_extract_zp(pp,gl[i],pr);
