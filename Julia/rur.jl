@@ -1156,7 +1156,17 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
             print("\n*** bad prime for lead detected ***\n")
             continue
         end
-        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
+        success,t_v=nothing,nothing
+        try
+            success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
+        catch err
+            println("***** Fatal error. Debug info will follow *****")
+            println(err)
+            println("nn=$nn, dd=$dd, linform=$linform, pr=$pr")
+            println("sys_z=\n$sys_z")
+            println("cfs_zp=\n$cfs_zp")
+            rethrow(err)
+        end
         if !success
             print("\n*** bad prime for Gbasis detected ***\n")
             continue
