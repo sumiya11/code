@@ -1272,7 +1272,7 @@ function prepare_system(sys_z, nn,R,use_block)
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),linform)
 end
 
-function zdim_parameterization(sys,nn::Int32=Int32(27),use_block::Bool=false)
+function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
     sys_z=convert_sys_to_sys_z(sys);
     dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);

@@ -6,7 +6,7 @@
 #   dimension 256
 #   nb primes (27 bit) 1282
 #   ZP computations 27 bits
-# computation time over Q : 15 sec (24) [34]
+# computation time over Q : 11 sec (24) [34]
 
 # chandran 10
 #   Shape position
@@ -14,7 +14,7 @@
 #   dimension 512
 #   nb primes (27 bit) 2560
 #   ZP computations 27 bits
-# computation time over Q : 123 jam2 (374) [305]
+# computation time over Q : 106 jam2 (374) [305]
 
 # chandran 11
 #   Shape position
@@ -22,7 +22,7 @@
 #   dimension 1024
 #   nb primes (27 bit) 
 #   ZP computations 28 bits
-# computation time over Q : 1459 sec jam2 () [2482]
+# computation time over Q : 1166 sec jam2 () [2482]
 
 # cp_d_3_n_6_p_2
 #   Shape position
@@ -30,7 +30,7 @@
 #   dimension 720
 #   nb primes 28 bits : 1174
 #   Zp computations 28 bits
-#computation time over Q : 128 sec jam2 (138) [191]
+#computation time over Q : 107 sec jam2 (138) [191]
 
 # cp_d_3_n_6_p_6
 #   Shape position
@@ -38,7 +38,7 @@
 #   dimension 729
 #   nb primes 28 bits : 884
 #   Zp computations 28 bits
-#computation time over Q : 86 sec jam2 (98) [124]
+#computation time over Q : 69 sec jam2 (98) [124]
 
 # eco 11 
 #   Shape position
@@ -46,15 +46,15 @@
 #   dimension 512
 #   size of coeffs in param over Q : 330
 #   ZP computations 27 bits
-#   computation time over Q : 17 sec (35) [26]
+#   computation time over Q : 14 sec (35) [26]
 
 # eco 12 
 #   Shape position
 #   nb vars 12
 #   dimension 1024
-#   size of coeffs in param over Q : 530
+#   nb primes 27 bits : 283
 #   ZP computations 27 bits
-# computation time over Q : 227 sec - 206 - jam2 (516) [268]
+# computation time over Q : 201 - jam2 (516) [268]
 
 # eco 13
 #   Shape position
@@ -62,15 +62,15 @@
 #   dimension : 2048 
 #   size coeffs param in Q : 1200 31 bit primes 
 #   ZP computations 27 bits
-# computation time over Q : 2821 sec jam2 sec (7697)
+# computation time over Q : 2668 sec jam2 sec (7697)
 
 # Fab 4
 #   General
 #   Nb vars : 4
 #   Dimension : 1120(1296)
-#   Nb Primes (31 bit) : 1025
-#   ZP computations 27 bits
-#   computation time over Q : 385 jam2 sec (361) [533]
+#   Nb Primes (28 bit) : 1554
+#   ZP computations 28 bits
+#   computation time over Q : 362 jam2 sec (363) [533]
 
 # henrion6
 #   Shape position
@@ -79,7 +79,7 @@
 #   size coeffs param in Q : 612 31 bit primes 
 #   ZP computations 27 bits
 #
-# estimate computation time over Q : 31 sec - 21 - Jam2 (95) [25]
+# estimate computation time over Q : 15 - Jam2 (95) [25]
 
 # katsura 11
 #   Shape position
@@ -88,7 +88,7 @@
 #   size coeffs param in Q : 400 31 bit primes 
 #   ZP computations 27 bits
 #
-#   computation time over Q : 250 sec  - 207 jam2 (180 *) [252]
+#   computation time over Q : 182 jam2 (180 *) [252]
 
 # katsura 12
 #   Shape position
@@ -114,7 +114,7 @@
 #   nb vas : 6
 #   dimension : 579
 #   Nb primes (28 bit) : 259
-#   computation time over Q : 14.5 sec jam2 (35) [23]
+#   computation time over Q : 15 sec jam2 (35) [23]
 
 # Reimer7 
 #   Cyclic - var
