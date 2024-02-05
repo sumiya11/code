@@ -206,7 +206,8 @@ param_zerodim_internal_mm:=proc(sys,vars,param_engine_zp)
  reco_p:=FAIL:
  i:=1:
  while evalb(reco_p = FAIL) do
-   pack2:=max(8,2^(ceil(log[2](i*10/100))));
+ #  pack2:=max(8,2^(ceil(log[2](i*10/100))));
+   pack2:=max(2,ceil(i*10/100));
    print(i,pack2);
    pr,p_pr,lift_p:=pack_compute_seq(sys,vars,pr,param_engine_zp,pack2):
    lift_0:=chrem([lift_0,lift_p],[prod_pr,p_pr]):
@@ -312,23 +313,3 @@ end:
 end module:
 
 #savelib('zds',"/tmp");
-
-
-#> sys:=numer(expand([randpoly([x,y,z],degree=10,dense),randpoly([x,y,z],degree=10,dense),randpoly([x,y,z],degree=10,dense)])):
-#> lso:=zds:-isolate(sys,[x,y,z],precision=10):
-#> seq(evalf(subs(map(u->(lhs(u)=(rhs(u)[1]+rhs(u)[2])/2),lso[j]),sys),10),j=1..nops(lso));
-
-
-#Name           ZDS            MS      Ratio
-#
-#Eco10		2.8           4.3       0.65
-#Eco11 	       26.3          34.4       0.76
-#Eco12        268.4         517.1       0.51
-#Katsura11    252.8         161.5       1.56
-#Katsura12   3374.9        2386.7       1.41
-#Noon7       2436.5        1723.5       1.41
-#Henrion6      25.0          36.9       0,67
-#phuoc1      1730.4        2801.7       0,61
-#cp_3_6_2     191.3         141.9       1,34
-#cp_4_4_3      14.9          12.6       1.35
-#cp_3_6_6     124.3          93.5       1,32
