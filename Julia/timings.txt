@@ -130,7 +130,7 @@
 #   dimension : 2048
 #   Nb primes (28 bit) : 1282
 #   Zp Compputations 28 bit
-#   computation time over Q :  2310 sec jam2 () []
+#   computation time over Q :  2310 sec jam2 () [1958]
 
 # phuoc-1 
 #   Cyclic - var

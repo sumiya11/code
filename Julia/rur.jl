@@ -1259,15 +1259,18 @@ function prepare_system(sys_z, nn,R)
         sep=push!(sep,lc[i])
     end
     push!(sys,lf)
+    
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
+    
     # gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
     linform=true    # if a linear form was appended
     gro=groebner_linform(sys_Int32,linform)
     quo,g=kbase_linform(gro,pr,linform)
     # quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
     # g=sys_mod_p(gro,pr);
+
     ltg=map(u->u.exp[1],g);
     q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
     i_xw,t_xw=prepare_table_mxi(ltg,q);
