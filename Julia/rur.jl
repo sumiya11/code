@@ -29,6 +29,88 @@ function extract_raw_data(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}})
  end
 
 #####################################################
+# Add on to Groebner
+#####################################################
+
+const _enable_product_ord = Ref{Bool}(true)
+
+# If linform == true and _enable_product_ord[] == true, then the basis of
+#   [sys, f(_Z)]
+# is computed by computing the basis of sys and appending f(_Z) to the result.
+
+# We also tweak manually the order of monomials in f(_Z), since
+# AbstractAlgebra.leading_monomial and friends operate in :degrevlex.
+
+# If linform == true, then we assume that
+# - the last element of the input array is the linear form,
+# - the last variable in the AbstractAlgebra ring is the new variable.
+
+function groebner_apply_linform!(graph,cfs_zp,pr,linform)
+    if linform && _enable_product_ord[]
+        success,gro=Groebner.groebner_applyX!(graph,cfs_zp[1:end-1],pr);
+        gro=vcat(gro,[cfs_zp[end]])
+        # Move the monomial with _Z up front as the largest
+        _form=gro[end]
+        _form=vcat(_form[end],_form[1:end-1])
+        gro[end]=_form
+        return success,gro
+    else
+        success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
+        return success,gro
+    end
+end
+
+function groebner_linform(sys_Int32,linform)
+    if linform && _enable_product_ord[]
+        gro=Groebner.groebner(sys_Int32[1:end-1],ordering=Groebner.DegRevLex());
+        if any(f -> AbstractAlgebra.total_degree(AbstractAlgebra.leading_monomial(f)) == 1, gro)
+            @warn "The basis is possibly not inter-reduced. Switching back to degrevlex."
+            _enable_product_ord[] = false  # globally change the setting
+            gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+            return gro
+        end
+        gro=vcat(gro,sys_Int32[end])  
+        return gro
+    else
+        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+        return gro
+    end
+end
+
+function groebner_learn_linform(sys_Int32,linform)
+    if linform && _enable_product_ord[]
+        graph,gro=Groebner.groebner_learn(sys_Int32[1:end-1],ordering=Groebner.DegRevLex());
+        @assert !any(f -> AbstractAlgebra.total_degree(AbstractAlgebra.leading_monomial(f)) == 1, gro)
+        gro=vcat(gro,sys_Int32[end])  
+        return graph,gro
+    else
+        graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
+        return graph,gro
+    end
+end
+
+function kbase_linform(gro,pr,linform)
+    if linform && _enable_product_ord[]
+        R=AbstractAlgebra.parent(gro[1])
+        vars=AbstractAlgebra.gens(R)
+        @assert length(unique(map(string,vars))) == length(vars)   # variable names are unique
+        ord=Groebner.Lex(vars[end])*Groebner.DegRevLex(vars[1:end-1])
+        quo=Groebner.kbase(gro,ordering=ord);
+        g=sys_mod_p(gro,pr)
+        # Move the monomial with _Z up front as the largest
+        _f=g[end]
+        @assert length(_f.exp) == findfirst(e -> e.data[end] == 1, _f.exp)
+        _f=PolUInt32(vcat(_f.exp[end], _f.exp[1:end-1]), vcat(_f.co[end], _f.co[1:end-1]))
+        g[end] = _f
+        return quo,g
+    else
+        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+        g=sys_mod_p(gro,pr);
+        return quo,g
+    end
+end
+
+#####################################################
 # internal polynomials
 #####################################################
 
@@ -433,19 +515,23 @@ end
 #learn_zdim
 ############################################
 
-function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm)
+function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform)
 #   pr=UInt32(Primes.prevprime(2^27-1));
 #   @timeit tmr "convert" 
-   sys_Int32=convert_to_mpol_UInt32(sys,pr)
+    sys_Int32=convert_to_mpol_UInt32(sys,pr)
 # @timeit tmr "groebner learn"  
-   graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
-# @timeit tmr "kbase" 
-   quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
-   g=sys_mod_p(gro,pr);
+   # graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
+   graph,gro=groebner_learn_linform(sys_Int32,linform);
+   # @timeit tmr "kbase" 
+   # quo=Groebner.kbase(gro00,ordering=Groebner.DegRevLex());
+   quo,g=kbase_linform(gro,pr,linform);
+
+#    g=sys_mod_p(gro,pr);
    gb_expvecs=map(poly->poly.exp,g)
    ltg=map(u->u.exp[1],g);
    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
-# @timeit tmr "prepare table" 
+
+   # @timeit tmr "prepare table" 
    i_xw,t_xw=prepare_table_mxi(ltg,q);
    t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
 # @timeit tmr "learn table"  
@@ -461,12 +547,14 @@ function apply_zdim_quo!(graph,
                          pr::UInt32,
                          arithm,
                          gb_expvecs::Vector{Vector{PP}},
-                         cfs_zp::Vector{Vector{UInt32}})
+                         cfs_zp::Vector{Vector{UInt32}},
+                         linform::Bool)
 #   @timeit tmr "convert" 
     # sys_Int32=convert_to_mpol_UInt32(sys,pr);
 #   @timeit tmr "groebner" 
     # f,gro=Groebner.groebner_apply!(graph,sys_Int32);
-    success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
+    success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
+    #success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
     if (success)
 #   @timeit tmr "gro mod p" 
     # g=sys_mod_p(gro,pr);
@@ -1090,13 +1178,13 @@ function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{B
     return(zzm)
 end
 
-function general_param(sys_z, nn, dd)::Vector{Vector{Rational{BigInt}}}
+function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{BigInt}}}
     qq_m=Vector{Vector{Rational{BigInt}}}()
     t_pr=Vector{UInt32}();
     t_param=Vector{Vector{Vector{UInt32}}}();
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm);
+    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform);
     expvecs,cfs_zz=extract_raw_data(sys_z)
     continuer=true
     bloc_p=Int32(2)
@@ -1111,7 +1199,7 @@ function general_param(sys_z, nn, dd)::Vector{Vector{Rational{BigInt}}}
             print("\n*** bad prime for lead detected ***\n")
             continue
         end
-        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp);
+        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
         if !success
             print("\n*** bad prime for Gbasis detected ***\n")
             continue
@@ -1153,7 +1241,7 @@ function general_param(sys_z, nn, dd)::Vector{Vector{Rational{BigInt}}}
 end
 
 # Fix the random number generator for better reproducibility
-const _rur_rng = Ref{Random.Xoshiro}(Random.Xoshiro(42))
+# const _rur_rng = Ref{Random.Xoshiro}(Random.Xoshiro(42))
 
 function prepare_system(sys_z, nn,R)
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
@@ -1161,7 +1249,9 @@ function prepare_system(sys_z, nn,R)
     C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
     lls=AbstractAlgebra.gens(C)
     sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
-    lc=map(u->BigInt(u%83),rand(_rur_rng[], Int, length(lls)-1));
+    _rur_rng=Random.Xoshiro(42)
+    lc=map(u->BigInt(u%83),rand(_rur_rng, Int, length(lls)-1));
+    # lc=map(u->(2u)%83,1:(length(lls)-1));
     lf=lls[length(lls)]
     sep=Vector{BigInt}()
     for i in eachindex(lc)
@@ -1172,9 +1262,12 @@ function prepare_system(sys_z, nn,R)
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
-    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
-    quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
-    g=sys_mod_p(gro,pr);
+    # gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+    linform=true    # if a linear form was appended
+    gro=groebner_linform(sys_Int32,linform)
+    quo,g=kbase_linform(gro,pr,linform)
+    # quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+    # g=sys_mod_p(gro,pr);
     ltg=map(u->u.exp[1],g);
     q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
     i_xw,t_xw=prepare_table_mxi(ltg,q);
@@ -1211,14 +1304,16 @@ function prepare_system(sys_z, nn,R)
         push!(ls3,ls[ii])
         C,ls=polynomial_ring(AbstractAlgebra.ZZ,ls3,ordering=:degrevlex)
         sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
+        linform=false
     end
-    return(dd,length(gred),sys,AbstractAlgebra.symbols(C))
+    return(dd,length(gred),sys,AbstractAlgebra.symbols(C),linform)
 end
 
 function zdim_parameterization(sys)
+    @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
     nn=Int32(28)
     sys_z=convert_sys_to_sys_z(sys);
-    dm,Dq,sys_T,_vars=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]));
-    qq_m=general_param(sys_T,nn,dm);
+    dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]));
+    qq_m=general_param(sys_T,nn,dm,linform);
     return(qq_m)
 end
