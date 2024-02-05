@@ -1,3 +1,4 @@
+
 import AbstractAlgebra,Nemo,Primes,Random
 
 #####################################################
@@ -1244,9 +1245,7 @@ function prepare_system(sys_z, nn,R)
     U, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
     
     f=U(zp_param[1]);
-#    ifp=Nemo.derivative(f)
-#    f=f/Nemo.gcd(f,ifp)
-    
+
     dd=Nemo.degree(f)
     print("\nSeparating vector ",dd,"(",length(q),")")
     ii-=1
@@ -1272,7 +1271,7 @@ function prepare_system(sys_z, nn,R)
         sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
         linform=false
     end
-    return(dd,length(gred),sys,AbstractAlgebra.symbols(C),linform)
+    return(dd,length(q),sys,AbstractAlgebra.symbols(C),linform)
 end
 
 function zdim_parameterization(sys)
