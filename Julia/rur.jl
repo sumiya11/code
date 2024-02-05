@@ -71,7 +71,6 @@ end
 ## tests if pp1 is divisible by pp2
 ## then returns the greatest variable
 ## that appear in the divisor
-
 @inline function divides(pp1::PP,pp2::PP)
     # tmp=pp1.data-pp2.data
     # i=1
@@ -93,10 +92,8 @@ end
     end
     return true, var
 end
-
 # Interface with AbstractAlgebra
 #####################################################
-
 function coeff_mod_p(x::AbstractAlgebra.GFElem{Int32},pr::UInt32)::UInt32
     return(UInt32(AbstractAlgebra.data(x)))
 end
@@ -112,12 +109,9 @@ function sys_mod_p(sys::Vector{AbstractAlgebra.Generic.MPoly{T}},pr::UInt32)::Ve
     end
     return(res)
 end
-
-
 #####################################################
 # Multiplication Matrices
 #####################################################
-
 
 #test if a monomial is already in the
 #border and, if not, try to find a
@@ -223,7 +217,6 @@ end
 
 # stuff
 ########################################
-
 function reduce_mod_p(
     cfs_zz::Vector{Vector{BigInt}},
     prime::UInt32
@@ -243,9 +236,6 @@ end
 
 # vectors add-ons
 ########################################
-
-
-#@timeit tmr "addmul" 
 @inline function add_mul!(vres::Vector{UInt64},a::UInt32,v::Vector{UInt32})
     @fastmath @inbounds @simd ivdep for i in eachindex(vres)
         vres[i]+=UInt64(a)*UInt64(v[i])
@@ -280,13 +270,11 @@ end
     end
 end
 
-#@timeit tmr "modulo" 
 function reduce_mod!(vres::Vector{UInt64},pr::UInt32,arithm)
    @fastmath @inbounds @simd ivdep for i in eachindex(vres)
       vres[i]=Groebner.mod_p(vres[i],arithm)
    end
 end
-
 
 function vectorize_pol_gro(p::PolUInt32,
                            kb::Vector{PP},
@@ -308,7 +296,6 @@ end
 # elements of the quotient basis
 # are represented by a vector of length 1
 # whose entry is the place of the element in the quotient basis
-
 function compute_fill_quo_gb!(t_xw::Vector{StackVect},
                               gro::Vector{PolUInt32},
                               quo::Vector{PP},
@@ -328,7 +315,6 @@ function compute_fill_quo_gb!(t_xw::Vector{StackVect},
    return(t_v)
 end
 
-#@timeit tmr "mul_var" 
 function _mul_var_quo_UInt32(v::Vector{UInt32},
                         ii::Int32,
                         t_v::Vector{Vector{UInt32}},
@@ -402,7 +388,6 @@ function learn_compute_table!(t_v::Vector{Vector{UInt32}},
    return(t_learn)
 end
 
-
 function apply_compute_table!(t_v::Vector{Vector{UInt32}},
                               t_learn::Vector{Int32},
                               t_xw::Vector{StackVect},
@@ -418,7 +403,6 @@ function apply_compute_table!(t_v::Vector{Vector{UInt32}},
    end
 end
 
-
 function reduce_mod(v::Vector{UInt64},pr::UInt32,arithm)
    vres=Vector{UInt32}(undef, length(v))
     @fastmath @inbounds @simd for i in eachindex(vres)
@@ -427,12 +411,9 @@ function reduce_mod(v::Vector{UInt64},pr::UInt32,arithm)
    return(vres)
 end
 
-
-
 ############################################
 #learn_zdim
 ############################################
-
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm)
 #   pr=UInt32(Primes.prevprime(2^27-1));
 #   @timeit tmr "convert" 
@@ -481,7 +462,6 @@ function apply_zdim_quo!(graph,
         return(success,nothing)
     end
 end
-
 
 function zdim_mx(t_v::Vector{Vector{Int32}},
                  i_xw::Vector{Vector{Int32}},
@@ -811,8 +791,6 @@ function gauss_reduct_jam4(
     end
 end
 
-#@timeit tmr "first variable" 
-
 function normalize_row!(v::Vector{UInt32},tmp::UInt32,pr::UInt32,arithm)
      @fastmath @inbounds @simd for i in eachindex(v)
         v[i]=Groebner.mod_p((v[i]%UInt64)*(tmp%UInt64), arithm)%UInt32
@@ -844,7 +822,6 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     gred[i-1]=Vector{UInt32}(v)
     if (gred[i-1][1]!=0) gred[i-1][1]=pr-gred[i-1][1]; end
     if (gred[i-1][i]!=1)
-        print("\nWarning : normalization of _Z ")
         hom[i-1]=invmod(gred[i-1][i],pr)%UInt32
         normalize_row!(gred[i-1],hom[i-1],pr,arithm)
     end
@@ -944,7 +921,6 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
     return(new_monomial_basis,new_leading_monomials,new_generators);
 end
 
-
 function convert_biv_lex_2_biv_pol(n_g,m_b,lt_g,pr)
     l_base=Vector{Vector{Vector{Int32}}}()
     for kk in eachindex(n_g)
@@ -981,45 +957,28 @@ function convert_biv_lex_2_biv_pol(n_g,m_b,lt_g,pr)
     return(l_base)
 end
 
-
-function biv_shape_lemma(t_v::Vector{Vector{UInt32}},   
-                         i_xw::Vector{Vector{Int32}},
-                         deg::Int32,
-                         gred::Vector{Vector{UInt32}},
-                         index::Vector{Int32},
-                         hom::Vector{UInt32},
-                         dg::Int32,
-                         ii::Int32,
-                         pr::UInt32,
-                         arithm)
-    pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
-    d=Int32(length(gred))
-    w=zeros(UInt32, d)
-    if (length(t_v[i_xw[ii][1]])>1)
-        w=t_v[i_xw[ii][1]]
-    else
-        w[t_v[i_xw[ii][1]][1]]=UInt32(1)
-    end
-    if (w[1]!=0) w[1]=pr-w[1]; end
-    buf=Vector{UInt64}(undef,d)
-    new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm,buf);
-    if (new_i<d)
-        print("Not in shape position")
-    end
-    v=Vector{UInt32}(undef,deg)
-    v[1]=w[1]
-    @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
-    return(v);
-end
-
-# @timeit tmr "zdim param" 
 function coeff_mod_p(x::Nemo.fpFieldElem,pr::UInt32)
     return(UInt32(Nemo.data(x)))
 end
 
+function check_separation_biv(bli,f,C)
+    k=length(bli)-1;
+    akk=C(bli[k+1])
+    invakk=Nemo.invmod(k*akk,f)
+    b=C(bli[k])*invakk
+    for i in (k-1):-1:1
+        tmp=Nemo.mod((k-i+1)*C(bli[i])-(i)*b*C(bli[i+1]),f)
+        if (tmp!=0) 
+            print("\n Error - variable is not separated ",Nemo.degree(f)," ** ",tmp);
+            return(false);
+        end 
+    end
+    return(true);
+end
+
 function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                                i_xw::Vector{Vector{Int32}},
-                               pr::UInt32,dd::Int32,
+                               pr::UInt32,dd::Int32,check::Int32,
                                arithm)
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
@@ -1030,14 +989,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     f=f/Nemo.gcd(f,ifp)
     ifp=Nemo.derivative(f)
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
-    flag=(Int32(Nemo.degree(f))==dd)
-#    if length(v)==length(gred)
-#        @inbounds for j in 1:(ii-1)
-#            v1=biv_shape_lemma(t_v,i_xw,Int32(length(v)),gred,index,hom,dg,Int32(j),pr,arithm)
-#            n1=Nemo.mulmod(ifp,-C(v1),f);
-#            push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(n1))));
-#        end
-#    else 
+    if (dd<0) flag=true else flag=(Int32(Nemo.degree(f))==dd) end
     if (flag)    
         @inbounds for j in 1:(ii-1)
             m_b,lt_b,n_g=biv_lex(t_v,i_xw,copy(gred),copy(index),copy(dg),copy(hom),copy(free_set),Int32(j),pr,arithm);
@@ -1054,6 +1006,10 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                 f1=ft/f2           
                 # in some non radical case
                 if (Nemo.degree(f1)>0)
+                  if (check>0)
+                        flag=check_separation_biv(bl[i],f1,C)
+                        if (!flag) print("\nError - System not separated"); end
+                  end
                   #lc1=Nemo.mod(-d1*lc1,f1)
                   s1+=Nemo.mulmod(d1*lc1,pro,f)
                   #co0=Nemo.mod(co0,f1)
@@ -1116,7 +1072,7 @@ function general_param(sys_z, nn, dd)::Vector{Vector{Rational{BigInt}}}
             print("\n*** bad prime for Gbasis detected ***\n")
             continue
         end
-        flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),arithm);
+        flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);
         if !flag
             print("\n*** bad prime for RUR detected ***\n")
             continue
@@ -1183,15 +1139,21 @@ function prepare_system(sys_z, nn,R)
     t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
     t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
     ii=Int32(length(i_xw))
-    v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
+    
+    flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
+
+    if (!flag) 
+        print("\n Error in the choice of the separating form \n") 
+    end
+    dd=length(zp_param[1])
     U, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
     
-    f=U(v)+_Z^(length(v));
-    ifp=Nemo.derivative(f)
-    f=f/Nemo.gcd(f,ifp)
+    f=U(zp_param[1]);
+#    ifp=Nemo.derivative(f)
+#    f=f/Nemo.gcd(f,ifp)
     
     dd=Nemo.degree(f)
-    print("\nSeparating vector ",dd,"(",length(gred),")")
+    print("\nSeparating vector ",dd,"(",length(q),")")
     ii-=1
     while (ii>0)
         v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
@@ -1214,7 +1176,7 @@ function prepare_system(sys_z, nn,R)
         C,ls=polynomial_ring(AbstractAlgebra.ZZ,ls3,ordering=:degrevlex)
         sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
     end
-    return(dd,length(gred),sys,AbstractAlgebra.symbols(C))
+    return(dd,length(q),sys,AbstractAlgebra.symbols(C))
 end
 
 function zdim_parameterization(sys)
