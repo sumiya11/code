@@ -28,24 +28,21 @@ sys_z = convert_sys_to_sys_z(sys)
 # rur = test_param(sys_z, 27)
 
 sys = [x - 1, y^2 + 1]
-sys_z = convert_sys_to_sys_z(sys)
-rur = test_param(sys_z, 27)
+rur = zdim_parameterization(sys)
 @test rur == [
     [1//1, 0//1, 1//1],
     [0//1, 2//1]
 ]
 
 sys = Groebner.noonn(2, ordering=:degrevlex)
-sys_z = convert_sys_to_sys_z(sys)
-rur = test_param(sys_z, 27)
+rur = zdim_parameterization(sys)
 @test rur == [
     [-11//10, 331//1100, 2//1, -11//5, -10//11, 1//1],
     [331//1210, 50//11, -6//1, -100//121, 10//11]
 ]
 
 sys = Groebner.chandran(3, ordering=:degrevlex)
-sys_z = convert_sys_to_sys_z(sys)
-rur = test_param(sys_z, 27)
+rur = zdim_parameterization(sys)
 @test rur == [
     [13016198158497821231889892947963417080429844249640621965941145600//14780607353199594067361659251327125954359640739917121291481681, -4761897999097476895468565115080156576666723377371412609357578240//14780607353199594067361659251327125954359640739917121291481681, -3905565285999177228403161085968179887534211276835917014857940992//14780607353199594067361659251327125954359640739917121291481681, -41738612957090672010477264961536//3844555546900004677751591891209, 1//1],
     [3843162496864274560482853963759457628242393849363871432892169765218135421485056//852609813903724657420458088312468645897510725411277724196832567082114481175, -21334190464088875516062230172219016126022160945289137387797031114205215540117504//4263049069518623287102290441562343229487553627056388620984162835410572405875, 339298824644533344549760701685858163924876132352//1108853550823596269200473988933971789029022875, 24714223531135976//288421779135875],
@@ -69,37 +66,39 @@ sys = [
     x*y,
     y^2
 ]
-sys_z = convert_sys_to_sys_z(sys)
-rur = test_param(sys_z, 27)
+rur = zdim_parameterization(sys)
 # @test rur == [
 #     [0, 0, 1],  # y^2 = 0
 #     []          # x   = 0
 # ]
 
-# This example is used for testing "biv_general" (_Z is not separating)
-R, (t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["t", "_Z"], ordering=:degrevlex)
+# This example is used for testing "biv_general" (y is not separating)
+R, (t, y) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["t", "y"], ordering=:degrevlex)
 sys = [
-    _Z^4 + _Z^2,
-    t*_Z^2 + t + _Z^3 + _Z,
-    t^4 + t*_Z^3 + t*_Z + _Z^2,
+    y^4 + y^2,
+    t*y^2 + t + y^3 + y,
+    t^4 + t*y^3 + t*y + y^2,
 ]
-sys_z = convert_sys_to_sys_z(sys)
-gb = Groebner.groebner(sys, ordering=Groebner.Lex())
-rur = test_param(sys_z, 27)
-# @test rur = ...
+rur = zdim_parameterization(sys)
 
-# Non-shape, _Z separates
-R, (x, y, z, t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x", "y", "z", "t", "_Z"], ordering=:degrevlex)
+#=
+┌ Info: 
+└   g[end] = PolUInt32(PP[PP(Int32[1, 0, 0]), PP(Int32[0, 1, 0]), PP(Int32[0, 0, 1])], UInt32[0x0fffffa4, 0x0000002b, 0x00000001])
+PolUInt32[PolUInt32(PP[PP(Int32[1, 2, 0]), PP(Int32[0, 3, 0]), PP(Int32[1, 0, 0]), PP(Int32[0, 1, 0])], UInt32[0x00000001, 0x00000001, 0x00000001, 0x00000001]), PolUInt32(PP[PP(Int32[0, 4, 0]), PP(Int32[0, 2, 0])], UInt32[0x00000001, 0x00000001]), PolUInt32(PP[PP(Int32[4, 0, 0]), PP(Int32[0, 2, 0])], UInt32[0x00000001, 0x00000001]), PolUInt32(PP[PP(Int32[1, 0, 0]), PP(Int32[0, 1, 0]), PP(Int32[0, 0, 1])], UInt32[0x0fffffa4, 0x0000002b, 0x00000001])]
+=#
+
+# Non-shape, w separates
+R, (x, y, z, t, w) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x", "y", "z", "t", "w"], ordering=:degrevlex)
 sys = [
     y^2 * z + 2 * x * y * t - 2 * x - z,
     -x^3 * z + 4 * x * y^2 * z + 4 * x^2 * y * t + 2 * y^3 * t + 4 * x^2 - 10 * y^2 + 4 * x * z - 10 * y * t + 2,
     2 * y * z * t + x * t^2 - x - 2 * z,
     -x * z^3 + 4 * y * z^2 * t + 4 * x * z * t^2 + 2 * y * t^3 + 4 * x * z + 4 * z^2 - 10 * y * t - 10 * t^2 + 2,
-    x - 2y - 3z + 4t + _Z
+    x - y - z + t + w
 ]
-sys_z = convert_sys_to_sys_z(sys)
-gb = Groebner.groebner(map(f -> change_coefficient_ring(GF(2^30+3), f), sys_z), ordering=Groebner.Lex())
-_, _, sys_z_sep = prepare_system(sys_z, 27, R)
-rur = test_param(sys_z_sep, 27)
-# @test rur = ...
+rur = zdim_parameterization(sys)
+
+#=
+
+=#
 

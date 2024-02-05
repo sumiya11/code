@@ -22,7 +22,7 @@ using BenchmarkTools
 using JET
 # using Traceur
 include("../../Groebner.jl/src/Groebner.jl")
-Groebner.invariants_enabled() = true
+# Groebner.invariants_enabled() = true
 
 include((@__DIR__)*"/../Julia/rur.jl")
 # include((@__DIR__)*"/rur_old.jl")
@@ -38,12 +38,36 @@ end
 
 ###
 
-nn=Int32(29);
+R, (x, y, z, t, _Z) = AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ, ["x", "y", "z", "t", "_Z"], ordering=:degrevlex)
+sys = [
+    y^2 * z + 2 * x * y * t - 2 * x - z,
+    -x^3 * z + 4 * x * y^2 * z + 4 * x^2 * y * t + 2 * y^3 * t + 4 * x^2 - 10 * y^2 + 4 * x * z - 10 * y * t + 2,
+    2 * y * z * t + x * t^2 - x - 2 * z,
+    -x * z^3 + 4 * y * z^2 * t + 4 * x * z * t^2 + 2 * y * t^3 + 4 * x * z + 4 * z^2 - 10 * y * t - 10 * t^2 + 2,
+    x - y - z + t + _Z
+]
+sys_z=convert_sys_to_sys_z(sys);
+prep = prepare_system(sys_z, 27, R)
+
+R, (_Z,x,y) = polynomial_ring(QQ, ["_Z","x","y"], ordering=:degrevlex)
+
+Groebner.groebner([x*y^3 + y^2, x^2*y + x])
+
+Groebner.groebner([x*y^3 + y^2, x^2*y + x, _Z + 2x + 3y])
+
+prepare_system(convert_sys_to_sys_z([x*y^3 + y^2, x^2*y + x]), 27, R)
+
+
+nn=Int32(28);
 tmr = TimerOutputs.TimerOutput()
 sys = Groebner.eco10(k=QQ, ordering=:degrevlex);
-include("../Data/Systems/fab_4.jl");
+include("../Data/Systems/chandran9.jl");
+
+@time zdim_parameterization(sys);
+
 sys_z = convert_sys_to_sys_z(sys);
 dm,Dq,sys_T,_vars=prepare_system(sys_z, nn,R);
+
 @time rur_jam = test_param(sys_T, nn);
 
 d = 200
