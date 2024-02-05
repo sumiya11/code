@@ -1116,7 +1116,6 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     else 
         print("Bad prime number for parameterization ",Int32(Nemo.degree(f)),"(",dd,")")
     end
-#    end
     return(flag,res)
 end
 
@@ -1174,6 +1173,7 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
         kk != bloc_p && continue
         # Attempt reconstruction
         print("[",kk,",",length(t_pr),"]");
+        Base.flush(Base.stdout)
         kk=0
         zz_p=BigInt(1);
         if (lift_level==0)
@@ -1198,13 +1198,10 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
     return qq_m;
 end
 
-# Fix the random number generator for better reproducibility
-# const _rur_rng = Ref{Random.Xoshiro}(Random.Xoshiro(42))
-
-function prepare_system(sys_z, nn,R)
+function prepare_system(sys_z, nn,R,use_block)
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
-    # C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
     C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
+    #C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
     lls=AbstractAlgebra.gens(C)
     sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
     _rur_rng=Random.Xoshiro(42)
@@ -1221,14 +1218,16 @@ function prepare_system(sys_z, nn,R)
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
-    
-    # gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
-    linform=true    # if a linear form was appended
-    gro=groebner_linform(sys_Int32,linform)
-    quo,g=kbase_linform(gro,pr,linform)
-    # quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
-    # g=sys_mod_p(gro,pr);
-
+    linform=false 
+    if (use_block)
+        linform=true    # if a linear form was appended
+        gro=groebner_linform(sys_Int32,linform)
+        quo,g=kbase_linform(gro,pr,linform)
+    else 
+        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+        g=sys_mod_p(gro,pr);
+    end
     ltg=map(u->u.exp[1],g);
     q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
     i_xw,t_xw=prepare_table_mxi(ltg,q);
@@ -1247,7 +1246,6 @@ function prepare_system(sys_z, nn,R)
     f=U(zp_param[1]);
 
     dd=Nemo.degree(f)
-    print("\nSeparating vector ",dd,"(",length(q),")")
     ii-=1
     while (ii>0)
         v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
@@ -1255,10 +1253,8 @@ function prepare_system(sys_z, nn,R)
         ifp=Nemo.derivative(f)
         f=f/Nemo.gcd(f,ifp)
         if (dd==Nemo.degree(f)) 
-            print("\nvariable ",ii," is separating ",Nemo.degree(f))
+            print("\nvariable ",ii," is separating ",Nemo.degree(f),"(",length(q),")\n")
             break;
-        else
-           print("\nvariable ",ii," is NOT separating ",Nemo.degree(f))
         end
         ii-=1
     end
@@ -1270,15 +1266,16 @@ function prepare_system(sys_z, nn,R)
         C,ls=polynomial_ring(AbstractAlgebra.ZZ,ls3,ordering=:degrevlex)
         sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
         linform=false
+    else 
+        print("\nSeparating vector ",dd,"(",length(q),")\n")
     end
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),linform)
 end
 
-function zdim_parameterization(sys)
+function zdim_parameterization(sys,nn::Int32=Int32(27),use_block::Bool=false)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
-    nn=Int32(28)
     sys_z=convert_sys_to_sys_z(sys);
-    dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]));
+    dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
     qq_m=general_param(sys_T,nn,dm,linform);
     return(qq_m)
 end
