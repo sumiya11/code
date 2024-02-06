@@ -1214,17 +1214,18 @@ function prepare_system(sys_z, nn,R,use_block)
     #C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
     lls=AbstractAlgebra.gens(C)
     sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
-    _rur_rng=Random.Xoshiro(42)
-    lc=map(u->BigInt(u%83),rand(_rur_rng, Int, length(lls)-1));
-    # lc=map(u->(2u)%83,1:(length(lls)-1));
+
     lf=lls[length(lls)]
     sep=Vector{BigInt}()
-    for i in eachindex(lc)
-        lf+=C(lc[i])*lls[i]
-        sep=push!(sep,lc[i])
+    push!(sep,BigInt(1))
+    lf-=lls[1]
+    for i in 2:length(ls)
+        cc=-BigInt(rand(-50:50))
+        lf+=C(cc)*lls[i]
+        sep=push!(sep,cc)
     end
     push!(sys,lf)
-    
+  
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
