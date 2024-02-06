@@ -1142,6 +1142,7 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
     graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform);
+    backup=deepcopy(graph)
     expvecs,cfs_zz=extract_raw_data(sys_z)
     continuer=true
     bloc_p=Int32(2)
@@ -1156,19 +1157,22 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
             print("\n*** bad prime for lead detected ***\n")
             continue
         end
-        success,t_v=nothing,nothing
-        try
-            success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
-        catch err
-            println("***** Fatal error. Debug info will follow *****")
-            println(err)
-            println("nn=$nn, dd=$dd, linform=$linform, pr=$pr")
-            println("sys_z=\n$sys_z")
-            println("cfs_zp=\n$cfs_zp")
-            rethrow(err)
-        end
+        # success,t_v=nothing,nothing
+        # try
+        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
+        # catch err
+        #     println("***** Fatal error. Debug info will follow *****")
+        #     println(err)
+        #     println("nn=$nn, dd=$dd, linform=$linform, pr=$pr")
+        #     println("sys_z=\n$sys_z")
+        #     println("cfs_zp=\n$cfs_zp")
+        #     rethrow(err)
+        # end
         if !success
             print("\n*** bad prime for Gbasis detected ***\n")
+            # The object may be corrupted after the failure. Revive it.
+            graph=backup
+            backup=deepcopy(backup)
             continue
         end
         flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);

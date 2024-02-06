@@ -61,7 +61,7 @@ prepare_system(convert_sys_to_sys_z([x*y^3 + y^2, x^2*y + x]), 27, R)
 nn=Int32(28);
 tmr = TimerOutputs.TimerOutput()
 sys = Groebner.eco10(k=QQ, ordering=:degrevlex);
-include("../Data/Systems/chandran9.jl");
+include("../Data/Systems/reimer6.jl");
 
 @time zdim_parameterization(sys);
 
