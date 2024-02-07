@@ -1,3 +1,11 @@
+# ******************************************************************************
+# Copyright 2024 
+#
+# Alexander Demin (asdemin_2@edu.hse.ru)
+# Fabrice Rouillier (Fabrice.Rouillier@inria.fr)
+# ******************************************************************************
+
+
 
 import AbstractAlgebra,Nemo,Primes,Random
 
