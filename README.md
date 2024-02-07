@@ -6,7 +6,7 @@ This code is basically proposed to reproduce the results of an article.
 
 ## Julia 
 
-Warning : the package does not pre-compile anything so that the first run maight be slow.
+Warning : the package does not pre-compile anything so that the first run might be slow.
 
 Please first get a fresh version of the development version of Groebner.jl package at [https://github.com/sumiya11/Groebner.jl] (https://github.com/sumiya11/Groebner.jl)
 
@@ -23,6 +23,8 @@ qq=zdim_parameterization(sys);
  ```
 
 ## Maple
+Should work with any Maple version since Maple 2020
+
 
  ```
 read("Maple/zds.mpl");
