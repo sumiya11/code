@@ -22,7 +22,7 @@ qq=zdim_parameterization(sys);
  ```
 
 ## Maple
-Should work with any Maple version since Maple 2020
+Should work with any Maple version since Maple 2018
 
 
  ```
