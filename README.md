@@ -6,7 +6,7 @@ This code is basically proposed to reproduce the results of an [article](Article
 
 ## Julia 
 
-Please first get a fresh version of the development version of Groebner.jl package at [https://github.com/sumiya11/Groebner.jl] (https://github.com/sumiya11/Groebner.jl)
+Please first get a fresh version of the [development version of Groebner.jl package](https://github.com/sumiya11/Groebner.jl)
 
 **Warning : the package does not pre-compile anything so that the first run might be slow.**
 
