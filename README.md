@@ -6,10 +6,9 @@ This code is basically proposed to reproduce the results of an article.
 
 ## Julia 
 
-<span style="color:red;">Warning : the package does not pre-compile anything so that the first run might be slow.</span>
-
 Please first get a fresh version of the development version of Groebner.jl package at [https://github.com/sumiya11/Groebner.jl] (https://github.com/sumiya11/Groebner.jl)
 
+**Warning : the package does not pre-compile anything so that the first run might be slow.**
 
  ```
 include("../Groebner.jl/src/Groebner.jl")
