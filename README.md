@@ -1,8 +1,8 @@
 # Rational Univariate Representation in (almost) pure Julia or Maple
 
-We propose two prototypes that implement the computation of Rational Univariate Representation for solving zero-dimensional systems of polynomial equations with rational coefficients.
+We propose two prototypes that implement the computation of Rational Univariate Representations for solving zero-dimensional systems of polynomial equations with rational coefficients.
 
-This code is basically proposed to reproduce the results of an article.
+This code is basically proposed to reproduce the results of an [article](Article/RUR.pdf).
 
 ## Julia 
 
