@@ -1067,9 +1067,8 @@ function check_separation_biv(bli,f,C)
     for i in (k-1):-1:1
         tmp=Nemo.mod((k-i+1)*C(bli[i])-(i)*b*C(bli[i+1]),f)
         if (tmp!=0) 
-            print("\n Error - variable is not separated ",Nemo.degree(f)," ** ",tmp);
             return(false);
-        end 
+        end
     end
     return(true);
 end
@@ -1089,7 +1088,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
     if (dd<0) flag=true else flag=(Int32(Nemo.degree(f))==dd) end
     if (flag)    
-        @inbounds for j in 1:(ii-1)
+        @inbounds for j in (ii-1):-1:1
             m_b,lt_b,n_g=biv_lex(t_v,i_xw,copy(gred),copy(index),copy(dg),copy(hom),copy(free_set),Int32(j),pr,arithm);
             bl=convert_biv_lex_2_biv_pol(n_g,m_b,lt_b,pr)
             s1=C([Int32(0)])
@@ -1106,7 +1105,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                 if (Nemo.degree(f1)>0)
                   if (check>0)
                         flag=check_separation_biv(bl[i],f1,C)
-                        if (!flag) print("\nError - System not separated"); end
+                        if (!flag) return(false,[],j) end
                   end
                   #lc1=Nemo.mod(-d1*lc1,f1)
                   s1+=Nemo.mulmod(d1*lc1,pro,f)
@@ -1124,7 +1123,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     else 
         print("Bad prime number for parameterization ",Int32(Nemo.degree(f)),"(",dd,")")
     end
-    return(flag,res)
+    return(flag,res,ii)
 end
 
 function zz_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{BigInt}}
@@ -1168,14 +1167,6 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
         # success,t_v=nothing,nothing
         # try
         success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
-        # catch err
-        #     println("***** Fatal error. Debug info will follow *****")
-        #     println(err)
-        #     println("nn=$nn, dd=$dd, linform=$linform, pr=$pr")
-        #     println("sys_z=\n$sys_z")
-        #     println("cfs_zp=\n$cfs_zp")
-        #     rethrow(err)
-        # end
         if !success
             print("\n*** bad prime for Gbasis detected ***\n")
             # The object may be corrupted after the failure. Revive it.
@@ -1220,37 +1211,25 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
     return qq_m;
 end
 
+function swap_elts!(v,i,j)
+    t=v[i]
+    v[i]=v[j]
+    v[j]=t
+    return(v)
+end
 function prepare_system(sys_z, nn,R,use_block)
-    ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
-    C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
-    #C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
-    lls=AbstractAlgebra.gens(C)
-    sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
 
-    lf=lls[length(lls)]
-    sep=Vector{BigInt}()
-    push!(sep,BigInt(1))
-    lf-=lls[1]
-    for i in 2:length(ls)
-        cc=-BigInt(rand(-50:50))
-        lf+=C(cc)*lls[i]
-        sep=push!(sep,cc)
-    end
-    push!(sys,lf)
-  
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    sys_Int32=convert_to_mpol_UInt32(sys,pr)
-    linform=false 
-    if (use_block)
-        linform=true    # if a linear form was appended
-        gro=groebner_linform(sys_Int32,linform)
-        quo,g=kbase_linform(gro,pr,linform)
-    else 
-        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
-        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
-        g=sys_mod_p(gro,pr);
-    end
+    sys=copy(sys_z)
+    sys_Int32=convert_to_mpol_UInt32(sys_z,pr)
+
+    print("\nTest the shape position")
+    
+    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+    quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+    g=sys_mod_p(gro,pr);
+
     ltg=map(u->u.exp[1],g);
     q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
     i_xw,t_xw=prepare_table_mxi(ltg,q);
@@ -1258,47 +1237,127 @@ function prepare_system(sys_z, nn,R,use_block)
     t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
     ii=Int32(length(i_xw))
     
-    flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
+    flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
 
-    if (!flag) 
-        print("\n Error in the choice of the separating form \n") 
+    if (flag) 
+        dd0=length(zp_param[1])-1
+        print("\nSystem is shape position (",ii,")")
+        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false);
     end
-    dd=length(zp_param[1])
-    U, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
+
+    print("\nTest Cyclic variables")
     
-    f=U(zp_param[1]);
+    for ii in (length(i_xw)-1):-1:1
+      ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
+      ls=swap_elts!(ls,length(ls),ii)
+      print("(",ls[length(ls)],")")
+      C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls),ordering=:degrevlex);
+      lls=AbstractAlgebra.gens(C)
+      sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
+      sys_Int32=convert_to_mpol_UInt32(sys0,pr)
 
-    dd=Nemo.degree(f)
-    ii-=1
-    while (ii>0)
-        v,gred,index,dg,hom=first_variable(t_v,i_xw,Int32(ii),pr,arithm)
-        f=U(v)+_Z^(length(v));
-        ifp=Nemo.derivative(f)
-        f=f/Nemo.gcd(f,ifp)
-        if (dd==Nemo.degree(f)) 
-            print("\nvariable ",ii," is separating ",Nemo.degree(f),"(",length(q),")\n")
-            break;
+      gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+      quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+      g=sys_mod_p(gro,pr);
+
+      ltg=map(u->u.exp[1],g);
+      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+      i_xw,t_xw=prepare_table_mxi(ltg,q);
+      t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
+      t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
+      ii=Int32(length(i_xw))
+    
+      flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
+    
+      if (flag) 
+        dd0=length(zp_param[1])-1
+        print("\nSystem has a cyclic variable (",ls[length(ls)],")")
+        return(dd0,length(q),sys0,AbstractAlgebra.symbols(C),false);
+      end
+    end
+
+    print("\nFind a separating vector")
+
+    dd0=0
+    
+    ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
+    C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
+    #C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
+    lls=AbstractAlgebra.gens(C)
+    sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
+
+    sep=[ BigInt(0) for i=1:length(lls)]
+    sep[length(lls)]=1
+    vv=length(lls)-1
+    cc=BigInt(1)
+    sep[length(lls)-1]=-BigInt(1)
+    vv-=1
+    dd=-1
+    while (!flag) 
+      sys=copy(sys0)
+      lf=C(BigInt(0))
+      for j in eachindex(lls)
+            lf+=sep[j]*lls[j]
+      end
+      print("\nLF ",lf)
+      Base.flush(stdout)
+
+      push!(sys,lf) 
+
+      sys_Int32=convert_to_mpol_UInt32(sys,pr)
+      linform=false 
+      if (use_block)
+        linform=true    # if a linear form was appended
+        gro=groebner_linform(sys_Int32,linform)
+        quo,g=kbase_linform(gro,pr,linform)
+      else 
+        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+        g=sys_mod_p(gro,pr);
+      end
+      ltg=map(u->u.exp[1],g);
+      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+      i_xw,t_xw=prepare_table_mxi(ltg,q);
+      t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
+      t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
+      ii=Int32(length(i_xw))
+      flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
+      if (!flag)
+        print(" (",uu,",",vv,")")
+        if (sep[uu]>0) sep[uu]=-sep[uu]
+        else sep[uu]=-sep[uu]+1 end
+        vv=uu
+        if (vv<1)
+            print("\n Error in the choice of the separating form \n") 
+            return(-1,-1,sys,AbstractAlgebra.symbols(C),linform)
         end
-        ii-=1
+      else
+        dd=length(zp_param[1])-1
+      end  
     end
-    if (ii>0)
-        ls3=Vector{Symbol}()
-        for i in 1:(ii-1) push!(ls3,ls[i]) end
-        for i in (ii+1):(length(ls)-1) push!(ls3,ls[i]) end
-        push!(ls3,ls[ii])
-        C,ls=polynomial_ring(AbstractAlgebra.ZZ,ls3,ordering=:degrevlex)
-        sys=map(u->C(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys_z);
-        linform=false
-    else 
-        print("\nSeparating vector ",dd,"(",length(q),")\n")
+
+    if (dd==dd0)
+         print("\nSystem is in fact cyclic (",ii,")")
+        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false)
     end
-    return(dd,length(q),sys,AbstractAlgebra.symbols(C),linform)
+
+    
+    print("\nSeparating form : ",sys[length(sys)],"\n")
+    return(dd,length(q),sys,AbstractAlgebra.symbols(C),false)
 end
 
 function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
     sys_z=convert_sys_to_sys_z(sys);
     dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
-    qq_m=general_param(sys_T,nn,dm,linform);
-    return(qq_m)
+    print("\n New ordered set of variables : ",_vars,"\n");
+    Base.flush(stdout)    
+    if (dm>0) 
+        qq_m=general_param(sys_T,nn,dm,linform);
+        print("\n");
+        return(qq_m)
+    else 
+        print("\nSomething goes wrong");
+        return([]) 
+    end
 end
