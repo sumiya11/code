@@ -1253,13 +1253,15 @@ function prepare_system(sys_z, nn,R,use_block)
     
     flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
 
+    dd0=0
     if (flag) 
         dd0=length(zp_param[1])-1
+        i_max=ii
         print("\nSystem is shape position (",ii,")")
         return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false);
     end
 
-    print("\nTest Cyclic variables")
+    print("\nTest if variables are cyclic")
     
     for ii in (length(i_xw)-1):-1:1
       ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
@@ -1284,7 +1286,10 @@ function prepare_system(sys_z, nn,R,use_block)
       flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
     
       if (flag) 
-        dd0=length(zp_param[1])-1
+        if ((length(zp_param[1])-1)>dd0)
+            dd0=(length(zp_param[1])-1)
+            i_max=ii
+        end
         print("\nSystem has a cyclic variable (",ls[length(ls)],")")
         return(dd0,length(q),sys0,AbstractAlgebra.symbols(C),false);
       end
@@ -1338,8 +1343,8 @@ function prepare_system(sys_z, nn,R,use_block)
       flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
       if (!flag)
         print(" (",uu,",",vv,")")
-        if (sep[uu]>0) sep[uu]=-sep[uu]
-        else sep[uu]=-sep[uu]+1 end
+        if (sep[uu]<0) sep[uu]=-sep[uu]
+        else sep[uu]=-sep[uu]-1 end
         vv=uu
         if (vv<1)
             print("\n Error in the choice of the separating form \n") 
