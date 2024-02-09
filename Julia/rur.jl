@@ -523,6 +523,13 @@ end
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform)
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
    graph,gro=groebner_learn_linform(sys_Int32,linform);
+   for pr2 in Primes.nextprimes(UInt32(2^30), 2)
+    sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
+    gb_2 = Groebner.groebner(sys_Int32_2)
+    if !(map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gro) == map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gb_2))
+        throw("Learned basis modulo $pr may be not generic enough.")
+    end
+   end
    quo,g=kbase_linform(gro,pr,linform);
 
    gb_expvecs=map(poly->poly.exp,g)
@@ -544,27 +551,23 @@ function apply_zdim_quo!(graph,
                          arithm,
                          gb_expvecs::Vector{Vector{PP}},
                          cfs_zp::Vector{Vector{UInt32}},
+                         sys,
                          linform::Bool)
+
     sav_graph=copy(graph)
     sav_cfs_zp=copy(cfs_zp)
     
-    success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
-    # should check the leading terms here.
-    for i in 1:length(gb_expvecs)
-        if (length(gb_expvecs[i])!=length(gro[i]))
-            print("\n***** Critical bad prime - monomials in GB ******\n");
-            success=false;
-            break;
-        else
-            if ((gro[i][1])%pr==0)
-                print("\n***** Critical bad prime - leading coefficients null in GB ******\n");
-                success=false;
-                break;
-           end
-        end
-    end
+#   @timeit tmr "convert" 
+    sys_Int32=convert_to_mpol_UInt32(sys,pr);
+#   @timeit tmr "groebner" 
+    success,gro=Groebner.groebner_apply!(graph,sys_Int32);
+    # success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
+    #success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
     if (success)
-        g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+#   @timeit tmr "gro mod p" 
+        g=sys_mod_p(gro,pr);
+        # g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+        #   @timeit tmr "fill"
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
         return(success,t_v)
@@ -1173,15 +1176,19 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
     while(continuer)
         kk+=1
         pr=UInt32(Primes.prevprime(pr-1))
+        # print("kk = $kk, pr = $pr, ")
         arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
         redflag,cfs_zp=reduce_mod_p(cfs_zz,pr)
+        # print("redflag=$redflag, ")
         if !redflag
             print("\n*** bad prime for lead detected ***\n")
             continue
         end
         # success,t_v=nothing,nothing
         # try
-        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
+        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,sys_z,linform);
+        # print("success=$success, ")
+        # println()
         if !success
             print("\n*** bad prime for Gbasis detected ***\n")
             # The object may be corrupted after the failure. Revive it.
