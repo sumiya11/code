@@ -1379,15 +1379,16 @@ end
 function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
     sys_z=convert_sys_to_sys_z(sys);
+    print("\nLearning step");
     dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
-    print("\nNew ordered set of variables : ",_vars,"\n");
+    print("\nStart the computation");
     Base.flush(stdout)    
     if (dm>0) 
         qq_m=general_param(sys_T,nn,dm,linform);
         print("\n");
         return(qq_m)
     else 
-        print("\nSomething goes wrong");
+        print("\nSomething went wrongly");
         return([]) 
     end
 end
