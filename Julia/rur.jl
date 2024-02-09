@@ -560,18 +560,19 @@ function apply_zdim_quo!(graph,
                          arithm,
                          gb_expvecs::Vector{Vector{PP}},
                          cfs_zp::Vector{Vector{UInt32}},
+                         sys,
                          linform::Bool)
 #   @timeit tmr "convert" 
-    # sys_Int32=convert_to_mpol_UInt32(sys,pr);
+    sys_Int32=convert_to_mpol_UInt32(sys,pr);
 #   @timeit tmr "groebner" 
-    # f,gro=Groebner.groebner_apply!(graph,sys_Int32);
-    success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
+    success,gro=Groebner.groebner_apply!(graph,sys_Int32);
+    # success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
     #success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
     if (success)
 #   @timeit tmr "gro mod p" 
-    # g=sys_mod_p(gro,pr);
-        g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
-#   @timeit tmr "fill"
+        g=sys_mod_p(gro,pr);
+        # g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+        #   @timeit tmr "fill"
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
 #  @timeit tmr "table" 
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
@@ -1189,7 +1190,7 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
         end
         # success,t_v=nothing,nothing
         # try
-        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
+        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,sys_z,linform);
         # print("success=$success, ")
         # println()
         if !success
