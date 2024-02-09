@@ -6,28 +6,35 @@ This code is basically proposed to reproduce the results of an [article](Article
 
 ## Julia 
 
-Please first get a fresh version of the [development version of Groebner.jl package](https://github.com/sumiya11/Groebner.jl)
+Install the package RationalUnivariateRepresentation.jl with
 
-**Warning : the package does not pre-compile anything so that the first run might be slow.**
+```julia
+using Pkg; Pkg.develop(path="Julia/RationalUnivariateRepresentation.jl/")
+```
 
- ```
-include("../Groebner.jl/src/Groebner.jl")
-include("Julia/rur.jl")
+<!-- Please first get a fresh version of the [development version of Groebner.jl package](https://github.com/sumiya11/Groebner.jl) -->
 
-QQ=AbstractAlgebra.QQ
-polynomial_ring=AbstractAlgebra.polynomial_ring
+<!-- **Warning : the package does not pre-compile anything so that the first run might be slow.** -->
+
+Then you should be able to do
+
+```julia
+using RationalUnivariateRepresentation
+
+# Create a zero-dimensional system
 include("Data/Systems/caprasse.jl")
 
-qq=zdim_parameterization(sys);
- ```
+# Find a RUR of solutions
+rur = zdim_parameterization(sys)
+```
 
 ## Maple
 Should work with any Maple version since Maple 2018
 
 
- ```
+```
 read("Maple/zds.mpl");
 include("Data/Systems/caprasse.mpl")
 
 ext,coo:=zds:-rur(sys,vars)
- ```
+```
