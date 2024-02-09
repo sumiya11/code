@@ -521,25 +521,16 @@ end
 ############################################
 
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform)
-#   pr=UInt32(Primes.prevprime(2^27-1));
-#   @timeit tmr "convert" 
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
-# @timeit tmr "groebner learn"  
-   # graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
    graph,gro=groebner_learn_linform(sys_Int32,linform);
-   # @timeit tmr "kbase" 
-   # quo=Groebner.kbase(gro00,ordering=Groebner.DegRevLex());
    quo,g=kbase_linform(gro,pr,linform);
 
-#    g=sys_mod_p(gro,pr);
    gb_expvecs=map(poly->poly.exp,g)
    ltg=map(u->u.exp[1],g);
    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
 
-   # @timeit tmr "prepare table" 
-   i_xw,t_xw=prepare_table_mxi(ltg,q);
+  i_xw,t_xw=prepare_table_mxi(ltg,q);
    t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
-# @timeit tmr "learn table"  
    t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
    return(graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs)
 end
@@ -554,22 +545,32 @@ function apply_zdim_quo!(graph,
                          gb_expvecs::Vector{Vector{PP}},
                          cfs_zp::Vector{Vector{UInt32}},
                          linform::Bool)
-#   @timeit tmr "convert" 
-    # sys_Int32=convert_to_mpol_UInt32(sys,pr);
-#   @timeit tmr "groebner" 
-    # f,gro=Groebner.groebner_apply!(graph,sys_Int32);
+    sav_graph=copy(graph)
+    sav_cfs_zp=copy(cfs_zp)
+    
     success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
-    #success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
+    # should check the leading terms here.
+    for i in 1:length(gb_expvecs)
+        if (length(gb_expvecs[i])!=length(gro[i]))
+            print("\n***** Critical bad prime - monomials in GB ******\n");
+            success=false;
+            break;
+        else
+            if ((gro[i][1])%pr==0)
+                print("\n***** Critical bad prime - leading coefficients null in GB ******\n");
+                success=false;
+                break;
+           end
+        end
+    end
     if (success)
-#   @timeit tmr "gro mod p" 
-    # g=sys_mod_p(gro,pr);
         g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
-#   @timeit tmr "fill"
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
-#  @timeit tmr "table" 
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
         return(success,t_v)
     else
+        graph=copy(sav_graph)
+        cfs_zp=copy(sav_cfs_zp)
         print("\n*** Bad prime detected in apply_zdim ***\n")
         return(success,nothing)
     end
@@ -1318,7 +1319,7 @@ function prepare_system(sys_z, nn,R,use_block)
       for j in eachindex(lls)
             lf+=sep[j]*lls[j]
       end
-      print("\nLF ",lf)
+      print("\nTry ",lf)
       Base.flush(stdout)
 
       push!(sys,lf) 
@@ -1347,7 +1348,7 @@ function prepare_system(sys_z, nn,R,use_block)
         else sep[uu]=-sep[uu]-1 end
         vv=uu
         if (vv<1)
-            print("\n Error in the choice of the separating form \n") 
+            print("\nError in the choice of the separating form \n") 
             return(-1,-1,sys,AbstractAlgebra.symbols(C),linform)
         end
       else
