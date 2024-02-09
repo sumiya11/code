@@ -563,19 +563,16 @@ function apply_zdim_quo!(graph,
                          cfs_zp::Vector{Vector{UInt32}},
                          sys,
                          linform::Bool)
-#   @timeit tmr "convert" 
     sys_Int32=convert_to_mpol_UInt32(sys,pr);
-#   @timeit tmr "groebner" 
-    success,gro=Groebner.groebner_apply!(graph,sys_Int32);
+#F    success,gro=Groebner.groebner_apply!(graph,sys_Int32);
     # success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
-    #success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
+    success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
     if (success)
 #   @timeit tmr "gro mod p" 
-        g=sys_mod_p(gro,pr);
-        # g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+#        g=sys_mod_p(gro,pr);
+        g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
         #   @timeit tmr "fill"
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
-#  @timeit tmr "table" 
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
         return(success,t_v)
     else
@@ -1195,14 +1192,16 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
         # print("success=$success, ")
         # println()
         if !success
+            kk-=1
             print("\n*** bad prime for Gbasis detected ***\n")
             # The object may be corrupted after the failure. Revive it.
             graph=backup
             backup=deepcopy(backup)
             continue
         end
-        flag,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);
-        if !flag
+        success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);
+        if !success
+            kk-=1
             print("\n*** bad prime for RUR detected ***\n")
             continue
         end
@@ -1210,7 +1209,7 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
         # From this point, we assume that the prime is OK
         push!(t_pr,UInt32(pr));
         push!(t_param,zp_param);
-        kk != bloc_p && continue
+        kk < bloc_p && continue
         # Attempt reconstruction
         print("[",kk,",",length(t_pr),"]");
         Base.flush(Base.stdout)
@@ -1232,7 +1231,6 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
             Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
             continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
         end
-        #bloc_p=Int32(2^(Int32(floor(max(log(length(t_pr)/10)/log(2),2)))))
         bloc_p=Int32(max(floor(length(t_pr)/10),2))
     end;
     return qq_m;
@@ -1331,7 +1329,7 @@ function prepare_system(sys_z, nn,R,use_block)
       for j in eachindex(lls)
             lf+=sep[j]*lls[j]
       end
-      print("\nLF ",lf)
+      print("\nTry ",lf)
       Base.flush(stdout)
 
       push!(sys,lf) 
@@ -1382,7 +1380,7 @@ function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
     sys_z=convert_sys_to_sys_z(sys);
     dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
-    print("\n New ordered set of variables : ",_vars,"\n");
+    print("\nNew ordered set of variables : ",_vars,"\n");
     Base.flush(stdout)    
     if (dm>0) 
         qq_m=general_param(sys_T,nn,dm,linform);
