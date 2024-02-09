@@ -30,7 +30,7 @@ local
      tri_sep_restrict_zp,biv_test_sep_gblex_zp,test_sep_gblex_zp,lin_extract_gblex_zp,
      param_shape_lemma_radicalize_zp,find_sep_elt,param_general_zp,pack_compute_seq,
      param_zerodim_internal_mm,param_zerodim,isolate_zerodim,
-     gb_drl_zp,gb_lex_2_biv,gb_lex_zp,tri_split_zp,tri_lin_extract_zp,biv_lin_extract_gblex_zp:
+     gb_drl_zp,gb_lex_2_biv,gb_lex_zp,tri_split_zp,tri_lin_extract_zp,biv_lin_extract_gblex_zp,find_sep_elt_ori:
 
 # ******************************************************************************
 # Groebner Engine: direct call to the limgb package 
@@ -162,14 +162,14 @@ end:
 
 test_sep_gblex_zp:=proc(glex,vars,pr)
   local i, test_ok,vars2,gg3:
-  i:=1:test_ok:=true:
-  while ((i<nops(vars)) and (test_ok)) do
+  i:=(nops(vars)-1):test_ok:=true:
+  while ((i>0) and (test_ok)) do
     vars2:=[vars[i],vars[nops(vars)]]:
     gg3:=gb_lex_2_biv(glex,vars,vars[i],pr):
     test_ok:=biv_test_sep_gblex_zp(gg3,vars2,pr):
-    if (test_ok) then i:=i+1: fi:
+    if (test_ok) then i:=i-1: fi:
   od:
-  return(evalb(i=nops(vars))):
+  return(i):
 end:
 
 lin_extract_gblex_zp:=proc(glex,vars,pr)
@@ -229,7 +229,6 @@ param_zerodim_internal_mm:=proc(sys,vars,param_engine_zp)
  reco_p:=FAIL:
  i:=1:
  while evalb(reco_p = FAIL) do
- #  pack2:=max(8,2^(ceil(log[2](i*10/100))));
    pack2:=max(2,ceil(i*10/100));
    print(i,pack2);
    pr,p_pr,lift_p:=pack_compute_seq(sys,vars,pr,param_engine_zp,pack2):
@@ -246,19 +245,35 @@ end:
 # ******************************************************************************
 
 find_sep_elt:=proc(sys,vars)
-  local pr,gdrl,glex,sys2,vars2,p,stop_comp,roll,i,is_cyclic,ii:
+  local pr,gdrl,glex,sys2,vars2,p,roll,i,is_cyclic,ii,ori,sep,stop_comp,uu,dd:
   roll:=rand(-10..10):
   pr:=prevprime(2^31);
   vars2:=vars:
   glex:=gb_lex_zp(sys,vars,pr):
-  stop_comp:=test_sep_gblex_zp(glex,vars,pr):
-  p:=vars[nops(vars)]:
+
+  stop_comp:=false:
+  ii:=nops(vars);
+  while ((ii>0) and (not(stop_comp))) do
+  	stop_comp:=evalb(test_sep_gblex_zp(glex,vars,pr)<1):
+  	p:=vars[ii]:
+        ii:=ii-1:
+  end:
+
+  sep:=[seq(0,i=1..nops(vars))]:
+  sep[nops(vars)]:=-1:
+  dd:=-1:
   while (not(stop_comp)) do
-    p:=_Z-(vars[1]+add(roll()*vars[i],i=2..nops(vars))):
+    p:=_Z+add(vars[i]*sep[i],i=1..(nops(vars))):
     sys2:=[op(sys),p]:
     vars2:=[op(vars),_Z]:
     glex:=gb_lex_zp(sys2,vars2,pr):
-    stop_comp:=test_sep_gblex_zp(glex,vars2,pr):
+    uu:=test_sep_gblex_zp(glex,vars2,pr):
+    if (uu>0) then
+        if (sep[uu]<0) then sep[uu]:=-sep[uu]:
+        else sep[uu]:=-sep[uu]-1 end
+    else
+        stop_comp:=true:
+    end:
   end:
   if (nops(glex)=nops(vars)) then
      is_cyclic:=evalb(0=add(degree(glex[ii],vars2[nops(vars2)-ii+1])-1,ii=2..(nops(vars2))));
