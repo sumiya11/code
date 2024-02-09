@@ -13,6 +13,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
 AbstractAlgebra = "0.36"
+Groebner = "0.7.0"
 Nemo = "0.40"
 PrecompileTools = "1"
 Primes = "0.5"
