@@ -526,16 +526,12 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
 # @timeit tmr "groebner learn"  
    # graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
-   graph,gro=nothing,nothing
-   i,attempts=0,3
-   prms=Primes.nextprimes(UInt32(2^30), attempts)
-   while i<=attempts
-    i+=1
-    graph,gro=groebner_learn_linform(sys_Int32,linform);
-    sys_Int32_2=convert_to_mpol_UInt32(sys,prms[i])
+   graph,gro=groebner_learn_linform(sys_Int32,linform);
+   for pr2 in Primes.nextprimes(UInt32(2^30), 2)
+    sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
     gb_2 = Groebner.groebner(sys_Int32_2)
-    if map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gro) == map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gb_2)
-        break
+    if !(map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gro) == map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gb_2))
+        throw("Learned basis modulo $pr may be not generic enough.")
     end
    end
    # @timeit tmr "kbase" 
@@ -1183,10 +1179,10 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
     while(continuer)
         kk+=1
         pr=UInt32(Primes.prevprime(pr-1))
-        print("kk = $kk, pr = $pr, ")
+        # print("kk = $kk, pr = $pr, ")
         arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
         redflag,cfs_zp=reduce_mod_p(cfs_zz,pr)
-        print("redflag=$redflag, ")
+        # print("redflag=$redflag, ")
         if !redflag
             print("\n*** bad prime for lead detected ***\n")
             continue
@@ -1194,8 +1190,8 @@ function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{Big
         # success,t_v=nothing,nothing
         # try
         success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,linform);
-        print("success=$success, ")
-        println()
+        # print("success=$success, ")
+        # println()
         if !success
             print("\n*** bad prime for Gbasis detected ***\n")
             # The object may be corrupted after the failure. Revive it.
