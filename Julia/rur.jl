@@ -178,14 +178,6 @@ end
 ## then returns the greatest variable
 ## that appear in the divisor
 @inline function divides(pp1::PP,pp2::PP)
-    # tmp=pp1.data-pp2.data
-    # i=1
-    # var=0
-    # while ((i<=length(tmp)) && (tmp[i]>=0))
-    #     if (tmp[i]>0) var=i end
-    #     i=i+1
-    # end
-    # return((i>length(tmp)),var)
     a, b = pp1.data, pp2.data
     var = 0
     @inbounds for j in 1:length(a)
@@ -198,6 +190,7 @@ end
     end
     return true, var
 end
+
 # Interface with AbstractAlgebra
 #####################################################
 function coeff_mod_p(x::AbstractAlgebra.GFElem{Int32},pr::UInt32)::UInt32
@@ -215,6 +208,7 @@ function sys_mod_p(sys::Vector{AbstractAlgebra.Generic.MPoly{T}},pr::UInt32)::Ve
     end
     return(res)
 end
+
 #####################################################
 # Multiplication Matrices
 #####################################################
@@ -522,11 +516,7 @@ end
 ############################################
 
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform)
-#   pr=UInt32(Primes.prevprime(2^27-1));
-#   @timeit tmr "convert" 
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
-# @timeit tmr "groebner learn"  
-   # graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
    graph,gro=groebner_learn_linform(sys_Int32,linform);
    for pr2 in Primes.nextprimes(UInt32(2^30), 2)
     sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
@@ -535,19 +525,12 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
         throw("Learned basis modulo $pr may be not generic enough.")
     end
    end
-   # @timeit tmr "kbase" 
-   # quo=Groebner.kbase(gro00,ordering=Groebner.DegRevLex());
    quo,g=kbase_linform(gro,pr,linform);
-
-#    g=sys_mod_p(gro,pr);
    gb_expvecs=map(poly->poly.exp,g)
    ltg=map(u->u.exp[1],g);
    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
-
-   # @timeit tmr "prepare table" 
    i_xw,t_xw=prepare_table_mxi(ltg,q);
    t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
-# @timeit tmr "learn table"  
    t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
    return(graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs)
 end
@@ -564,14 +547,9 @@ function apply_zdim_quo!(graph,
                          sys,
                          linform::Bool)
     sys_Int32=convert_to_mpol_UInt32(sys,pr);
-#F    success,gro=Groebner.groebner_apply!(graph,sys_Int32);
-    # success,gro=groebner_apply_linform!(graph,cfs_zp,pr,linform)
     success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
     if (success)
-#   @timeit tmr "gro mod p" 
-#        g=sys_mod_p(gro,pr);
         g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
-        #   @timeit tmr "fill"
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
         return(success,t_v)
@@ -603,7 +581,6 @@ end
 # Run "_gauss_reduct_jam[] = 1" to disable jamming
 const _gauss_reduct_jam = Ref{Int}(2)
 
-# @timeit tmr "gred" 
 function gauss_reduct(
         v::Vector{UInt32},
         gred::Vector{Vector{UInt32}},
@@ -626,7 +603,6 @@ function gauss_reduct(
     @inbounds for ell in 1:dv
         b[ell] = UInt64(v[ell])
     end
-    # b=[UInt64(v[i]) for i=1:dv]
     @inbounds for i in 1:(dg-1)
         b[i+1]=Groebner.mod_p(b[i+1], arithm)
         iszero(b[i+1]) && continue
@@ -681,7 +657,6 @@ function gauss_reduct_jam2(
     @inbounds for ell in 1:dv
         b[ell] = UInt64(v[ell])
     end
-    # b=[UInt64(v[i]) for i=1:dv]
     ub2 = (dg-1) & xor(typemax(Int), 1)
     k = 1
     @inbounds while k <= ub2
@@ -979,7 +954,6 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     #set v[i] cofficient of T^(i-1) in the min poly
     v=Vector{UInt32}(undef,deg)
     v[1]=w[1];
-#old    @inbounds for i in 2:deg v[i]=w[index[i-1]+1]; end;
     @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
     return(v,gred,index,dg,hom,free_set)
 end
@@ -1312,7 +1286,6 @@ function prepare_system(sys_z, nn,R,use_block)
     
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
     C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
-    #C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex,cached=false);
     lls=AbstractAlgebra.gens(C)
     sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
 
@@ -1369,9 +1342,7 @@ function prepare_system(sys_z, nn,R,use_block)
     if (dd==dd0)
          print("\nSystem is in fact cyclic (",ii,")")
         return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false)
-    end
-
-    
+    end    
     print("\nSeparating form : ",sys[length(sys)],"\n")
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),false)
 end
