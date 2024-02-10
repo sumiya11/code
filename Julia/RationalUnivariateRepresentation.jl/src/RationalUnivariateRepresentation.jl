@@ -1062,6 +1062,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
         new_monomial_free_set=copy(tmp_mon_set)
         append!(new_monomial_basis,copy(tmp_mon_set))
     end
+#    print("{",length(new_monomial_basis),"}")
     return(new_monomial_basis,new_leading_monomials,new_generators);
 end
 
@@ -1271,6 +1272,25 @@ function swap_elts!(v,i,j)
     v[j]=t
     return(v)
 end
+
+function isuniv(v)
+    pos=0
+    for i in eachindex(v)
+        if (v[i]!=0) 
+            if (pos>0) return(0)
+            else pos=i end
+        end
+    end
+    return(1)
+end
+function count_univ(l)
+    nb=0
+    for i in eachindex(l)
+        nb+=l[i]
+    end
+    return(nb)
+end
+
 function prepare_system(sys_z, nn,R,use_block)
 
     pr=UInt32(Primes.prevprime(2^nn-1));
@@ -1281,6 +1301,10 @@ function prepare_system(sys_z, nn,R,use_block)
     print("\nTest the shape position")
     
     gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+    if !(count_univ(map(w->isuniv(w),map(u->collect(AbstractAlgebra.exponent_vectors(u))[1],gro)))==length(AbstractAlgebra.gens(AbstractAlgebra.parent(gro[1]))))
+        print("\nError :  System is not zero-dimensional \n")
+        return(-1,nothing,nothing,nothing,nothing,nothing)
+    end
     quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
     g=sys_mod_p(gro,pr);
 
@@ -1407,9 +1431,9 @@ function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
     sys_z=convert_sys_to_sys_z(sys);
     print("\nLearning step");
     dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
-    print("\nStart the computation (cyclic = ",cyclic,")");
-    Base.flush(stdout)    
     if (dm>0) 
+        print("\nStart the computation (cyclic = ",cyclic,")");
+        Base.flush(stdout)    
         qq_m=general_param(sys_T,nn,dm,linform,cyclic);
         print("\n");
         return(qq_m)
