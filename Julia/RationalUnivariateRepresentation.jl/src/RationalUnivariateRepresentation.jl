@@ -29,6 +29,20 @@ import AbstractAlgebra: QQ, polynomial_ring
 export zdim_parameterization, QQ, polynomial_ring
 
 #####################################################
+# Logging
+#####################################################
+
+# Call zdim_parameterization with verbose=true/false,
+# or set this value directly
+const _verbose = Ref{Bool}(true)
+
+rur_print(xs...) = rur_print(stdout, xs...)
+function rur_print(io::IO, xs...)
+    _verbose[] && print(io, xs...)
+    nothing
+end
+
+#####################################################
 # Add on to AbstractAlgebra
 #####################################################
 
@@ -252,7 +266,7 @@ function find_in_border(m::PP,
             if (res_flag>0) 
                return(res_flag,res_dd,res_pos)
             else
-               print("\nError find in border : ",tm," ",tmm)
+               rur_print("\nError find in border : ",tm," ",tmm)
                return(0,0,0)
             end
       end
@@ -261,7 +275,7 @@ function find_in_border(m::PP,
    if (res_flag>0)
       return(res_flag,res_dd,res_pos)
    else 
-      print("\n\nError in finding a predecessor")
+      rur_print("\n\nError in finding a predecessor")
       return(0,0,0)
    end
 end
@@ -293,7 +307,7 @@ function prepare_table_mxi(ltg::Vector{PP},
 		             nb_stack=nb_stack+1
 	                 tablex[i][j]=Int32(nb_stack)
                          push!(general_stack,StackVect(nb_stack,PP(nm.data),Int32(prec),Int32(v)))
-	             else print("\n*** Error search table ***\n") end
+	             else rur_print("\n*** Error search table ***\n") end
 	         else
 		     #nm is a leading monomial of an element of the Gb
 		     #we insert it with the flags prev=0 and var=pos in the gb
@@ -389,7 +403,7 @@ function vectorize_pol_gro(p::PolUInt32,
    @inbounds for i in 2:length(p.co)
       m=monomial(p,Int32(i))
       while ((pos>0) && (kb[pos].data!=m.data)) pos=pos-1 end
-      if (pos<1) print("\nError vectorisation ",pos," ",m)
+      if (pos<1) rur_print("\nError vectorisation ",pos," ",m)
       else
          res[pos]=pr-coeff(p,Int32(i))
       end
@@ -407,7 +421,7 @@ function compute_fill_quo_gb!(t_xw::Vector{StackVect},
                               arithm)
    t_v=[Vector{UInt32}() for i=1:length(t_xw)]
    @inbounds for i in eachindex(t_xw)
-      #print("\n",t_xw[i])
+      #rur_print("\n",t_xw[i])
       if ((t_xw[i].var>0) && (t_xw[i].prev==0))
          #var>0 and prev=0 => groebner basis element at position var in the list gro
          t_v[i]=vectorize_pol_gro(gro[t_xw[i].var],quo,pr,arithm)
@@ -574,9 +588,9 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
       t_learn=learn_compute_table_sl!(t_v,t_xw,i_xw,q,pr,arithm);
       success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(1),arithm)
       if (success) 
-        print("\nApply cyclic optimization")
+        rur_print("\nApply cyclic optimization")
       else
-        print("\nSwitch off cyclic optimization")
+        rur_print("\nSwitch off cyclic optimization")
         i_xw,t_xw=prepare_table_mxi(ltg,q);
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
         t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm);
@@ -606,7 +620,7 @@ function apply_zdim_quo!(graph,
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
         return(success,t_v)
     else
-        print("\n*** Bad prime detected in apply_zdim ***\n")
+        rur_print("\n*** Bad prime detected in apply_zdim ***\n")
         return(success,nothing)
     end
 end
@@ -1062,7 +1076,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
         new_monomial_free_set=copy(tmp_mon_set)
         append!(new_monomial_basis,copy(tmp_mon_set))
     end
-#    print("{",length(new_monomial_basis),"}")
+#    rur_print("{",length(new_monomial_basis),"}")
     return(new_monomial_basis,new_leading_monomials,new_generators);
 end
 
@@ -1131,7 +1145,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     f=C(v)+_Z^(length(v));
     ifp=Nemo.derivative(f)
     f=f/Nemo.gcd(f,ifp)
-#    print("Min Poly : ",Nemo.degree(f))
+#    rur_print("Min Poly : ",Nemo.degree(f))
     ifp=Nemo.derivative(f)
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
     if (dd<0) flag=true 
@@ -1170,7 +1184,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
             push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(s0))))
         end
     else 
-        print("Bad prime number for parameterization ",Int32(Nemo.degree(f)),"(",dd,")")
+        rur_print("Bad prime number for parameterization ",Int32(Nemo.degree(f)),"(",dd,")")
     end
     return(flag,res,ii)
 end
@@ -1208,22 +1222,16 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
     while(continuer)
         kk+=1
         pr=UInt32(Primes.prevprime(pr-1))
-        # print("kk = $kk, pr = $pr, ")
         arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
         redflag,cfs_zp=reduce_mod_p(cfs_zz,pr)
-        # print("redflag=$redflag, ")
         if !redflag
-            print("\n*** bad prime for lead detected ***\n")
+            rur_print("\n*** bad prime for lead detected ***\n")
             continue
         end
-        # success,t_v=nothing,nothing
-        # try
         success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,sys_z,linform);
-        # print("success=$success, ")
-        # println()
         if !success
             kk-=1
-            print("\n*** bad prime for Gbasis detected ***\n")
+            rur_print("\n*** bad prime for Gbasis detected ***\n")
             # The object may be corrupted after the failure. Revive it.
             graph=backup
             backup=deepcopy(backup)
@@ -1232,7 +1240,7 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
         success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);
         if !success
             kk-=1
-            print("\n*** bad prime for RUR detected ***\n")
+            rur_print("\n*** bad prime for RUR detected ***\n")
             continue
         end
         length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
@@ -1241,12 +1249,12 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
         push!(t_param,zp_param);
         kk < bloc_p && continue
         # Attempt reconstruction
-        print("[",kk,",",length(t_pr),"]");
+        rur_print("[",kk,",",length(t_pr),"]");
         Base.flush(Base.stdout)
         kk=0
         zz_p=BigInt(1);
         if (lift_level==0)
-            print("(",0,")");
+            rur_print("(",0,")");
             zz_m=zz_mat_same_dims([t_param[1][1]]);
             qq_m=qq_mat_same_dims([t_param[1][1]]);
             tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
@@ -1255,7 +1263,7 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
             if (aa) lift_level=1 end
         end
         if (lift_level==1)
-            print("(",1,")");
+            rur_print("(",1,")");
             zz_m=zz_mat_same_dims(t_param[1]);
             qq_m=qq_mat_same_dims(t_param[1]);
             Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
@@ -1298,11 +1306,11 @@ function prepare_system(sys_z, nn,R,use_block)
     sys=copy(sys_z)
     sys_Int32=convert_to_mpol_UInt32(sys_z,pr)
 
-    print("\nTest the shape position")
+    rur_print("\nTest the shape position")
     
     gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
     if !(count_univ(map(w->isuniv(w),map(u->collect(AbstractAlgebra.exponent_vectors(u))[1],gro)))==length(AbstractAlgebra.gens(AbstractAlgebra.parent(gro[1]))))
-        print("\nError :  System is not zero-dimensional \n")
+        rur_print("\nError :  System is not zero-dimensional \n")
         return(-1,nothing,nothing,nothing,nothing,nothing)
     end
     quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
@@ -1321,16 +1329,16 @@ function prepare_system(sys_z, nn,R,use_block)
     if (flag) 
         dd0=length(zp_param[1])-1
         i_max=ii
-        print("\nSystem has a separating variable (",ii,")")
+        rur_print("\nSystem has a separating variable (",ii,")")
         return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false,dd0==length(q));
     end
 
-    print("\nTest if variables are separating")
+    rur_print("\nTest if variables are separating")
     
     for ii in (length(i_xw)-1):-1:1
       ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
       ls=swap_elts!(ls,length(ls),ii)
-      print("(",ls[length(ls)],")")
+      rur_print("(",ls[length(ls)],")")
       C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls),ordering=:degrevlex);
       lls=AbstractAlgebra.gens(C)
       sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
@@ -1354,12 +1362,12 @@ function prepare_system(sys_z, nn,R,use_block)
             dd0=(length(zp_param[1])-1)
             i_max=ii
         end
-        print("\nSystem has a separating variable (",ls[length(ls)],")")
+        rur_print("\nSystem has a separating variable (",ls[length(ls)],")")
         return(dd0,length(q),sys0,AbstractAlgebra.symbols(C),false,dd0==length(q));
       end
     end
 
-    print("\nFind a separating vector")
+    rur_print("\nFind a separating vector")
 
     dd0=0
     
@@ -1381,7 +1389,7 @@ function prepare_system(sys_z, nn,R,use_block)
       for j in eachindex(lls)
             lf+=sep[j]*lls[j]
       end
-      print("\nTry ",lf)
+      rur_print("\nTry ",lf)
       Base.flush(stdout)
 
       push!(sys,lf) 
@@ -1405,12 +1413,12 @@ function prepare_system(sys_z, nn,R,use_block)
       ii=Int32(length(i_xw))
       flag,zp_param,uu=zdim_parameterization(t_v,i_xw,pr,Int32(-1),Int32(1),arithm);
       if (!flag)
-        print(" (",uu,",",vv,")")
+        rur_print(" (",uu,",",vv,")")
         if (sep[uu]<0) sep[uu]=-sep[uu]
         else sep[uu]=-sep[uu]-1 end
         vv=uu
         if (vv<1)
-            print("\n Error in the choice of the separating form \n") 
+            rur_print("\n Error in the choice of the separating form \n") 
             return(-1,-1,sys,AbstractAlgebra.symbols(C),linform)
         end
       else
@@ -1419,26 +1427,27 @@ function prepare_system(sys_z, nn,R,use_block)
     end
 
     if (dd==dd0)
-         print("\nSystem is in fact a separating variable (",ii,")")
+         rur_print("\nSystem is in fact a separating variable (",ii,")")
         return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false,dd==length(q))
     end    
-    print("\nSeparating form : ",sys[length(sys)],"\n")
+    rur_print("\nSeparating form : ",sys[length(sys)],"\n")
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),false,dd==length(q))
 end
 
-function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
+function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=true)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
+    _verbose[]=verbose
     sys_z=convert_sys_to_sys_z(sys);
-    print("\nLearning step");
+    rur_print("\nLearning step");
     dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
     if (dm>0) 
-        print("\nStart the computation (cyclic = ",cyclic,")");
+        rur_print("\nStart the computation (cyclic = ",cyclic,")");
         Base.flush(stdout)    
         qq_m=general_param(sys_T,nn,dm,linform,cyclic);
-        print("\n");
+        rur_print("\n");
         return(qq_m)
     else 
-        print("\nSomething went wrongly");
+        rur_print("\nSomething went wrongly");
         return([]) 
     end
 end
