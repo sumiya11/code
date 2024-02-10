@@ -492,6 +492,41 @@ function learn_compute_table!(t_v::Vector{Vector{UInt32}},
    return(t_learn)
 end
 
+function learn_compute_table_sl!(t_v::Vector{Vector{UInt32}},
+                                 t_xw::Vector{StackVect},
+                                 i_xw::Vector{Vector{Int32}},
+                                 quo::Vector{PP},
+                                 pr::UInt32,
+                                 arithm)
+
+   nb=1
+   t_learn=Int32[]
+   buf = Vector{UInt64}()
+   to_compute=copy(i_xw[end])
+   for i in 1:(length(i_xw)-1)
+        push!(to_compute,i_xw[i][1])
+   end
+   while (nb>0)
+      nb=0
+      for i in eachindex(to_compute)
+         #test if already computed
+         if (length(t_v[i])==0)
+            continuer=false
+            #test if the ancestor is computed
+            if (length(t_v[t_xw[i].prev])>0)
+                continuer,vv= _mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf)
+                if (continuer) 
+                    t_v[i]=vv
+                    push!(t_learn,i)
+                    nb=nb+1
+                end
+            end
+         end
+      end
+   end
+   return(t_learn)
+end
+
 function apply_compute_table!(t_v::Vector{Vector{UInt32}},
                               t_learn::Vector{Int32},
                               t_xw::Vector{StackVect},
@@ -519,7 +554,7 @@ end
 #learn_zdim
 ############################################
 
-function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform)
+function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform,cyclic,dd)
     sys_Int32=convert_to_mpol_UInt32(sys,pr)
    graph,gro=groebner_learn_linform(sys_Int32,linform);
    for pr2 in Primes.nextprimes(UInt32(2^30), 2)
@@ -535,7 +570,20 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
    i_xw,t_xw=prepare_table_mxi(ltg,q);
    t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
-   t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
+   if (cyclic)
+      t_learn=learn_compute_table_sl!(t_v,t_xw,i_xw,q,pr,arithm);
+      success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(1),arithm)
+      if (success) 
+        print("\nApply cyclic optimization")
+      else
+        print("\nSwitch off cyclic optimization")
+        i_xw,t_xw=prepare_table_mxi(ltg,q);
+        t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
+        t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm);
+      end
+   else
+      t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm);
+   end
    return(graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs)
 end
 
@@ -899,7 +947,7 @@ function first_variable(t_v::Vector{Vector{UInt32}},
                         ii::Int32,pr::UInt32,
                         arithm)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
-    d=Int32(length(i_xw[1])) 
+    d=Int32(length(i_xw[ii])) 
     free_set=[append!([UInt32(1)],[UInt32(0) for i=2:d])]
     if (length(t_v[i_xw[ii][1]])>1)
         v=t_v[i_xw[ii][1]]
@@ -973,7 +1021,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
                  pr::UInt32,
                  arithm)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
-    d=Int32(length(i_xw[1])) 
+    d=Int32(length(i_xw[length(i_xw)])) 
     new_free_set=copy(free_set);
     deg=length(free_set);
     new_generators=Vector{Vector{Int32}}()
@@ -1082,9 +1130,11 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     f=C(v)+_Z^(length(v));
     ifp=Nemo.derivative(f)
     f=f/Nemo.gcd(f,ifp)
+#    print("Min Poly : ",Nemo.degree(f))
     ifp=Nemo.derivative(f)
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
-    if (dd<0) flag=true else flag=(Int32(Nemo.degree(f))==dd) end
+    if (dd<0) flag=true 
+    else  flag=(Int32(Nemo.degree(f))==dd)  end
     if (flag)    
         @inbounds for j in (ii-1):-1:1
             m_b,lt_b,n_g=biv_lex(t_v,i_xw,copy(gred),copy(index),copy(dg),copy(hom),copy(free_set),Int32(j),pr,arithm);
@@ -1140,13 +1190,14 @@ function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{B
     return(zzm)
 end
 
-function general_param(sys_z, nn, dd, linform::Bool)::Vector{Vector{Rational{BigInt}}}
+function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector{Rational{BigInt}}}
     qq_m=Vector{Vector{Rational{BigInt}}}()
     t_pr=Vector{UInt32}();
     t_param=Vector{Vector{Vector{UInt32}}}();
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform);
+    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
+
     backup=deepcopy(graph)
     expvecs,cfs_zz=extract_raw_data(sys_z)
     continuer=true
@@ -1246,11 +1297,11 @@ function prepare_system(sys_z, nn,R,use_block)
     if (flag) 
         dd0=length(zp_param[1])-1
         i_max=ii
-        print("\nSystem is shape position (",ii,")")
-        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false);
+        print("\nSystem has a separating variable (",ii,")")
+        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false,dd0==length(q));
     end
 
-    print("\nTest if variables are cyclic")
+    print("\nTest if variables are separating")
     
     for ii in (length(i_xw)-1):-1:1
       ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
@@ -1279,8 +1330,8 @@ function prepare_system(sys_z, nn,R,use_block)
             dd0=(length(zp_param[1])-1)
             i_max=ii
         end
-        print("\nSystem has a cyclic variable (",ls[length(ls)],")")
-        return(dd0,length(q),sys0,AbstractAlgebra.symbols(C),false);
+        print("\nSystem has a separating variable (",ls[length(ls)],")")
+        return(dd0,length(q),sys0,AbstractAlgebra.symbols(C),false,dd0==length(q));
       end
     end
 
@@ -1344,22 +1395,22 @@ function prepare_system(sys_z, nn,R,use_block)
     end
 
     if (dd==dd0)
-         print("\nSystem is in fact cyclic (",ii,")")
-        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false)
+         print("\nSystem is in fact a separating variable (",ii,")")
+        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false,dd==length(q))
     end    
     print("\nSeparating form : ",sys[length(sys)],"\n")
-    return(dd,length(q),sys,AbstractAlgebra.symbols(C),false)
+    return(dd,length(q),sys,AbstractAlgebra.symbols(C),false,dd==length(q))
 end
 
 function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false)
     @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
     sys_z=convert_sys_to_sys_z(sys);
     print("\nLearning step");
-    dm,Dq,sys_T,_vars,linform=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
-    print("\nStart the computation");
+    dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
+    print("\nStart the computation (cyclic = ",cyclic,")");
     Base.flush(stdout)    
     if (dm>0) 
-        qq_m=general_param(sys_T,nn,dm,linform);
+        qq_m=general_param(sys_T,nn,dm,linform,cyclic);
         print("\n");
         return(qq_m)
     else 
