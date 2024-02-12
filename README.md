@@ -4,7 +4,8 @@ We propose two prototypes that implement the computation of Rational Univariate 
 
 This code is basically proposed to reproduce the results of an [article](Article/RUR.pdf).
 
-If you want to get better timings with our Julia package, please aviod running several large examples in the meantime in order to avoid cache effect that might sensibly affect the computation time.
+
+If you want to get better performances with our Julia package, please aviod running several large examples simultanously in order to avoid cache effects that might sensibly affect the computation times.
 
 ## Julia 
 
