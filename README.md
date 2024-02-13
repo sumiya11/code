@@ -21,7 +21,9 @@ If you use this result, the right way to cite it is currently :
 
 ## Julia 
 
-Warning : if you want to get better performances with our Julia package, please aviod running several large examples simultanously on the same machine in order to avoid cache effects that might sensibly affect the computation times.
+**Warning** : if you want to get better performances with our Julia package, please aviod running several large examples simultanously on the same machine in order to avoid cache effects that might sensibly affect the computation times.
+
+Our package is based on the Gröbner engine [Groebner.jl](https://github.com/sumiya11/Groebner.jl), you might need to update it if it is already installed on your system.
 
 Install the package RationalUnivariateRepresentation.jl with
 
@@ -47,7 +49,8 @@ rur = zdim_parameterization(sys)
 Note that the polynomials of the RUR are given as vectors of coefficients to allow conversions in your favorite package.
 
 ## Maple
-Should work with any Maple version since Maple 2018
+
+The following should work with any Maple version since Maple 2018
 
 Note that the output is a little bit more sophisticated than in Julia and is of the form f=0,[xi=fi/f0]
 
@@ -57,3 +60,11 @@ include("Data/Systems/caprasse.mpl")
 
 ext,coo:=zds:-rur(sys,vars)
 ```
+
+You can also use the "isolate" function that will isolate the real roots of the system directly.
+
+**IMPORTANT** : for historical reasons, the default `RootFinding[Isolate]` package from Maple is using a small limit (8096 bits) for the hybrid (fast) computations when using the 20-years old algorithm 'RS'. To get better results avoiding this switch, please  set this limit to 2^30 using 
+```
+fgbrs:-rs_set_hybrid_limit(2^30);
+```
+and call it with a squarefree polynomial (the internal computation of the squafreepart is old and slow).
