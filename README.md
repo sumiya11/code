@@ -2,7 +2,7 @@
 
 We propose two prototypes that implement the computation of Rational Univariate Representations for solving zero-dimensional systems of polynomial equations with rational coefficients.
 
-Given a multivariate system S of polynomial equations depending on n variables (x1,..,xn), a Rational Univariate Representation is a linear form t=a1x1+..+anxn and a set of n+2 univariate polynomials f(T),f0(T),f1(T), ... ,fn(T), such that {(x1,..,xn) s.t. f(u)=0,xi=fi(u)/f0(u)} is in bijection with the roots of S, its inverse , from the roots of S to those of f, being defined by the linear form t.
+Given a multivariate system S of polynomial equations depending on n variables (x1,..,xn), a Rational Univariate Representation is a linear form t=a1x1+..+anxn and a set of n+1 univariate polynomials f(T),f1(T), ... ,fn(T), such that {(x1,..,xn) s.t. f(u)=0,xi=fi(u)/f0(u)}, where f0 is the derivative of the squarefreepar of f, is in bijection with the roots of S, its inverse , from the roots of S to those of f, being defined by the linear form t.
 
 The present source code is basically proposed to reproduce the results of an [article](Article/RUR.pdf).
 
@@ -31,10 +31,12 @@ include("Data/Systems/caprasse.jl")
 # Find a RUR of solutions
 rur = zdim_parameterization(sys)
 ```
+Note that the polynomials of the RUR are given as vectors of coefficients to allow conversions in your favorite package.
 
 ## Maple
 Should work with any Maple version since Maple 2018
 
+Note that the output is a little bit more sophisticated than in Julia and is of the form f=0,[xi=fi/f0]
 
 ```
 read("Maple/zds.mpl");
