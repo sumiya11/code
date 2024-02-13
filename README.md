@@ -64,6 +64,6 @@ ext,coo:=zds:-rur(sys,vars)
 You can also use the "isolate" function that will isolate the real roots of the system directly.
 
 **IMPORTANT for fans of Benchmarks** : for those who like performing benchmarks to try to illustrate theoretical informations, it must be precised that for historical reasons :  
-- the default `RootFinding[Isolate]` package from Maple , when run with the 20-year olg algorithm 'RS' is using a small limit (8096 bits) for the hybrid (fast) computations. On large examples, you will get better results by avoiding the switch to the slow algorithm, by modifying this limit to a greater value, either by setting the environment variable USPMAXPREC before launching Maple (the saftest way) or using the function `fgbrs:-rs_set_hybrid_limit(<any integer < 2^31>);`.
+- the default `RootFinding[Isolate]` package from Maple , when run with the 20-year old algorithm 'RS', is using a small limit (8096 bits) for the hybrid  computations. On large examples, you will get better results by avoiding the switch to the slow algorithm, by modifying this limit to a greater value, either by setting the environment variable USPMAXPREC before launching Maple (the saftest way) or using the function `fgbrs:-rs_set_hybrid_limit(<any integer < 2^31>);`.
 - call the isolate funciton with a squarefree polynomial (the internal computation of the squafreepart is old and slow, the one of Maple is way faster), otherwise you will essentially measure the computation of the gcd.
 
