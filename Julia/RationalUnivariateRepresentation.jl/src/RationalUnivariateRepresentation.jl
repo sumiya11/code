@@ -26,7 +26,7 @@ module RationalUnivariateRepresentation
 import AbstractAlgebra,Groebner,Nemo,Primes,Random
 import AbstractAlgebra: QQ, polynomial_ring
 
-export zdim_parameterization, QQ, polynomial_ring
+export zdim_parameterization, QQ, polynomial_ring, to_file
 
 #####################################################
 # Logging
@@ -39,6 +39,7 @@ const _verbose = Ref{Bool}(true)
 rur_print(xs...) = rur_print(stdout, xs...)
 function rur_print(io::IO, xs...)
     _verbose[] && print(io, xs...)
+    Base.flush(io)
     nothing
 end
 
@@ -569,13 +570,13 @@ end
 ############################################
 
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform,cyclic,dd)
-    sys_Int32=convert_to_mpol_UInt32(sys,pr)
+   sys_Int32=convert_to_mpol_UInt32(sys,pr)
    graph,gro=groebner_learn_linform(sys_Int32,linform);
    for pr2 in Primes.nextprimes(UInt32(2^30), 2)
     sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
     gb_2 = Groebner.groebner(sys_Int32_2)
     if !(map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gro) == map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gb_2))
-        throw("Learned basis modulo $pr may be not generic enough.")
+        throw("Learned basis modulo $pr may be not generic enough. ")
     end
    end
    quo,g=kbase_linform(gro,pr,linform);
@@ -588,9 +589,9 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
       t_learn=learn_compute_table_sl!(t_v,t_xw,i_xw,q,pr,arithm);
       success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(1),arithm)
       if (success) 
-        rur_print("\nApply cyclic optimization")
+        rur_print("\nApply cyclic optimization ")
       else
-        rur_print("\nSwitch off cyclic optimization")
+        rur_print("\nSwitch off cyclic optimization ")
         i_xw,t_xw=prepare_table_mxi(ltg,q);
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
         t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm);
@@ -1145,7 +1146,6 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     f=C(v)+_Z^(length(v));
     ifp=Nemo.derivative(f)
     f=f/Nemo.gcd(f,ifp)
-#    rur_print("Min Poly : ",Nemo.degree(f))
     ifp=Nemo.derivative(f)
     push!(res,map(u->coeff_mod_p(u,pr),collect(Nemo.coefficients(f))));
     if (dd<0) flag=true 
@@ -1170,9 +1170,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
                         flag=check_separation_biv(bl[i],f1,C)
                         if (!flag) return(false,[],j) end
                   end
-                  #lc1=Nemo.mod(-d1*lc1,f1)
                   s1+=Nemo.mulmod(d1*lc1,pro,f)
-                  #co0=Nemo.mod(co0,f1)
                   s0+=Nemo.mulmod(co0,pro,f)
                   pro=pro*f1
                 end
@@ -1211,8 +1209,8 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
     t_param=Vector{Vector{Vector{UInt32}}}();
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+    rur_print("\nLearn ");
     graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
-
     backup=deepcopy(graph)
     expvecs,cfs_zz=extract_raw_data(sys_z)
     continuer=true
@@ -1249,12 +1247,11 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
         push!(t_param,zp_param);
         kk < bloc_p && continue
         # Attempt reconstruction
-        rur_print("[",kk,",",length(t_pr),"]");
-        Base.flush(Base.stdout)
+        rur_print(length(t_pr));
         kk=0
         zz_p=BigInt(1);
         if (lift_level==0)
-            rur_print("(",0,")");
+            rur_print("-");
             zz_m=zz_mat_same_dims([t_param[1][1]]);
             qq_m=qq_mat_same_dims([t_param[1][1]]);
             tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
@@ -1263,7 +1260,7 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
             if (aa) lift_level=1 end
         end
         if (lift_level==1)
-            rur_print("(",1,")");
+            rur_print("+");
             zz_m=zz_mat_same_dims(t_param[1]);
             qq_m=qq_mat_same_dims(t_param[1]);
             Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
@@ -1390,8 +1387,6 @@ function prepare_system(sys_z, nn,R,use_block)
             lf+=sep[j]*lls[j]
       end
       rur_print("\nTry ",lf)
-      Base.flush(stdout)
-
       push!(sys,lf) 
 
       sys_Int32=convert_to_mpol_UInt32(sys,pr)
@@ -1434,22 +1429,44 @@ function prepare_system(sys_z, nn,R,use_block)
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),false,dd==length(q))
 end
 
-function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=true)
-    @assert AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
+function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=false)
     _verbose[]=verbose
-    sys_z=convert_sys_to_sys_z(sys);
-    rur_print("\nLearning step");
+    if (AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
+        sys_z=convert_sys_to_sys_z(sys);
+    else 
+        CC,_vars=AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ,AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1])),ordering=:degrevlex)
+        sys_z=convert_sys_to_sys_z(map(u->CC(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys));
+    end
+    rur_print("\nSeparation step");
     dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
     if (dm>0) 
         rur_print("\nStart the computation (cyclic = ",cyclic,")");
-        Base.flush(stdout)    
         qq_m=general_param(sys_T,nn,dm,linform,cyclic);
         rur_print("\n");
         return(qq_m)
     else 
-        rur_print("\nSomething went wrongly");
+        rur_print("\nSomething went wrong");
         return([]) 
     end
+end
+
+function to_file(f_name,rur)
+   cof=lcm(map(v->lcm(map(u->denominator(u),v)),rur));
+   C, _Z = Nemo.polynomial_ring(Nemo.ZZ)
+   rur_z=[C(map(u->Nemo.ZZ(numerator(u*cof)),rur[i])) for i=1:length(rur)];
+   open(f_name, "w") do f
+           write(f,"rur:=[",string(rur_z[1]))
+           for i in 2:length(rur)
+              write(f,",\n",string(rur_z[i]))
+           end
+           write(f,"]:\n")
+       end
+    return(nothing);
+end
+
+function parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=false)
+#    qq=zdim_parameterization(sys,nn,,use_block,verbose)
+#    AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
 end
 
 using PrecompileTools
