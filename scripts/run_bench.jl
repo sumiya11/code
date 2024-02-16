@@ -13,13 +13,13 @@ pinthreads(:cores)
 versioninfo()
 threadinfo()
 
-for name in ["chandran9"] # ["caprasse", "eco10", "chandran9", "noon6", "reimer6"]
+for name in ["schwarz11"] # ["caprasse", "eco10", "chandran9", "noon6", "reimer6"]
     include("../Data/Systems/$name.jl")
     @info "name = $name"
-    @time rur1 = zdim_parameterization(sys, verbose=true, threads=1)
-    @time rur2 = zdim_parameterization(sys, verbose=true, threads=4)
-    @time rur3 = zdim_parameterization(sys, verbose=true, threads=8)
-    @time rur4 = zdim_parameterization(sys, verbose=true, threads=16)
+    @time rur1 = zdim_parameterization(sys, verbose=false, threads=1)
+    @time rur2 = zdim_parameterization(sys, verbose=false, threads=4)
+    @time rur3 = zdim_parameterization(sys, verbose=false, threads=8)
+    @time rur4 = zdim_parameterization(sys, verbose=false, threads=16)
     @assert rur1 == rur2 == rur3 == rur4 
 end
 
