@@ -25,6 +25,8 @@ module RationalUnivariateRepresentation
 
 import AbstractAlgebra,Groebner,Nemo,Primes,Random
 import AbstractAlgebra: QQ, polynomial_ring
+import Base.Threads: nthreads
+import ThreadPools: @tspawnat
 
 export zdim_parameterization, QQ, polynomial_ring, to_file
 
@@ -47,8 +49,11 @@ end
 # Add on to AbstractAlgebra
 #####################################################
 
+# DANGER. DANGER. DANGER.
+# AbstractAlgebra.GF and AbstractAlgebra.polynomial_ring are NOT thread-safe.
+
 function convert_sys_to_sys_z(sys::Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}})
-   sys_z=AbstractAlgebra.Generic.MPoly{BigInt}[]
+    sys_z=AbstractAlgebra.Generic.MPoly{BigInt}[]
    for p in sys
 	 push!(sys_z,AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.ZZ,p*lcm(map(denominator,collect(AbstractAlgebra.coefficients(p))))))
    end
@@ -122,12 +127,12 @@ end
 
 function groebner_learn_linform(sys_Int32,linform)
     if linform && _enable_product_ord[]
-        graph,gro=Groebner.groebner_learn(sys_Int32[1:end-1],ordering=Groebner.DegRevLex());
+        graph,gro=Groebner.groebner_learn(sys_Int32[1:end-1],ordering=Groebner.DegRevLex(),threaded=:no);
         @assert !any(f -> AbstractAlgebra.total_degree(AbstractAlgebra.leading_monomial(f)) == 1, gro)
         gro=vcat(gro,sys_Int32[end])  
         return graph,gro
     else
-        graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex());
+        graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
         return graph,gro
     end
 end
@@ -355,6 +360,7 @@ end
 
 # vectors add-ons
 ########################################
+
 @inline function add_mul!(vres::Vector{UInt64},a::UInt32,v::Vector{UInt32})
     @fastmath @inbounds @simd ivdep for i in eachindex(vres)
         vres[i]+=UInt64(a)*UInt64(v[i])
@@ -571,10 +577,12 @@ end
 
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform,cyclic,dd)
    sys_Int32=convert_to_mpol_UInt32(sys,pr)
+   # Sasha: groebner_learn can use multi-threading itself (but let's not use it for now).
    graph,gro=groebner_learn_linform(sys_Int32,linform);
    for pr2 in Primes.nextprimes(UInt32(2^30), 2)
     sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
-    gb_2 = Groebner.groebner(sys_Int32_2)
+    # Sasha: groebner can use multi-threading (-//-)
+    gb_2 = Groebner.groebner(sys_Int32_2, threaded=:no)
     if !(map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gro) == map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gb_2))
         throw("Learned basis modulo $pr may be not generic enough. ")
     end
@@ -613,7 +621,6 @@ function apply_zdim_quo!(graph,
                          cfs_zp::Vector{Vector{UInt32}},
                          sys,
                          linform::Bool)
-    sys_Int32=convert_to_mpol_UInt32(sys,pr);
     success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
     if (success)
         g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
@@ -1142,7 +1149,7 @@ function zdim_parameterization(t_v::Vector{Vector{UInt32}},
     res=Vector{Vector{UInt32}}()
     ii=Int32(length(i_xw))
     v,gred,index,dg,hom,free_set=first_variable(t_v,i_xw,ii,pr,arithm)
-    C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr)))
+    C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr),cached=false),cached=false)
     f=C(v)+_Z^(length(v));
     ifp=Nemo.derivative(f)
     f=f/Nemo.gcd(f,ifp)
@@ -1203,7 +1210,47 @@ function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{B
     return(zzm)
 end
 
-function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector{Rational{BigInt}}}
+function param_modular_image(
+        graph,
+        t_learn,q,i_xw::Vector{Vector{Int32}},t_xw::Vector{StackVect},
+        gb_expvecs,sys_z,cfs_zz,
+        pr::UInt32,dd,linform::Bool)
+    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+    redflag,cfs_zp=reduce_mod_p(cfs_zz,pr)
+    if !redflag
+        rur_print("\n*** bad prime for lead detected ***\n")
+        return false,nothing
+    end
+    success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,sys_z,linform);
+    if !success
+        rur_print("\n*** bad prime for Gbasis detected ***\n")
+        return false,nothing
+    end
+    success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);
+    if !success
+        rur_print("\n*** bad prime for RUR detected ***\n")
+        return false,nothing
+    end
+    return true,zp_param
+end
+
+function param_many_modular_images(
+        graph,
+        t_learn,q,i_xw::Vector{Vector{Int32}},t_xw::Vector{StackVect},
+        gb_expvecs,sys_z,cfs_zz,
+        prms::Vector{UInt32},dd,linform::Bool,
+        prms_range,t_globl_success,t_globl_zp_params)
+    for prm_id in prms_range
+        pr=prms[prm_id]
+        success,zp_param=param_modular_image(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,pr,dd,linform)
+        !success && return nothing
+        t_globl_success[prm_id]=success
+        t_globl_zp_params[prm_id]=zp_param
+    end
+    return nothing
+end
+
+function general_param_serial(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector{Rational{BigInt}}}
     qq_m=Vector{Vector{Rational{BigInt}}}()
     t_pr=Vector{UInt32}();
     t_param=Vector{Vector{Vector{UInt32}}}();
@@ -1220,25 +1267,12 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
     while(continuer)
         kk+=1
         pr=UInt32(Primes.prevprime(pr-1))
-        arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-        redflag,cfs_zp=reduce_mod_p(cfs_zz,pr)
-        if !redflag
-            rur_print("\n*** bad prime for lead detected ***\n")
-            continue
-        end
-        success,t_v=apply_zdim_quo!(graph,t_learn,q,i_xw,t_xw,pr,arithm,gb_expvecs,cfs_zp,sys_z,linform);
+        success,zp_param=param_modular_image(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,pr,dd,linform)
         if !success
             kk-=1
-            rur_print("\n*** bad prime for Gbasis detected ***\n")
             # The object may be corrupted after the failure. Revive it.
             graph=backup
             backup=deepcopy(backup)
-            continue
-        end
-        success,zp_param=zdim_parameterization(t_v,i_xw,pr,Int32(dd),Int32(0),arithm);
-        if !success
-            kk-=1
-            rur_print("\n*** bad prime for RUR detected ***\n")
             continue
         end
         length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
@@ -1269,6 +1303,107 @@ function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector{Vector
         bloc_p=Int32(max(floor(length(t_pr)/10),2))
     end;
     return qq_m;
+end
+
+function general_param_parallel(sys_z, nn, dd, linform::Bool,cyclic::Bool,threads::Int)::Vector{Vector{Rational{BigInt}}}
+    qq_m=Vector{Vector{Rational{BigInt}}}()
+    t_pr=Vector{UInt32}();
+    t_param=Vector{Vector{Vector{UInt32}}}();
+    pr=UInt32(Primes.prevprime(2^nn-1));
+    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+    rur_print("\nLearn ");
+    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
+    backup=deepcopy(graph)
+    expvecs,cfs_zz=extract_raw_data(sys_z)
+    continuer=true
+    bloc_p=Int32(threads)
+    lift_level=0
+    # Setup up "thread-local" buffers
+    workers=Vector{Task}(undef,threads-1)
+    t_local_trace=map(_ -> deepcopy(graph), 1:threads)
+    # Sasha: no need to use deepcopy everywhere here, and it is very-very expensive
+    t_local_data=map(_ -> (deepcopy(t_learn),deepcopy(q),deepcopy(i_xw),deepcopy(t_xw),deepcopy(gb_expvecs),deepcopy(sys_z),deepcopy(cfs_zz)), 1:threads)
+    t_globl_success=Vector{Bool}()
+    t_globl_zp_params=Vector{Vector{Vector{UInt32}}}()
+    while(continuer)
+        prms_per_worker=(threads==1) ? 0 : div(bloc_p,threads)
+        tail=bloc_p-prms_per_worker*threads
+        # Pre-allocate stuff
+        rur_print("\nbatch: $bloc_p, split: ")
+        t_globl_success=map(_->false, 1:bloc_p)
+        resize!(t_globl_zp_params, bloc_p)
+        prms=Vector{UInt32}(undef, bloc_p)
+        for k in 1:bloc_p
+            pr=UInt32(Primes.prevprime(pr-1))
+            prms[k]=pr
+        end
+        # Run worker tasks in parallel...
+        pr_idx=1
+        for t_id in 1:(threads-1)
+            trace=t_local_trace[t_id]
+            t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz=t_local_data[t_id]
+            prms_range=((t_id-1)*prms_per_worker+1):(t_id*prms_per_worker)
+            rur_print("$prms_range / ")
+            # id=1 is the main Julia thread, and id=2..nthreads() are the workers
+            workers[t_id] = @tspawnat (t_id+1) param_many_modular_images($trace,$t_learn,$q,$i_xw,$t_xw,$gb_expvecs,$sys_z,$cfs_zz,prms,dd,linform,$prms_range,t_globl_success,t_globl_zp_params)
+        end
+        # ...and run any trailing computation on the main Julia thread.
+        trace=t_local_trace[end]
+        t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz=t_local_data[end]
+        prms_range=((threads-1)*prms_per_worker+1):bloc_p
+        rur_print("$prms_range, ")
+        param_many_modular_images(trace,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,prms,dd,linform,prms_range,t_globl_success,t_globl_zp_params)
+        # Wait for the workers
+        for t_id in 1:(threads-1)
+            wait(workers[t_id])
+        end
+        # Check the results
+        for t_id in 1:threads
+            prms_range=((t_id-1)*prms_per_worker+1):((t_id==threads) ? bloc_p : t_id*prms_per_worker)
+            for prm_id in prms_range
+                if !t_globl_success[prm_id]
+                    t_local_trace[t_id]=backup
+                    backup=deepcopy(backup)
+                    break
+                end
+                zp_param=t_globl_zp_params[prm_id]
+                length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
+                push!(t_pr,UInt32(prms[prm_id]));
+                push!(t_param,zp_param);
+            end
+        end
+        # Attempt reconstruction
+        rur_print(length(t_pr));
+        zz_p=BigInt(1);
+        if (lift_level==0)
+            rur_print("-");
+            zz_m=zz_mat_same_dims([t_param[1][1]]);
+            qq_m=qq_mat_same_dims([t_param[1][1]]);
+            tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
+            Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
+            aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
+            if (aa) lift_level=1 end
+        end
+        if (lift_level==1)
+            rur_print("+");
+            zz_m=zz_mat_same_dims(t_param[1]);
+            qq_m=qq_mat_same_dims(t_param[1]);
+            Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
+            continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
+        end
+        bloc_p=Int32(max(threads,max(floor(length(t_pr)/10),2)))
+        # smallest number >= bloc_p, divisible by threads
+        bloc_p=(bloc_p+threads-1) & (~(threads-1))
+    end;
+    return qq_m;
+end
+
+function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool,threads::Int)
+    if threads==1
+        general_param_serial(sys_z,nn,dd,linform,cyclic)
+    else
+        general_param_parallel(sys_z,nn,dd,linform,cyclic,threads)
+    end
 end
 
 function swap_elts!(v,i,j)
@@ -1336,7 +1471,7 @@ function prepare_system(sys_z, nn,R,use_block)
       ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
       ls=swap_elts!(ls,length(ls),ii)
       rur_print("(",ls[length(ls)],")")
-      C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls),ordering=:degrevlex);
+      C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),ordering=:degrevlex);
       lls=AbstractAlgebra.gens(C)
       sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
       sys_Int32=convert_to_mpol_UInt32(sys0,pr)
@@ -1369,7 +1504,7 @@ function prepare_system(sys_z, nn,R,use_block)
     dd0=0
     
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
-    C,ls2=polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
+    C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
     lls=AbstractAlgebra.gens(C)
     sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
 
@@ -1429,8 +1564,15 @@ function prepare_system(sys_z, nn,R,use_block)
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),false,dd==length(q))
 end
 
-function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=false)
+# `threads`: an `Integer`. If `threads=N` uses `N` Julia threads. 
+function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=false,threads=1)
     _verbose[]=verbose
+    @assert threads > 0 && (threads==1 || iseven(threads))
+    if nthreads() < threads
+        rur_print("Specified threads=$threads, but only $(nthreads()) Julia threads are available.")
+        threads=nthreads()
+    end
+    rur_print("Using $threads Julia threads.")
     if (AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
         sys_z=convert_sys_to_sys_z(sys);
     else 
@@ -1441,7 +1583,7 @@ function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;ver
     dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
     if (dm>0) 
         rur_print("\nStart the computation (cyclic = ",cyclic,")");
-        qq_m=general_param(sys_T,nn,dm,linform,cyclic);
+        qq_m=general_param(sys_T,nn,dm,linform,cyclic,threads);
         rur_print("\n");
         return(qq_m)
     else 

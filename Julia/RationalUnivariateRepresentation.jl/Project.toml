@@ -10,6 +10,7 @@ Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 
 [compat]
 AbstractAlgebra = "0.36"
