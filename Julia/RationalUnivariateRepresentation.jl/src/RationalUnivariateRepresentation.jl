@@ -1072,17 +1072,17 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
     new_free_set=copy(free_set);
     deg=length(free_set);
     new_generators=Vector{Vector{Int32}}()
-    new_monomial_free_set=[[Int32(i-1),Int32(0)] for i=1:deg]
+    new_monomial_free_set=[(Int32(i-1),Int32(0)) for i=1:deg]
     new_monomial_basis=copy(new_monomial_free_set);
-    new_leading_monomials=Vector{Vector{Int32}}()
+    new_leading_monomials=Vector{Tuple{Int32,Int32}}()
     buf1=Vector{UInt64}()
     buf2=Vector{UInt64}()
     while (length(new_free_set)>0)
         tmp_set=Vector{Vector{UInt32}}()
-        tmp_mon_set=Vector{Vector{Int32}}()
+        tmp_mon_set=Vector{Tuple{Int32,Int32}}()
         @inbounds for j in eachindex(new_free_set)
-            curr_mon=copy(new_monomial_free_set[j])
-            curr_mon[2]+=Int32(1)
+            curr_mon=new_monomial_free_set[j]
+            curr_mon=(curr_mon[1],curr_mon[2]+Int32(1))
             v=mul_var_quo_UInt32(new_free_set[j],ii,t_v,i_xw,pr,arithm,buf1) 
             w=Vector{UInt32}(v)
             if (w[1]!=0) w[1]=pr-w[1]; end
@@ -1101,7 +1101,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
                 v[1]=w[1];
                 @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
                 push!(new_generators,copy(v))
-                push!(new_leading_monomials,copy(curr_mon));
+                push!(new_leading_monomials,curr_mon);
                 break;
             end;
         end;
