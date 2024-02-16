@@ -50,3 +50,22 @@ N = 8:
  11.319487 seconds (1.84 k allocations: 99.297 KiB)
 =#
 
+#=
+On another PC:
+
+N = 1:
+ 244.747607 seconds (2.71 M allocations: 82.790 GiB, 2.75% gc time, 0.24% compilation time)
+ 281.859264 seconds (1.06 M allocations: 70.604 MiB, 0.06% gc time, 0.66% compilation time)
+
+N = 2:
+ 120.446679 seconds (2.71 M allocations: 82.790 GiB, 4.88% gc time, 1.04% compilation time)
+ 135.672287 seconds (1.06 M allocations: 70.658 MiB, 0.06% gc time, 1.31% compilation time)
+
+N = 4:
+ 54.183032 seconds (2.05 M allocations: 82.749 GiB, 7.41% gc time, 0.67% compilation time)
+ 59.482889 seconds (931 allocations: 40.305 KiB)
+
+N = 8:
+ 24.010636 seconds (2.05 M allocations: 82.749 GiB, 15.24% gc time, 2.17% compilation time)
+ 22.953416 seconds (1.86 k allocations: 82.539 KiB)
+=#
