@@ -11,7 +11,7 @@ using Groebner, RationalUnivariateRepresentation, ThreadPinning
 pinthreads(:cores)
 
 versioninfo()
-threadinfo()
+#threadinfo()
 
 for name in ["chandran9"] # ["caprasse", "eco10", "chandran9", "noon6", "reimer6"]
     include("../Data/Systems/$name.jl")
