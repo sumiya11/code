@@ -704,7 +704,7 @@ function apply_zdim_quo!(graph,
         return success,t_v
     else
         rur_print("\n*** Bad prime detected in apply_zdim ***\n")
-        return success,t_v
+        return success,nothing
     end
 end
 
@@ -1702,7 +1702,7 @@ function parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose:
 #    AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
 end
 
-#using PrecompileTools
-#include("precompile.jl")
+using PrecompileTools
+include("precompile.jl")
 
 end # module
