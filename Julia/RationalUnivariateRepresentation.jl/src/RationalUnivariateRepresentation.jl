@@ -215,6 +215,51 @@ end
     return true, var
 end
 
+function find_divisor(m::PP,lm::Vector{PP})
+    pos=length(lm);
+    @inbounds for j in pos:-1:1
+       te,v=divides(m,lm[j])
+       if te return(j) end
+    end
+    return(0)
+end
+    
+function find_in_list(m::PP,lm::Vector{PP})
+    pos=length(lm);
+    @inbounds for j in pos:-1:1
+       if m.data==lm[j].data return(j) end
+    end
+    return(0)
+end
+
+function compute_quotient_basis(ltg::Vector{PP})
+    if length(ltg)==0 return([]) end
+    nbv=length(ltg[1].data)
+    quo=Vector{PP}()
+    todo=Vector{PP}([PP([Int32(0) for i=1:nbv])])
+    inspected=Vector{PP}([PP([Int32(0) for i=1:nbv])])
+    pos=1
+    while (length(todo)>0)
+        m=popfirst!(todo)
+        pos=find_divisor(m,ltg)
+        if pos==0 
+            push!(quo,m)
+#            rur_print("{",length(quo),"}")
+            @inbounds for i in 1:nbv
+                pp=PP(m.data)
+                pp.data[i]+=1
+                if (find_in_list(pp,inspected)==0)
+                   push!(todo,pp)
+                   push!(inspected,pp)
+                   #rur_print("!")
+                end           
+            end
+        end
+    end
+    rur_print("(",length(quo),",",length(inspected),")")
+    return(quo)
+end
+
 # Interface with AbstractAlgebra
 #####################################################
 function coeff_mod_p(x::AbstractAlgebra.GFElem{Int32},pr::UInt32)::UInt32
@@ -1445,11 +1490,15 @@ function prepare_system(sys_z, nn,R,use_block)
         rur_print("\nError :  System is not zero-dimensional \n")
         return(-1,nothing,nothing,nothing,nothing,nothing)
     end
-    quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
-    g=sys_mod_p(gro,pr);
+#    quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
 
+    g=sys_mod_p(gro,pr);
     ltg=map(u->u.exp[1],g);
-    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+#    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+    RU=parent(sys_Int32[1])
+    q1=compute_quotient_basis(ltg);
+    q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
+    
     i_xw,t_xw=prepare_table_mxi(ltg,q);
     t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
     t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
@@ -1477,11 +1526,18 @@ function prepare_system(sys_z, nn,R,use_block)
       sys_Int32=convert_to_mpol_UInt32(sys0,pr)
 
       gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
-      quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+#      quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+
       g=sys_mod_p(gro,pr);
 
       ltg=map(u->u.exp[1],g);
-      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+#      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+
+    RU=parent(sys_Int32[1])
+    q1=compute_quotient_basis(ltg);
+    q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
+
+        
       i_xw,t_xw=prepare_table_mxi(ltg,q);
       t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
       t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
@@ -1532,11 +1588,16 @@ function prepare_system(sys_z, nn,R,use_block)
         quo,g=kbase_linform(gro,pr,linform)
       else 
         gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
-        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+#        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
         g=sys_mod_p(gro,pr);
       end
       ltg=map(u->u.exp[1],g);
-      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+#      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+
+    RU=parent(sys_Int32[1])
+    q1=compute_quotient_basis(ltg);
+    q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
+
       i_xw,t_xw=prepare_table_mxi(ltg,q);
       t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
       t_learn=learn_compute_table!(t_v,t_xw,i_xw,q,pr,arithm); 
@@ -1611,7 +1672,7 @@ function parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose:
 #    AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
 end
 
-using PrecompileTools
-include("precompile.jl")
+#using PrecompileTools
+#include("precompile.jl")
 
 end # module
