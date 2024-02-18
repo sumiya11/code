@@ -1552,6 +1552,7 @@ function general_param_multiprocessing(sys_z, nn, dd, linform::Bool,cyclic::Bool
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
     rur_print("\nLearn ");
     graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
+    backup=deepcopy(graph)
     expvecs,cfs_zz=extract_raw_data(sys_z)
     continuer=true
     # Start worker threads on other processes
@@ -1624,7 +1625,13 @@ function general_param_multiprocessing(sys_z, nn, dd, linform::Bool,cyclic::Bool
         for t_id in 1:nprocs
             prms_range=((t_id-1)*prms_per_worker+1):((t_id==nprocs) ? bloc_p : t_id*prms_per_worker)
             for prm_id in prms_range
-                !t_globl_success[prm_id] && continue
+                if !t_globl_success[prm_id]
+                    if t_id==nprocs
+                        graph=backup
+                        backup=deepcopy(graph)
+                    end
+                    continue
+                end
                 zp_param=t_globl_zp_params[prm_id]
                 length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
                 push!(t_pr,UInt32(prms[prm_id]));
