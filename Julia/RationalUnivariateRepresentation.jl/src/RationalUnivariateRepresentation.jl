@@ -196,8 +196,13 @@ function kbase_linform(gro,pr,linform)
         g[end] = _f
         return quo,g
     else
-        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
+#        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
         g=sys_mod_p(gro,pr);
+        ltg=map(u->u.exp[1],g);
+#    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
+        R=AbstractAlgebra.parent(gro[1])
+        q1=compute_quotient_basis(ltg);
+        quo=sort(map(u->R([1],[Vector{Int64}(u.data)]),q1))
         return quo,g
     end
 end
@@ -743,7 +748,7 @@ function apply_zdim_quo!(graph,
         return success,t_v
     else
         rur_print("\n*** Bad prime detected in apply_zdim ***\n")
-        return success,t_v
+        return success,nothing
     end
 end
 
@@ -1944,7 +1949,7 @@ function parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose:
 #    AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
 end
 
-#using PrecompileTools
-#include("precompile.jl")
+using PrecompileTools
+include("precompile.jl")
 
 end # module
