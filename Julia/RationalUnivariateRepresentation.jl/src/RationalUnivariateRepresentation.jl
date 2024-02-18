@@ -446,11 +446,11 @@ function reduce_mod!(vres::Vector{UInt64},pr::UInt32,arithm)
    end
 end
 
-function vectorize_pol_gro(p::PolUInt32,
+function vectorize_pol_gro!(p::PolUInt32,
                            kb::Vector{PP},
                            pr::UInt32,
-                           arithm)
-   res=zeros(UInt32, length(kb))
+                           arithm,
+                           res::Vector{UInt32})
    pos=length(kb)
    @inbounds for i in 2:length(p.co)
       m=monomial(p,Int32(i))
@@ -460,12 +460,9 @@ function vectorize_pol_gro(p::PolUInt32,
          res[pos]=pr-coeff(p,Int32(i))
       end
    end
-   return(res)
+   return res
 end
 
-# elements of the quotient basis
-# are represented by a vector of length 1
-# whose entry is the place of the element in the quotient basis
 function compute_fill_quo_gb!(t_xw::Vector{StackVect},
                               gro::Vector{PolUInt32},
                               quo::Vector{PP},
@@ -476,23 +473,25 @@ function compute_fill_quo_gb!(t_xw::Vector{StackVect},
       #rur_print("\n",t_xw[i])
       if ((t_xw[i].var>0) && (t_xw[i].prev==0))
          #var>0 and prev=0 => groebner basis element at position var in the list gro
-         t_v[i]=vectorize_pol_gro(gro[t_xw[i].var],quo,pr,arithm)
+         t_v[i]=zeros(UInt32,length(quo))
+         vectorize_pol_gro!(gro[t_xw[i].var],quo,pr,arithm,t_v[i])
       elseif ((t_xw[i].var==0) && (t_xw[i].prev>0))
          #var=0 (and prev>0 )=> quotient element at position prev in the list quo
           t_v[i]=[t_xw[i].prev]
-      end
+        end
    end
-   return(t_v)
+   return t_v
 end
 
-function _mul_var_quo_UInt32(v::Vector{UInt32},
+function _mul_var_quo_UInt32!(v::Vector{UInt32},
                         ii::Int32,
                         t_v::Vector{Vector{UInt32}},
                         i_xw::Vector{Vector{Int32}},
                         pr::UInt32,
                         arithm,
-                        vv::Vector{UInt64})  # buffer
-    dim=length(v)
+                        vv::Vector{UInt64},       # buffer
+                        vres::Vector{UInt32})     # result
+    dim=length(v); @assert dim==length(vres)
     pack=Int32(2^(floor(63-2*log(pr-1)/log(2))))
     resize!(vv, dim)
     @inbounds for i in 1:dim
@@ -514,7 +513,19 @@ function _mul_var_quo_UInt32(v::Vector{UInt32},
             break;
         end
     end
-    return continuer,reduce_mod(vv,pr,arithm)
+    return continuer,reduce_mod!(vv,pr,arithm,vres)
+end
+
+function mul_var_quo_UInt32!(v::Vector{UInt32},
+                        ii::Int32,
+                        t_v::Vector{Vector{UInt32}},
+                        i_xw::Vector{Vector{Int32}},
+                        pr::UInt32,
+                        arithm,
+                        vv::Vector{UInt64},
+                        vres::Vector{UInt32})
+    f,r= _mul_var_quo_UInt32!(v,ii,t_v,i_xw,pr,arithm,vv,vres)
+    return r
 end
 
 function mul_var_quo_UInt32(v::Vector{UInt32},
@@ -524,8 +535,9 @@ function mul_var_quo_UInt32(v::Vector{UInt32},
                         pr::UInt32,
                         arithm,
                         vv::Vector{UInt64})
-    f,r= _mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm,vv)
-    return(r)
+    vres=Vector{UInt32}(undef,length(v))
+    f,r= _mul_var_quo_UInt32!(v,ii,t_v,i_xw,pr,arithm,vv,vres)
+    return r
 end
 
 function learn_compute_table!(t_v::Vector{Vector{UInt32}},
@@ -545,7 +557,8 @@ function learn_compute_table!(t_v::Vector{Vector{UInt32}},
             continuer=false
             #test if the ancestor is computed
             if (length(t_v[t_xw[i].prev])>0)
-                continuer,vv= _mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf)
+                vv=Vector{UInt32}(undef,length(t_v[t_xw[i].prev]))
+                continuer,vv= _mul_var_quo_UInt32!(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf,vv)
                 if (continuer) 
                     t_v[i]=vv
                     push!(t_learn,i)
@@ -580,7 +593,8 @@ function learn_compute_table_sl!(t_v::Vector{Vector{UInt32}},
             continuer=false
             #test if the ancestor is computed
             if (length(t_v[t_xw[i].prev])>0)
-                continuer,vv= _mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf)
+                vv=Vector{UInt32}(undef,length(t_v[t_xw[i].prev]))
+                continuer,vv= _mul_var_quo_UInt32!(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf,vv)
                 if (continuer) 
                     t_v[i]=vv
                     push!(t_learn,i)
@@ -606,6 +620,7 @@ function apply_compute_table!(t_v::Vector{Vector{UInt32}},
           t_v[i]=mul_var_quo_UInt32(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf)
       end
    end
+   return nothing
 end
 
 function reduce_mod(v::Vector{UInt64},pr::UInt32,arithm)
@@ -613,12 +628,21 @@ function reduce_mod(v::Vector{UInt64},pr::UInt32,arithm)
     @fastmath @inbounds @simd for i in eachindex(vres)
       vres[i]=Groebner.mod_p(v[i], arithm)%UInt32
    end
-   return(vres)
+   return vres
 end
+
+function reduce_mod!(v::Vector{UInt64},pr::UInt32,arithm,vres::Vector{UInt32})
+     @fastmath @inbounds @simd for i in eachindex(vres)
+       vres[i]=Groebner.mod_p(v[i], arithm)%UInt32
+    end
+    return vres
+ end
 
 ############################################
 #learn_zdim
 ############################################
+
+@noinline __throw_not_generic(pr) = throw("Basis modulo $pr may be not generic enough. ")
 
 function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32,arithm,linform,cyclic,dd)
    sys_Int32=convert_to_mpol_UInt32(sys,pr)
@@ -628,8 +652,9 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
     sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
     # Sasha: groebner can use multi-threading (-//-)
     gb_2 = Groebner.groebner(sys_Int32_2, threaded=:no)
-    if !(map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gro) == map(f -> collect(AbstractAlgebra.exponent_vectors(f)), gb_2))
-        throw("Learned basis modulo $pr may be not generic enough. ")
+    length(gro) != length(gb_2) && __throw_not_generic(pr)
+    for j in 1:length(gro)
+        length(gro[j]) != length(gb_2[j]) && __throw_not_generic(pr)
     end
    end
    quo,g=kbase_linform(gro,pr,linform);
@@ -671,10 +696,10 @@ function apply_zdim_quo!(graph,
         g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
-        return(success,t_v)
+        return success,t_v
     else
         rur_print("\n*** Bad prime detected in apply_zdim ***\n")
-        return(success,nothing)
+        return success,t_v
     end
 end
 
@@ -1092,17 +1117,17 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
     new_free_set=copy(free_set);
     deg=length(free_set);
     new_generators=Vector{Vector{Int32}}()
-    new_monomial_free_set=[[Int32(i-1),Int32(0)] for i=1:deg]
+    new_monomial_free_set=[(Int32(i-1),Int32(0)) for i=1:deg]
     new_monomial_basis=copy(new_monomial_free_set);
-    new_leading_monomials=Vector{Vector{Int32}}()
+    new_leading_monomials=Vector{Tuple{Int32,Int32}}()
     buf1=Vector{UInt64}()
     buf2=Vector{UInt64}()
     while (length(new_free_set)>0)
         tmp_set=Vector{Vector{UInt32}}()
-        tmp_mon_set=Vector{Vector{Int32}}()
+        tmp_mon_set=Vector{Tuple{Int32,Int32}}()
         @inbounds for j in eachindex(new_free_set)
-            curr_mon=copy(new_monomial_free_set[j])
-            curr_mon[2]+=Int32(1)
+            curr_mon=new_monomial_free_set[j]
+            curr_mon=(curr_mon[1],curr_mon[2]+Int32(1))
             v=mul_var_quo_UInt32(new_free_set[j],ii,t_v,i_xw,pr,arithm,buf1) 
             w=Vector{UInt32}(v)
             if (w[1]!=0) w[1]=pr-w[1]; end
@@ -1121,7 +1146,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
                 v[1]=w[1];
                 @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
                 push!(new_generators,copy(v))
-                push!(new_leading_monomials,copy(curr_mon));
+                push!(new_leading_monomials,curr_mon);
                 break;
             end;
         end;
