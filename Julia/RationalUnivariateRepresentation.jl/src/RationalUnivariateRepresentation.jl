@@ -26,6 +26,7 @@ module RationalUnivariateRepresentation
 import AbstractAlgebra,Groebner,Nemo,Primes,Random
 import AbstractAlgebra: QQ, polynomial_ring
 import Base.Threads: nthreads
+import Distributed
 import ThreadPools: @tspawnat
 
 export zdim_parameterization, QQ, polynomial_ring, to_file
@@ -77,6 +78,49 @@ function extract_raw_data(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}})
  end
 
 #####################################################
+# Add ons for multiprocessing
+#####################################################
+
+const _process_timeout = 5
+
+@noinline __throw_multiprocessing_error(msg) = throw(ErrorException("Multiprocessing error:\n$msg"))
+
+simplefun(x) = (Distributed.myid(), x^2)
+
+function wait_with_timeout_basic(future, timeout)
+    for i in 1:0.1:timeout
+        isready(future) && return true
+        sleep(0.1)
+    end
+    false
+end
+
+# Test that all processes are responding
+function multiprocessing_smoketest(procs::Vector{Int})
+    @assert 1 in procs
+    rur_print("Checking processes... timeout $_process_timeout sec\n")
+    futures = Vector{Distributed.Future}(undef, length(procs))
+    for (i,proc) in enumerate(procs)
+        futures[i] = Distributed.@spawnat proc RationalUnivariateRepresentation.simplefun(i)
+    end
+    any_not_responding=false
+    for (i,proc) in enumerate(procs)
+        rur_print(" id=$proc -- ")
+        success = wait_with_timeout_basic(futures[i], _process_timeout)
+        if !success
+            rur_print("not responding, ")
+            any_not_responding=true
+        else
+            id,payload=fetch(futures[i])
+            @assert id == proc || payload == i^2
+            rur_print("ok, ")
+        end
+    end
+    any_not_responding && __throw_multiprocessing_error("Some processes are not responding")
+    nothing
+end
+
+#####################################################
 # Add on to Groebner
 #####################################################
 
@@ -110,17 +154,17 @@ end
 
 function groebner_linform(sys_Int32,linform)
     if linform && _enable_product_ord[]
-        gro=Groebner.groebner(sys_Int32[1:end-1],ordering=Groebner.DegRevLex());
+        gro=Groebner.groebner(sys_Int32[1:end-1],ordering=Groebner.DegRevLex(),threaded=:no);
         if any(f -> AbstractAlgebra.total_degree(AbstractAlgebra.leading_monomial(f)) == 1, gro)
             @warn "The basis is possibly not inter-reduced. Switching back to degrevlex."
             _enable_product_ord[] = false  # globally change the setting
-            gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+            gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
             return gro
         end
         gro=vcat(gro,sys_Int32[end])  
         return gro
     else
-        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
         return gro
     end
 end
@@ -651,7 +695,7 @@ function learn_zdim_quo(sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::U
    for pr2 in Primes.nextprimes(UInt32(2^30), 2)
     sys_Int32_2=convert_to_mpol_UInt32(sys,pr2)
     # Sasha: groebner can use multi-threading (-//-)
-    gb_2 = Groebner.groebner(sys_Int32_2, threaded=:no)
+    gb_2 = Groebner.groebner(sys_Int32_2,threaded=:no)
     length(gro) != length(gb_2) && __throw_not_generic(pr)
     for j in 1:length(gro)
         length(gro[j]) != length(gb_2[j]) && __throw_not_generic(pr)
@@ -1375,7 +1419,7 @@ function general_param_serial(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector
     return qq_m;
 end
 
-function general_param_parallel(sys_z, nn, dd, linform::Bool,cyclic::Bool,threads::Int)::Vector{Vector{Rational{BigInt}}}
+function general_param_multithreading(sys_z, nn, dd, linform::Bool,cyclic::Bool,threads::Int)::Vector{Vector{Rational{BigInt}}}
     qq_m=Vector{Vector{Rational{BigInt}}}()
     t_pr=Vector{UInt32}();
     t_param=Vector{Vector{Vector{UInt32}}}();
@@ -1468,11 +1512,158 @@ function general_param_parallel(sys_z, nn, dd, linform::Bool,cyclic::Bool,thread
     return qq_m;
 end
 
-function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool,threads::Int)
-    if threads==1
+function param_multiprocessing_worker(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,dd,linform,primes_in,results_out)
+    rur_print("On $(Distributed.myid()): started working\n")
+    backup = deepcopy(graph)
+    while true
+        prime = take!(primes_in)
+        rur_print("On $(Distributed.myid()): received $prime\n")
+        # Zero flags the end
+        if iszero(prime)
+            break
+        end
+        success,zp_param=false,Vector{Vector{UInt32}}()
+        try
+            success,zp_param=param_modular_image(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,UInt32(prime),dd,linform)
+        catch e # catch errors, otherwise an error could silently block our communications
+            rur_print("On $(Distributed.myid()): error!\n")
+            rur_print(e)
+        end
+        rur_print("On $(Distributed.myid()): sending back success=$success\n")
+        put!(results_out,(success,zp_param))
+        if !success
+            graph=backup
+            backup=deepcopy(graph)
+        end
+    end
+    rur_print("On $(Distributed.myid()): the end\n")
+end
+
+function general_param_multiprocessing(sys_z, nn, dd, linform::Bool,cyclic::Bool,procs::Vector{Int})::Vector{Vector{Rational{BigInt}}}
+    qq_m=Vector{Vector{Rational{BigInt}}}()
+    t_pr=Vector{UInt32}();
+    t_param=Vector{Vector{Vector{UInt32}}}();
+    pr=UInt32(Primes.prevprime(2^nn-1));
+    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
+    rur_print("\nLearn ");
+    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
+    expvecs,cfs_zz=extract_raw_data(sys_z)
+    continuer=true
+    # Start worker threads on other processes
+    nprocs=length(procs)
+    workers=filter(pid->pid != 1,procs)
+    communications = [
+        (primes_in=Distributed.RemoteChannel(()->Channel{Int32}(128),pid),
+        results_out=Distributed.RemoteChannel(()->Channel{Tuple{Bool,Vector{Vector{UInt32}}}}(128),pid)) 
+        for pid in workers
+    ]
+    for i in 1:length(workers)
+        pid=workers[i]
+        primes_in,results_out=communications[i]
+        # This could be expensive, since the graph is heavy.
+        Distributed.@spawnat pid param_multiprocessing_worker(
+            graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,dd,linform,primes_in,results_out)
+    end
+    # Repeat until:
+    # - send primes to workers
+    # - receive back modular parametrizations
+    bloc_p=Int32(nprocs)
+    lift_level=0
+    while(continuer)
+        prms_per_worker=(nprocs==1) ? 0 : div(bloc_p,nprocs)
+        # Pre-allocate stuff
+        rur_print("\nbatch: $bloc_p, split: ")
+        for i in 1:length(workers)
+            prms_range=((i-1)*prms_per_worker+1):(i*prms_per_worker)
+            rur_print("$prms_range / ")
+        end
+        prms_range=((nprocs-1)*prms_per_worker+1):bloc_p
+        rur_print("$prms_range\n")
+        t_globl_success=map(_->false, 1:bloc_p)
+        t_globl_zp_params=Vector{Vector{Vector{UInt32}}}(undef,bloc_p)
+        prms=Vector{UInt32}(undef, bloc_p)
+        for k in 1:bloc_p
+            pr=UInt32(Primes.prevprime(pr-1))
+            prms[k]=pr
+        end
+        # Send the primes to workers (cheap)
+        for i in 1:length(workers)
+            primes_in,_=communications[i]
+            prms_range=((i-1)*prms_per_worker+1):(i*prms_per_worker)
+            for j in prms_range
+                pr=prms[j]
+                # Non-blocking send
+                put!(primes_in,pr)
+            end           
+        end
+        # Run any trailing computation on the main Julia thread
+        prms_range=((nprocs-1)*prms_per_worker+1):bloc_p
+        for j in prms_range
+            pr=prms[j]
+            success,zp_param=param_modular_image(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,pr,dd,linform)
+            t_globl_success[j]=success
+            t_globl_zp_params[j]=zp_param 
+        end
+        # Get the results from workers
+        for i in 1:(nprocs-1)
+            _,results_out=communications[i]
+            prms_range=((i-1)*prms_per_worker+1):(i*prms_per_worker)
+            # Blocking receive
+            for j in prms_range
+                success,zp_param=take!(results_out)
+                t_globl_success[j]=success
+                t_globl_zp_params[j]=zp_param 
+            end
+        end
+        # Check the results
+        for t_id in 1:nprocs
+            prms_range=((t_id-1)*prms_per_worker+1):((t_id==nprocs) ? bloc_p : t_id*prms_per_worker)
+            for prm_id in prms_range
+                !t_globl_success[prm_id] && continue
+                zp_param=t_globl_zp_params[prm_id]
+                length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
+                push!(t_pr,UInt32(prms[prm_id]));
+                push!(t_param,zp_param);
+            end
+        end
+        # Attempt reconstruction
+        rur_print(length(t_pr));
+        zz_p=BigInt(1);
+        if (lift_level==0)
+            rur_print("-");
+            zz_m=zz_mat_same_dims([t_param[1][1]]);
+            qq_m=qq_mat_same_dims([t_param[1][1]]);
+            tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
+            Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
+            aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
+            if (aa) lift_level=1 end
+        end
+        if (lift_level==1)
+            rur_print("+");
+            zz_m=zz_mat_same_dims(t_param[1]);
+            qq_m=qq_mat_same_dims(t_param[1]);
+            Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
+            continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
+        end
+        bloc_p=Int32(max(nprocs,max(floor(length(t_pr)/10),2)))
+        # smallest number >= bloc_p, divisible by nprocs
+        bloc_p=(bloc_p+nprocs-1) & (~(nprocs-1))
+    end;
+    # Shut down the execution on workers
+    for i in 1:length(workers)
+        primes_in,_=communications[i]
+        put!(primes_in,0)
+    end
+    return qq_m;
+end
+
+function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool,parallelism::Symbol,threads,procs)
+    if parallelism==:serial
         general_param_serial(sys_z,nn,dd,linform,cyclic)
+    elseif parallelism==:multithreading
+        general_param_multithreading(sys_z,nn,dd,linform,cyclic,threads)
     else
-        general_param_parallel(sys_z,nn,dd,linform,cyclic,threads)
+        general_param_multiprocessing(sys_z,nn,dd,linform,cyclic,procs)
     end
 end
 
@@ -1510,7 +1701,7 @@ function prepare_system(sys_z, nn,R,use_block)
 
     rur_print("\nTest the shape position")
     
-    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
     if !(count_univ(map(w->isuniv(w),map(u->collect(AbstractAlgebra.exponent_vectors(u))[1],gro)))==length(AbstractAlgebra.gens(AbstractAlgebra.parent(gro[1]))))
         rur_print("\nError :  System is not zero-dimensional \n")
         return(-1,nothing,nothing,nothing,nothing,nothing)
@@ -1550,7 +1741,7 @@ function prepare_system(sys_z, nn,R,use_block)
       sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
       sys_Int32=convert_to_mpol_UInt32(sys0,pr)
 
-      gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+      gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
 #      quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
 
       g=sys_mod_p(gro,pr);
@@ -1612,7 +1803,7 @@ function prepare_system(sys_z, nn,R,use_block)
         gro=groebner_linform(sys_Int32,linform)
         quo,g=kbase_linform(gro,pr,linform)
       else 
-        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex());
+        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
 #        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
         g=sys_mod_p(gro,pr);
       end
@@ -1650,15 +1841,72 @@ function prepare_system(sys_z, nn,R,use_block)
     return(dd,length(q),sys,AbstractAlgebra.symbols(C),false,dd==length(q))
 end
 
-# `threads`: an `Integer`. If `threads=N` uses `N` Julia threads. 
-function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=false,threads=1)
+"""
+    zdim_parameterization(sys; options...)
+
+Computes a RUR of a zero-dimensional system.
+
+## Optional Arguments
+
+- `nn`: an integer `<= 32`, use `nn`-bit prime numbers. 
+    Default is `28`.
+- `verbose`: a bool, whether to print progress statements or not. 
+    Default is `true`.
+- `parallelism`: a symbol, parallelism mode. 
+    The options are `:multithreading`, `:multiprocessing`, and `:serial`.
+    With `:multithreading`, the number of Julia threads can be specified via `threads` option.
+    With `:multiprocessing`, the worker processes must be configured manually and specified via `procs` option.
+    Default is `:serial`.
+- `threads`: an integer, the number of threads. 
+    Can only be used together with `parallelism=:multithreading`. 
+    Default is `nthreads()`.
+- `procs`: an array, the IDs of worker processes.
+    Uses the process with `pid == 1` as the master process.
+    Can only be used together with `parallelism=:multiprocessing`. 
+    Default is not specified.
+
+## Returns
+
+- Returns the arrays of coefficients of `f(x), g_1(x), ..., g_n(x)`, 
+    where `n` is the number of variables and `f(x)` is an annihilating polynomial of the separating element.
+"""
+function zdim_parameterization(
+        sys;
+        nn::Int32=Int32(28),
+        use_block::Bool=false,
+        verbose::Bool=true,
+        parallelism=:serial,
+        threads=nothing,
+        procs=nothing)
+    # Check input arguments and configure parallelism
     _verbose[]=verbose
-    @assert threads > 0 && (threads==1 || iseven(threads))
-    if nthreads() < threads
-        rur_print("Specified threads=$threads, but only $(nthreads()) Julia threads are available.")
-        threads=nthreads()
+    @assert 1 <= nn <= 32 
+    @assert parallelism in (:serial, :multithreading, :multiprocessing)
+    if parallelism == :serial
+        if !isnothing(threads) || !isnothing(procs)
+            @warn "Options `threads` and `procs` are not supported in `:serial` mode and were ignored"
+        end
+        rur_print("Using serial mode.\n")
+    elseif parallelism == :multithreading
+        @assert isnothing(threads) || threads > 0 && (threads==1 || iseven(threads))
+        if isnothing(threads)
+            # If not specified, use the current number of Julia threads
+            threads = nthreads()
+        elseif threads > nthreads()
+            @warn "Specified `threads=$threads`, but only $(nthreads()) Julia threads are available."
+            threads = nthreads()
+        end
+        rur_print("Using $threads Julia threads.\n")
+    else
+        @assert !isnothing(procs) "The option `procs` must be specified in `:multiprocessing` mode."
+        nprocs = length(procs)
+        @assert nprocs > 0
+        multiprocessing_smoketest(procs)
+        Distributed.@everywhere procs RationalUnivariateRepresentation._verbose[] = $verbose
+        rur_print("Using $nprocs Julia processes with IDs $procs.\n")
     end
-    rur_print("Using $threads Julia threads.")
+    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
+    # Convert the system to :degrevlex
     if (AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
         sys_z=convert_sys_to_sys_z(sys);
     else 
@@ -1667,15 +1915,14 @@ function zdim_parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;ver
     end
     rur_print("\nSeparation step");
     dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
-    if (dm>0) 
-        rur_print("\nStart the computation (cyclic = ",cyclic,")");
-        qq_m=general_param(sys_T,nn,dm,linform,cyclic,threads);
-        rur_print("\n");
-        return(qq_m)
-    else 
+    if !(dm>0)
         rur_print("\nSomething went wrong");
-        return([]) 
+        return []
     end
+    rur_print("\nStart the computation (cyclic = ",cyclic,")");
+    qq_m=general_param(sys_T,nn,dm,linform,cyclic,parallelism,threads,procs);
+    rur_print("\n");
+    return qq_m
 end
 
 function to_file(f_name,rur)
