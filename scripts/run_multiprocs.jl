@@ -7,6 +7,7 @@ versioninfo()
 addprocs(3)
 @info procs()  # 1+3 in total
 
+# can also do "@everywhere using Pkg; Pkg.develop(path=(@__DIR__)*"/../Julia/RationalUnivariateRepresentation.jl/")"
 @everywhere include((@__DIR__)*"/../Julia/RationalUnivariateRepresentation.jl/src/RationalUnivariateRepresentation.jl")
 
 ### Compute ###
@@ -15,7 +16,7 @@ using AbstractAlgebra
 include((@__DIR__)*"/../Data/Systems/caprasse.jl")
 
 # Run only on this process
-rur1 = RationalUnivariateRepresentation.zdim_parameterization(sys, parallelism=:multiprocessing, procs=[1])
+@time rur1 = RationalUnivariateRepresentation.zdim_parameterization(sys, parallelism=:multiprocessing, procs=[1])
 
 # Run on processes [1,2,3,4]
 @time rur2 = RationalUnivariateRepresentation.zdim_parameterization(sys, parallelism=:multiprocessing, procs=[1,2,3,4])
