@@ -35,8 +35,6 @@ export zdim_parameterization, QQ, polynomial_ring, to_file
 # Logging
 #####################################################
 
-# Call zdim_parameterization with verbose=true/false,
-# or set this value directly
 const _verbose = Ref{Bool}(true)
 
 rur_print(xs...) = rur_print(stdout, xs...)
@@ -49,9 +47,6 @@ end
 #####################################################
 # Add on to AbstractAlgebra
 #####################################################
-
-# DANGER. DANGER. DANGER.
-# AbstractAlgebra.GF and AbstractAlgebra.polynomial_ring are NOT thread-safe.
 
 function convert_sys_to_sys_z(sys::Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}})
     sys_z=AbstractAlgebra.Generic.MPoly{BigInt}[]
@@ -77,47 +72,20 @@ function extract_raw_data(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}})
     return expvecs,cfs_zz
  end
 
-#####################################################
-# Add ons for multiprocessing
-#####################################################
-
-const _process_timeout = 5
-
-@noinline __throw_multiprocessing_error(msg) = throw(ErrorException("Multiprocessing error:\n$msg"))
-
-simplefun(x) = (Distributed.myid(), x^2)
-
-function wait_with_timeout_basic(future, timeout)
-    for i in 1:0.1:timeout
-        isready(future) && return true
-        sleep(0.1)
-    end
-    false
+function coeff_mod_p(x::AbstractAlgebra.GFElem{Int32},pr::UInt32)::UInt32
+    return(UInt32(AbstractAlgebra.data(x)))
 end
 
-# Test that all processes are responding
-function multiprocessing_smoketest(procs::Vector{Int})
-    @assert 1 in procs
-    rur_print("Checking processes... timeout $_process_timeout sec\n")
-    futures = Vector{Distributed.Future}(undef, length(procs))
-    for (i,proc) in enumerate(procs)
-        futures[i] = Distributed.@spawnat proc RationalUnivariateRepresentation.simplefun(i)
+function coeff_mod_p(x::AbstractAlgebra.GFElem{Int64},pr::UInt32)::UInt32
+    return(UInt32(AbstractAlgebra.data(x)))
+end
+
+function sys_mod_p(sys::Vector{AbstractAlgebra.Generic.MPoly{T}},pr::UInt32)::Vector{PolUInt32} where {T}
+    res=PolUInt32[]
+    for p in sys
+        push!(res,PolUInt32(map(u->PP(u),collect(AbstractAlgebra.exponent_vectors(p))),map(u->coeff_mod_p(u,pr),collect(AbstractAlgebra.coefficients(p)))))
     end
-    any_not_responding=false
-    for (i,proc) in enumerate(procs)
-        rur_print(" id=$proc -- ")
-        success = wait_with_timeout_basic(futures[i], _process_timeout)
-        if !success
-            rur_print("not responding, ")
-            any_not_responding=true
-        else
-            id,payload=fetch(futures[i])
-            @assert id == proc || payload == i^2
-            rur_print("ok, ")
-        end
-    end
-    any_not_responding && __throw_multiprocessing_error("Some processes are not responding")
-    nothing
+    return(res)
 end
 
 #####################################################
@@ -196,10 +164,8 @@ function kbase_linform(gro,pr,linform)
         g[end] = _f
         return quo,g
     else
-#        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
         g=sys_mod_p(gro,pr);
         ltg=map(u->u.exp[1],g);
-#    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
         R=AbstractAlgebra.parent(gro[1])
         q1=compute_quotient_basis(ltg);
         quo=sort(map(u->R([1],[Vector{Int64}(u.data)]),q1))
@@ -247,9 +213,9 @@ function total_degree(pp::PP)::Int64
     sum(pp.data)
 end
 
-## tests if pp1 is divisible by pp2
-## then returns the greatest variable
-## that appear in the divisor
+# tests if pp1 is divisible by pp2
+# then returns the greatest variable
+# that appear in the divisor
 @inline function divides(pp1::PP,pp2::PP)
     a, b = pp1.data, pp2.data
     var = 0
@@ -293,14 +259,12 @@ function compute_quotient_basis(ltg::Vector{PP})
         pos=find_divisor(m,ltg)
         if pos==0 
             push!(quo,m)
-#            rur_print("{",length(quo),"}")
             @inbounds for i in 1:nbv
                 pp=PP(m.data)
                 pp.data[i]+=1
                 if (find_in_list(pp,inspected)==0)
                    push!(todo,pp)
                    push!(inspected,pp)
-                   #rur_print("!")
                 end           
             end
         end
@@ -309,34 +273,13 @@ function compute_quotient_basis(ltg::Vector{PP})
     return(quo)
 end
 
-# Interface with AbstractAlgebra
-#####################################################
-function coeff_mod_p(x::AbstractAlgebra.GFElem{Int32},pr::UInt32)::UInt32
-    return(UInt32(AbstractAlgebra.data(x)))
-end
-
-function coeff_mod_p(x::AbstractAlgebra.GFElem{Int64},pr::UInt32)::UInt32
-    return(UInt32(AbstractAlgebra.data(x)))
-end
-
-function sys_mod_p(sys::Vector{AbstractAlgebra.Generic.MPoly{T}},pr::UInt32)::Vector{PolUInt32} where {T}
-    res=PolUInt32[]
-    for p in sys
-        push!(res,PolUInt32(map(u->PP(u),collect(AbstractAlgebra.exponent_vectors(p))),map(u->coeff_mod_p(u,pr),collect(AbstractAlgebra.coefficients(p)))))
-    end
-    return(res)
-end
-
 #####################################################
 # Multiplication Matrices
 #####################################################
 
-#test if a monomial is already in the
-#border and, if not, try to find a
-#divisor of total degree -1
-#the function supposes that it does not belong to
-#the quotient
-#variant where we look for the smallest divisor
+# test if a monomial is already in the border and, if not, try to find a divisor
+# of total degree -1. the function supposes that it does not belong to the
+# quotient variant where we look for the smallest divisor
 function find_in_border(m::PP,
                         t_xw::Vector{StackVect})
    pos=length(t_xw)
@@ -352,7 +295,7 @@ function find_in_border(m::PP,
       if (tmm==tm)
          if (m==mm) return(1,m,pos) end
       elseif (tmm==tm-1)
-            #test if mm is not in the quotient basis
+            # test if mm is not in the quotient basis
             if (!((t_xw[pos].prev>0) && (t_xw[pos].var==0))) 
                flag,dd=divides(m,mm)
                if (flag)
@@ -362,7 +305,7 @@ function find_in_border(m::PP,
                end
             end
       else
-            #the total degree is to high to find a predecessor
+            # the total degree is to high to find a predecessor
             if (res_flag>0) 
                return(res_flag,res_dd,res_pos)
             else
@@ -409,8 +352,8 @@ function prepare_table_mxi(ltg::Vector{PP},
                          push!(general_stack,StackVect(nb_stack,PP(nm.data),Int32(prec),Int32(v)))
 	             else rur_print("\n*** Error search table ***\n") end
 	         else
-		     #nm is a leading monomial of an element of the Gb
-		     #we insert it with the flags prev=0 and var=pos in the gb
+		     # nm is a leading monomial of an element of the Gb
+		     # we insert it with the flags prev=0 and var=pos in the gb
                      prev=findlast(item-> item.mon.data==nm.data,general_stack)
                      if isnothing(prev)
 		                 nb_stack=nb_stack+1
@@ -419,8 +362,8 @@ function prepare_table_mxi(ltg::Vector{PP},
                      else tablex[i][j]=Int32(prev) end
 		     end
 	         else
-		          #nm is a element of the quotient basis
-		          #we insert it with the flags prev=pos and var=0
+		          # nm is a element of the quotient basis
+		          # we insert it with the flags prev=pos and var=0
                   prev=findlast(item-> item.mon.data==nm.data,general_stack)
                   if isnothing(prev)
                         nb_stack=nb_stack+1
@@ -433,8 +376,10 @@ function prepare_table_mxi(ltg::Vector{PP},
    return(tablex,general_stack)
 end
 
-# stuff
 ########################################
+# vectors add-ons
+########################################
+
 function reduce_mod_p(
     cfs_zz::Vector{Vector{BigInt}},
     prime::UInt32
@@ -452,40 +397,9 @@ function reduce_mod_p(
     true, cfs_zp
 end
 
-# vectors add-ons
-########################################
-
 @inline function add_mul!(vres::Vector{UInt64},a::UInt32,v::Vector{UInt32})
     @fastmath @inbounds @simd ivdep for i in eachindex(vres)
         vres[i]+=UInt64(a)*UInt64(v[i])
-    end
-end
-
-@inline function add_mul_jam2!(
-        vres::Vector{UInt64},
-        a1::UInt32,v1::Vector{UInt32},
-        a2::UInt32,v2::Vector{UInt32})
-    @fastmath @inbounds @simd ivdep for i in 1:length(vres)
-        s=vres[i]
-        s=s+UInt64(a1)*UInt64(v1[i])
-        s=s+UInt64(a2)*UInt64(v2[i])
-        vres[i]=s
-    end
-end
-
-@inline function add_mul_jam4!(
-        vres::Vector{UInt64},
-        a1::UInt32,v1::Vector{UInt32},
-        a2::UInt32,v2::Vector{UInt32},
-        a3::UInt32,v3::Vector{UInt32},
-        a4::UInt32,v4::Vector{UInt32})
-    @fastmath @inbounds @simd ivdep for i in 1:length(vres)
-        s=vres[i]
-        s=s+UInt64(a1)*UInt64(v1[i])
-        s=s+UInt64(a2)*UInt64(v2[i])
-        s=s+UInt64(a3)*UInt64(v3[i])
-        s=s+UInt64(a4)*UInt64(v4[i])
-        vres[i]=s
     end
 end
 
@@ -519,13 +433,12 @@ function compute_fill_quo_gb!(t_xw::Vector{StackVect},
                               arithm)
    t_v=[Vector{UInt32}() for i=1:length(t_xw)]
    @inbounds for i in eachindex(t_xw)
-      #rur_print("\n",t_xw[i])
       if ((t_xw[i].var>0) && (t_xw[i].prev==0))
-         #var>0 and prev=0 => groebner basis element at position var in the list gro
+         # var>0 and prev=0 => groebner basis element at position var in the list gro
          t_v[i]=zeros(UInt32,length(quo))
          vectorize_pol_gro!(gro[t_xw[i].var],quo,pr,arithm,t_v[i])
       elseif ((t_xw[i].var==0) && (t_xw[i].prev>0))
-         #var=0 (and prev>0 )=> quotient element at position prev in the list quo
+         # var=0 (and prev>0 )=> quotient element at position prev in the list quo
           t_v[i]=[t_xw[i].prev]
         end
    end
@@ -601,10 +514,10 @@ function learn_compute_table!(t_v::Vector{Vector{UInt32}},
    while (nb>0)
       nb=0
       for i in eachindex(t_xw)
-         #test if already computed
+         # test if already computed
          if (length(t_v[i])==0)
             continuer=false
-            #test if the ancestor is computed
+            # test if the ancestor is computed
             if (length(t_v[t_xw[i].prev])>0)
                 vv=Vector{UInt32}(undef,length(t_v[t_xw[i].prev]))
                 continuer,vv= _mul_var_quo_UInt32!(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf,vv)
@@ -637,10 +550,10 @@ function learn_compute_table_sl!(t_v::Vector{Vector{UInt32}},
    while (nb>0)
       nb=0
       for i in eachindex(to_compute)
-         #test if already computed
+         # test if already computed
          if (length(t_v[i])==0)
             continuer=false
-            #test if the ancestor is computed
+            # test if the ancestor is computed
             if (length(t_v[t_xw[i].prev])>0)
                 vv=Vector{UInt32}(undef,length(t_v[t_xw[i].prev]))
                 continuer,vv= _mul_var_quo_UInt32!(t_v[t_xw[i].prev],t_xw[i].var,t_v,i_xw,pr,arithm,buf,vv)
@@ -688,7 +601,7 @@ function reduce_mod!(v::Vector{UInt64},pr::UInt32,arithm,vres::Vector{UInt32})
  end
 
 ############################################
-#learn_zdim
+# learn_zdim
 ############################################
 
 @noinline __throw_not_generic(pr) = throw("Basis modulo $pr may be not generic enough. ")
@@ -765,14 +678,9 @@ end
 ############################################
 # Rational Parameterization
 ############################################
-#first non null element of a reduced row stored at position i 
-#in the gred is at position i+1 to simulate that
-#gred[0]is not stored
-#this element is the opposite element of the true pivot
-#rows are normalized
-
-# Run "_gauss_reduct_jam[] = 1" to disable jamming
-const _gauss_reduct_jam = Ref{Int}(2)
+# first non null element of a reduced row stored at position i in the gred is at
+# position i+1 to simulate that gred[0]is not stored this element is the
+# opposite element of the true pivot rows are normalized
 
 function gauss_reduct(
         v::Vector{UInt32},
@@ -783,11 +691,6 @@ function gauss_reduct(
         pr::UInt32,
         arithm,
         b::Vector{UInt64})   # buffer
-    if paquet > 3 && _gauss_reduct_jam[] == 4
-        return gauss_reduct_jam4(v,gred,dg,dv,paquet,pr,arithm,b)
-    elseif  paquet > 1 && _gauss_reduct_jam[] == 2
-        return gauss_reduct_jam2(v,gred,dg,dv,paquet,pr,arithm,b)
-    end
     i=Int32(0)
     j=Int32(0)
     last_nn=Int32(-1)
@@ -833,251 +736,7 @@ function gauss_reduct(
     end
 end
 
-function gauss_reduct_jam2(
-        v::Vector{UInt32},
-        gred::Vector{Vector{UInt32}},
-        dg::Int32,
-        dv::Int32,
-        paquet::Int32,
-        pr::UInt32,
-        arithm,
-        b::Vector{UInt64})
-    @assert paquet > 1
-    j=Int32(0)
-    last_nn=Int32(-1)
-    pivot=UInt32(0)
-    resize!(b, dv)
-    @inbounds for ell in 1:dv
-        b[ell] = UInt64(v[ell])
-    end
-    ub2 = (dg-1) & xor(typemax(Int), 1)
-    k = 1
-    @inbounds while k <= ub2
-        w1, w2 = gred[k], gred[k+1]
-        b[k+1]=Groebner.mod_p(b[k+1], arithm)
-        if isempty(w1)
-            if !iszero(b[k+1])
-                last_nn=k%Int32
-                break
-            end
-            # Go for a single iteration with w2
-            b[k+2]=Groebner.mod_p(b[k+2], arithm)
-            if iszero(b[k+2])
-                k += 2
-                continue
-            end
-            if isempty(w2)
-                last_nn=(k+1)%Int32
-                break
-            end
-            pivot=(UInt64(pr)-b[k+2])%UInt32;
-            add_mul!(b,pivot,w2);
-            b[k+2]=pivot;
-            if (j<paquet)
-                j+=Int32(1);
-            else
-                reduce_mod!(b,pr,arithm);
-                j=Int32(0);
-            end
-            k += 2
-            continue
-        end
-        # from this point, w1 is non-empty
-        if isempty(w2)
-            # Go for a single iteration with w1
-            pivot=(UInt64(pr)-b[k+1])%UInt32;
-            add_mul!(b,pivot,w1);
-            b[k+1]=pivot;
-            if (j<paquet)
-                j+=Int32(1);
-            else
-                reduce_mod!(b,pr,arithm);
-                j=Int32(0);
-            end
-            b[k+2]=Groebner.mod_p(b[k+2], arithm)
-            if !iszero(b[k+2])
-                last_nn=(k+1)%Int32
-                break
-            end
-            k+=2
-            continue
-        end
-        # from this point, w1 and w2 are non-empty
-        pivot1=(UInt64(pr)-b[k+1])%UInt32;
-        b[k+2]=Groebner.mod_p(b[k+2], arithm)
-        pivot2=(UInt64(pr)-Groebner.mod_p(b[k+2]+UInt64(pivot1)*w1[k+2], arithm))%UInt32;
-        add_mul_jam2!(b, pivot1, w1, pivot2, w2) 
-        b[k+1]=Groebner.mod_p(UInt64(pivot1)+UInt64(pivot2)*UInt64(w2[k+1]), arithm)%UInt32;
-        b[k+2]=pivot2;
-        if (j<paquet)
-            j+=Int32(2);
-        else
-            reduce_mod!(b,pr,arithm);
-            j=Int32(0);
-        end
-        k+=2
-    end
-
-    if last_nn == -1
-        @inbounds for i in (k):(dg-1)
-            b[i+1]=Groebner.mod_p(b[i+1], arithm)
-            iszero(b[i+1]) && continue
-            if (length(gred[i])==0)
-                last_nn=i%Int32
-                break
-            end
-            pivot=(UInt64(pr)-b[i+1])%UInt32;
-            add_mul!(b,pivot,gred[i]);
-            b[i+1]=pivot;
-            if (j<paquet)
-                j+=Int32(1);
-            else
-                reduce_mod!(b,pr,arithm);
-                j=Int32(0);
-            end
-        end
-    end
-
-    if (j>0) 
-        @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
-    else 
-        @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
-    end
-    if (last_nn==-1)
-        @inbounds for ii in dg:(dv-1)
-            if (v[ii+1]!=0)
-                last_nn=ii%Int32;
-                break;
-            end
-        end
-    end
-    if last_nn==-1
-        return dv
-    else
-        return last_nn
-    end
-end
-
-function gauss_reduct_jam4(
-        v::Vector{UInt32},
-        gred::Vector{Vector{UInt32}},
-        dg::Int32,
-        dv::Int32,
-        paquet::Int32,
-        pr::UInt32,
-        arithm,
-        b::Vector{UInt64})      # buffer
-    @assert paquet > 3
-    j=Int32(0)
-    last_nn=Int32(-1)
-    pivot=UInt32(0)
-    resize!(b, dv)
-    @inbounds for ell in 1:dv
-        b[ell] = UInt64(v[ell])
-    end
-    # b=[UInt64(v[i]) for i=1:dv]
-    # the largest number not greater than (dg-1) and divisible by 4
-    ub4 = (dg-1) & xor(typemax(Int), 3)
-    k = 1
-    # k repeatedly increases by exactly 4
-    @inbounds while k <= ub4
-        k1,k2,k3,k4 = k,k+1,k+2,k+3
-        w1,w2,w3,w4 = gred[k1],gred[k2],gred[k3],gred[k4]
-        # If any of the reducers are empty, then default to scalar iteration
-        if isempty(w1) || isempty(w2) || isempty(w3) || isempty(w4)
-            for ki in k:(k+3)
-                b[ki+1]=Groebner.mod_p(b[ki+1], arithm)
-                iszero(b[ki+1]) && continue
-                if (length(gred[ki])==0)
-                    last_nn=ki%Int32;
-                    break
-                end
-                pivot=Groebner.mod_p((UInt64(pr)-b[ki+1]),arithm)%UInt32;
-                add_mul!(b,pivot,gred[ki]);
-                b[ki+1]=pivot;
-                if (j<paquet)
-                    j+=Int32(1);
-                else
-                    reduce_mod!(b,pr,arithm);
-                    j=Int32(0);
-                end
-            end
-            (last_nn != -1) && break    # new pivot found, break out
-            k=k+4
-            continue
-        end
-        # From this point, w1, w2, w3, w4 are non-empty.
-        # Jam!
-        b[k1+1]=Groebner.mod_p(b[k1+1], arithm)
-        b[k2+1]=Groebner.mod_p(b[k2+1], arithm)
-        b[k3+1]=Groebner.mod_p(b[k3+1], arithm)
-        b[k4+1]=Groebner.mod_p(b[k4+1], arithm)
-        pivot1=(UInt64(pr)-b[k1+1])%UInt32;
-        pivot2=(UInt64(pr)-Groebner.mod_p(
-            b[k2+1] + UInt64(pivot1)*w1[k2+1], arithm))%UInt32;
-        pivot3=(UInt64(pr)-Groebner.mod_p(
-            b[k3+1] + UInt64(pivot1)*w1[k3+1] + UInt64(pivot2)*w2[k3+1], arithm))%UInt32;
-        pivot4=(UInt64(pr)-Groebner.mod_p(
-            b[k4+1] + UInt64(pivot1)*w1[k4+1] + UInt64(pivot2)*w2[k4+1] + UInt64(pivot3)*w3[k4+1], arithm))%UInt32;
-        add_mul_jam4!(b, pivot1, w1, pivot2, w2, pivot3, w3, pivot4, w4)
-        b[k1+1]=Groebner.mod_p(
-            UInt64(pivot1) + UInt64(pivot4)*UInt64(w4[k1+1]) + UInt64(pivot3)*UInt64(w3[k1+1]) + UInt64(pivot2)*UInt64(w2[k1+1]), arithm)%UInt32;
-        b[k2+1]=Groebner.mod_p(
-            UInt64(pivot2) + UInt64(pivot4)*UInt64(w4[k2+1]) + UInt64(pivot3)*UInt64(w3[k2+1]), arithm)%UInt32
-        b[k3+1]=Groebner.mod_p(
-            UInt64(pivot3) + UInt64(pivot4)*UInt64(w4[k3+1]), arithm)%UInt32
-        b[k4+1]=pivot4
-        if (j<paquet)
-            j+=Int32(4);
-        else
-            reduce_mod!(b,pr,arithm);
-            j=Int32(0);
-        end
-        k=k+4
-    end
-
-    # the scalar tail. At most 3 iterations.
-    if last_nn == -1
-        @inbounds for i in (k):(dg-1)
-            b[i+1]=Groebner.mod_p(b[i+1], arithm)
-            iszero(b[i+1]) && continue
-            if (length(gred[i])==0)
-                last_nn=i%Int32;
-                break
-            end
-            pivot=Groebner.mod_p((UInt64(pr)-b[i+1]),arithm)%UInt32;
-            add_mul!(b,pivot,gred[i]);
-            b[i+1]=pivot;
-            if (j<paquet)
-                j+=Int32(1);
-            else
-                reduce_mod!(b,pr,arithm);
-                j=Int32(0);
-            end
-        end
-    end
-
-    if (j>0) 
-        @inbounds for k in 1:dv v[k]=Groebner.mod_p(b[k], arithm)%UInt32; end
-    else 
-        @inbounds for k in 1:dv v[k]=b[k]%UInt32; end; 
-    end
-    if (last_nn==-1)
-        @inbounds for ii in dg:(dv-1)
-            if (v[ii+1]!=0)
-                last_nn=ii%Int32;
-                break;
-            end
-        end
-    end
-    if last_nn==-1
-        return dv
-    else
-        return last_nn
-    end
-end
-
-function normalize_row!(v::Vector{UInt32},tmp::UInt32,pr::UInt32,arithm)
+function make_monic_row!(v::Vector{UInt32},tmp::UInt32,pr::UInt32,arithm)
      @fastmath @inbounds @simd for i in eachindex(v)
         v[i]=Groebner.mod_p((v[i]%UInt64)*(tmp%UInt64), arithm)%UInt32
      end
@@ -1109,28 +768,27 @@ function first_variable(t_v::Vector{Vector{UInt32}},
     if (gred[i-1][1]!=0) gred[i-1][1]=pr-gred[i-1][1]; end
     if (gred[i-1][i]!=1)
         hom[i-1]=invmod(gred[i-1][i],pr)%UInt32
-        normalize_row!(gred[i-1],hom[i-1],pr,arithm)
+        make_monic_row!(gred[i-1],hom[i-1],pr,arithm)
     end
-    #T^0 is stored at gred[0] virtually
+    # T^0 is stored at gred[0] virtually
     index[1]=i-1;
-    #gred[dg+i] not used i=0..d-dg
+    # gred[dg+i] not used i=0..d-dg
     dg=Int32(i);
-    #we are now going to compute T^2
+    # we are now going to compute T^2
     deg=Int32(2);
     w=Vector{UInt32}(undef,d)
     buf1=Vector{UInt64}(undef,d)
     buf2=Vector{UInt64}(undef,d)
     @inbounds while (continuer==1)
         v=mul_var_quo_UInt32(v,ii,t_v,i_xw,pr,arithm,buf1)
-        # w=Vector{UInt32}(v)
         resize!(w, length(v))
         for ell in 1:length(v)
             w[ell] = v[ell]
         end
-        #reduce with gred[0]
+        # reduce with gred[0]
         if (w[1]!=0) w[1]=pr-w[1]; end
-        #reduce with gred[i] i=1..dg-1
-        #new_i = possible position to store the reduced vector in gred
+        # reduce with gred[i] i=1..dg-1
+        # new_i = possible position to store the reduced vector in gred
         new_i=gauss_reduct(w,gred,dg,d,pack,pr,arithm,buf2);
         if (new_i<d)
             push!(free_set,v)
@@ -1138,13 +796,13 @@ function first_variable(t_v::Vector{Vector{UInt32}},
             if (!(new_i<dg)) dg=Int32(new_i+1); end;
             index[deg]=Int32(new_i);
             hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
-            normalize_row!(gred[new_i],hom[new_i],pr,arithm)
+            make_monic_row!(gred[new_i],hom[new_i],pr,arithm)
             deg+=Int32(1);
         else
             continuer=0;
         end;
     end
-    #set v[i] cofficient of T^(i-1) in the min poly
+    # set v[i] cofficient of T^(i-1) in the min poly
     v=Vector{UInt32}(undef,deg)
     v[1]=w[1];
     @inbounds for i in 2:deg v[i]=Groebner.mod_p((w[index[i-1]+1]%UInt64)*(hom[index[i-1]]%UInt64), arithm)%UInt32 ; end;
@@ -1188,7 +846,7 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
                 if (!(new_i<dg)) dg=Int32(new_i+1); end;
                 index[deg]=Int32(new_i);
                 hom[new_i]=invmod(gred[new_i][new_i+1],pr)%UInt32
-                normalize_row!(gred[new_i],hom[new_i],pr,arithm)
+                make_monic_row!(gred[new_i],hom[new_i],pr,arithm)
                 deg+=Int32(1);
             else
                 v=Vector{UInt32}(undef,deg)
@@ -1203,7 +861,6 @@ function biv_lex(t_v::Vector{Vector{UInt32}},
         new_monomial_free_set=copy(tmp_mon_set)
         append!(new_monomial_basis,copy(tmp_mon_set))
     end
-#    rur_print("{",length(new_monomial_basis),"}")
     return(new_monomial_basis,new_leading_monomials,new_generators);
 end
 
@@ -1424,258 +1081,14 @@ function general_param_serial(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector
     return qq_m;
 end
 
-function general_param_multithreading(sys_z, nn, dd, linform::Bool,cyclic::Bool,threads::Int)::Vector{Vector{Rational{BigInt}}}
-    qq_m=Vector{Vector{Rational{BigInt}}}()
-    t_pr=Vector{UInt32}();
-    t_param=Vector{Vector{Vector{UInt32}}}();
-    pr=UInt32(Primes.prevprime(2^nn-1));
-    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    rur_print("\nLearn ");
-    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
-    backup=deepcopy(graph)
-    expvecs,cfs_zz=extract_raw_data(sys_z)
-    continuer=true
-    bloc_p=Int32(threads)
-    lift_level=0
-    # Setup up "thread-local" buffers
-    workers=Vector{Task}(undef,threads-1)
-    t_local_trace=map(_ -> deepcopy(graph), 1:threads)
-    # Sasha: no need to use deepcopy everywhere here, and it is very-very expensive
-    t_local_data=map(_ -> (deepcopy(t_learn),deepcopy(q),deepcopy(i_xw),deepcopy(t_xw),deepcopy(gb_expvecs),deepcopy(sys_z),deepcopy(cfs_zz)), 1:threads)
-    t_globl_success=Vector{Bool}()
-    t_globl_zp_params=Vector{Vector{Vector{UInt32}}}()
-    while(continuer)
-        prms_per_worker=(threads==1) ? 0 : div(bloc_p,threads)
-        tail=bloc_p-prms_per_worker*threads
-        # Pre-allocate stuff
-        rur_print("\nbatch: $bloc_p, split: ")
-        t_globl_success=map(_->false, 1:bloc_p)
-        resize!(t_globl_zp_params, bloc_p)
-        prms=Vector{UInt32}(undef, bloc_p)
-        for k in 1:bloc_p
-            pr=UInt32(Primes.prevprime(pr-1))
-            prms[k]=pr
-        end
-        # Run worker tasks in parallel...
-        pr_idx=1
-        for t_id in 1:(threads-1)
-            trace=t_local_trace[t_id]
-            t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz=t_local_data[t_id]
-            prms_range=((t_id-1)*prms_per_worker+1):(t_id*prms_per_worker)
-            rur_print("$prms_range / ")
-            # id=1 is the main Julia thread, and id=2..nthreads() are the workers
-            workers[t_id] = @tspawnat (t_id+1) param_many_modular_images($trace,$t_learn,$q,$i_xw,$t_xw,$gb_expvecs,$sys_z,$cfs_zz,prms,dd,linform,$prms_range,t_globl_success,t_globl_zp_params)
-        end
-        # ...and run any trailing computation on the main Julia thread.
-        trace=t_local_trace[end]
-        t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz=t_local_data[end]
-        prms_range=((threads-1)*prms_per_worker+1):bloc_p
-        rur_print("$prms_range, ")
-        param_many_modular_images(trace,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,prms,dd,linform,prms_range,t_globl_success,t_globl_zp_params)
-        # Wait for the workers
-        for t_id in 1:(threads-1)
-            wait(workers[t_id])
-        end
-        # Check the results
-        for t_id in 1:threads
-            prms_range=((t_id-1)*prms_per_worker+1):((t_id==threads) ? bloc_p : t_id*prms_per_worker)
-            for prm_id in prms_range
-                if !t_globl_success[prm_id]
-                    t_local_trace[t_id]=backup
-                    backup=deepcopy(backup)
-                    break
-                end
-                zp_param=t_globl_zp_params[prm_id]
-                length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
-                push!(t_pr,UInt32(prms[prm_id]));
-                push!(t_param,zp_param);
-            end
-        end
-        # Attempt reconstruction
-        rur_print(length(t_pr));
-        zz_p=BigInt(1);
-        if (lift_level==0)
-            rur_print("-");
-            zz_m=zz_mat_same_dims([t_param[1][1]]);
-            qq_m=qq_mat_same_dims([t_param[1][1]]);
-            tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
-            Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
-            aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
-            if (aa) lift_level=1 end
-        end
-        if (lift_level==1)
-            rur_print("+");
-            zz_m=zz_mat_same_dims(t_param[1]);
-            qq_m=qq_mat_same_dims(t_param[1]);
-            Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
-            continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
-        end
-        bloc_p=Int32(max(threads,max(floor(length(t_pr)/10),2)))
-        # smallest number >= bloc_p, divisible by threads
-        bloc_p=(bloc_p+threads-1) & (~(threads-1))
-    end;
-    return qq_m;
-end
-
-function param_multiprocessing_worker(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,dd,linform,primes_in,results_out)
-    rur_print("On $(Distributed.myid()): started working\n")
-    backup = deepcopy(graph)
-    while true
-        prime = take!(primes_in)
-        rur_print("On $(Distributed.myid()): received $prime\n")
-        # Zero flags the end
-        if iszero(prime)
-            break
-        end
-        success,zp_param=false,Vector{Vector{UInt32}}()
-        try
-            success,zp_param=param_modular_image(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,UInt32(prime),dd,linform)
-        catch e # catch errors, otherwise an error could silently block our communications
-            rur_print("On $(Distributed.myid()): error!\n")
-            rur_print(e)
-        end
-        rur_print("On $(Distributed.myid()): sending back success=$success\n")
-        put!(results_out,(success,zp_param))
-        if !success
-            graph=backup
-            backup=deepcopy(graph)
-        end
-    end
-    rur_print("On $(Distributed.myid()): the end\n")
-end
-
-function general_param_multiprocessing(sys_z, nn, dd, linform::Bool,cyclic::Bool,procs::Vector{Int})::Vector{Vector{Rational{BigInt}}}
-    qq_m=Vector{Vector{Rational{BigInt}}}()
-    t_pr=Vector{UInt32}();
-    t_param=Vector{Vector{Vector{UInt32}}}();
-    pr=UInt32(Primes.prevprime(2^nn-1));
-    arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    rur_print("\nLearn ");
-    graph,t_learn,t_v,q,i_xw,t_xw,pr,gb_expvecs=learn_zdim_quo(sys_z,pr,arithm,linform,cyclic,dd);
-    backup=deepcopy(graph)
-    expvecs,cfs_zz=extract_raw_data(sys_z)
-    continuer=true
-    # Start worker threads on other processes
-    nprocs=length(procs)
-    workers=filter(pid->pid != 1,procs)
-    communications = [
-        (primes_in=Distributed.RemoteChannel(()->Channel{Int32}(128),pid),
-        results_out=Distributed.RemoteChannel(()->Channel{Tuple{Bool,Vector{Vector{UInt32}}}}(128),pid)) 
-        for pid in workers
-    ]
-    for i in 1:length(workers)
-        pid=workers[i]
-        primes_in,results_out=communications[i]
-        # This could be expensive, since the graph is heavy.
-        Distributed.@spawnat pid param_multiprocessing_worker(
-            graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,dd,linform,primes_in,results_out)
-    end
-    # Repeat until:
-    # - send primes to workers
-    # - receive back modular parametrizations
-    bloc_p=Int32(nprocs)
-    lift_level=0
-    while(continuer)
-        prms_per_worker=(nprocs==1) ? 0 : div(bloc_p,nprocs)
-        # Pre-allocate stuff
-        rur_print("\nbatch: $bloc_p, split: ")
-        for i in 1:length(workers)
-            prms_range=((i-1)*prms_per_worker+1):(i*prms_per_worker)
-            rur_print("$prms_range / ")
-        end
-        prms_range=((nprocs-1)*prms_per_worker+1):bloc_p
-        rur_print("$prms_range\n")
-        t_globl_success=map(_->false, 1:bloc_p)
-        t_globl_zp_params=Vector{Vector{Vector{UInt32}}}(undef,bloc_p)
-        prms=Vector{UInt32}(undef, bloc_p)
-        for k in 1:bloc_p
-            pr=UInt32(Primes.prevprime(pr-1))
-            prms[k]=pr
-        end
-        # Send the primes to workers (cheap)
-        for i in 1:length(workers)
-            primes_in,_=communications[i]
-            prms_range=((i-1)*prms_per_worker+1):(i*prms_per_worker)
-            for j in prms_range
-                pr=prms[j]
-                # Non-blocking send
-                put!(primes_in,pr)
-            end           
-        end
-        # Run any trailing computation on the main Julia thread
-        prms_range=((nprocs-1)*prms_per_worker+1):bloc_p
-        for j in prms_range
-            pr=prms[j]
-            success,zp_param=param_modular_image(graph,t_learn,q,i_xw,t_xw,gb_expvecs,sys_z,cfs_zz,pr,dd,linform)
-            t_globl_success[j]=success
-            t_globl_zp_params[j]=zp_param 
-        end
-        # Get the results from workers
-        for i in 1:(nprocs-1)
-            _,results_out=communications[i]
-            prms_range=((i-1)*prms_per_worker+1):(i*prms_per_worker)
-            # Blocking receive
-            for j in prms_range
-                success,zp_param=take!(results_out)
-                t_globl_success[j]=success
-                t_globl_zp_params[j]=zp_param 
-            end
-        end
-        # Check the results
-        for t_id in 1:nprocs
-            prms_range=((t_id-1)*prms_per_worker+1):((t_id==nprocs) ? bloc_p : t_id*prms_per_worker)
-            for prm_id in prms_range
-                if !t_globl_success[prm_id]
-                    if t_id==nprocs
-                        graph=backup
-                        backup=deepcopy(graph)
-                    end
-                    continue
-                end
-                zp_param=t_globl_zp_params[prm_id]
-                length(t_param) > 0 && @assert map(length, t_param[end]) == map(length, zp_param)
-                push!(t_pr,UInt32(prms[prm_id]));
-                push!(t_param,zp_param);
-            end
-        end
-        # Attempt reconstruction
-        rur_print(length(t_pr));
-        zz_p=BigInt(1);
-        if (lift_level==0)
-            rur_print("-");
-            zz_m=zz_mat_same_dims([t_param[1][1]]);
-            qq_m=qq_mat_same_dims([t_param[1][1]]);
-            tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
-            Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
-            aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
-            if (aa) lift_level=1 end
-        end
-        if (lift_level==1)
-            rur_print("+");
-            zz_m=zz_mat_same_dims(t_param[1]);
-            qq_m=qq_mat_same_dims(t_param[1]);
-            Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
-            continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
-        end
-        bloc_p=Int32(max(nprocs,max(floor(length(t_pr)/10),2)))
-        # smallest number >= bloc_p, divisible by nprocs
-        bloc_p=(bloc_p+nprocs-1) & (~(nprocs-1))
-    end;
-    # Shut down the execution on workers
-    for i in 1:length(workers)
-        primes_in,_=communications[i]
-        put!(primes_in,0)
-    end
-    return qq_m;
-end
-
 function general_param(sys_z, nn, dd, linform::Bool,cyclic::Bool,parallelism::Symbol,threads,procs)
     if parallelism==:serial
         general_param_serial(sys_z,nn,dd,linform,cyclic)
     elseif parallelism==:multithreading
-        general_param_multithreading(sys_z,nn,dd,linform,cyclic,threads)
+        # TODO(Sasha)
+        # general_param_multithreading(sys_z,nn,dd,linform,cyclic,threads)
     else
-        general_param_multiprocessing(sys_z,nn,dd,linform,cyclic,procs)
+        # general_param_multiprocessing(sys_z,nn,dd,linform,cyclic,procs)
     end
 end
 
@@ -1718,11 +1131,9 @@ function prepare_system(sys_z, nn,R,use_block)
         rur_print("\nError :  System is not zero-dimensional \n")
         return(-1,nothing,nothing,nothing,nothing,nothing)
     end
-#    quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
 
     g=sys_mod_p(gro,pr);
     ltg=map(u->u.exp[1],g);
-#    q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
     RU=parent(sys_Int32[1])
     q1=compute_quotient_basis(ltg);
     q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
@@ -1748,18 +1159,16 @@ function prepare_system(sys_z, nn,R,use_block)
       ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
       ls=swap_elts!(ls,length(ls),ii)
       rur_print("(",ls[length(ls)],")")
-      C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),ordering=:degrevlex);
+      C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),internal_ordering=:degrevlex);
       lls=AbstractAlgebra.gens(C)
       sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
       sys_Int32=convert_to_mpol_UInt32(sys0,pr)
 
       gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
-#      quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
 
       g=sys_mod_p(gro,pr);
 
       ltg=map(u->u.exp[1],g);
-#      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
 
     RU=parent(sys_Int32[1])
     q1=compute_quotient_basis(ltg);
@@ -1788,7 +1197,7 @@ function prepare_system(sys_z, nn,R,use_block)
     dd0=0
     
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
-    C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
+    C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),internal_ordering=:degrevlex);
     lls=AbstractAlgebra.gens(C)
     sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
 
@@ -1816,11 +1225,9 @@ function prepare_system(sys_z, nn,R,use_block)
         quo,g=kbase_linform(gro,pr,linform)
       else 
         gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
-#        quo=Groebner.kbase(gro,ordering=Groebner.DegRevLex());
         g=sys_mod_p(gro,pr);
       end
       ltg=map(u->u.exp[1],g);
-#      q=map(u->u.exp[1],sys_mod_p(map(u->AbstractAlgebra.leading_monomial(u),quo),pr));
 
     RU=parent(sys_Int32[1])
     q1=compute_quotient_basis(ltg);
@@ -1883,13 +1290,13 @@ Computes a RUR of a zero-dimensional system.
     where `n` is the number of variables and `f(x)` is an annihilating polynomial of the separating element.
 """
 function zdim_parameterization(
-        sys;
+        sys::Vector{T};
         nn::Int32=Int32(28),
         use_block::Bool=false,
         verbose::Bool=true,
         parallelism=:serial,
         threads=nothing,
-        procs=nothing)
+        procs=nothing) where {T <: MPolyRingElem{Rational{BigInt}}}
     # Check input arguments and configure parallelism
     _verbose[]=verbose
     @assert 1 <= nn <= 32 
@@ -1899,30 +1306,13 @@ function zdim_parameterization(
             @warn "Options `threads` and `procs` are not supported in `:serial` mode and were ignored"
         end
         rur_print("Using serial mode.\n")
-    elseif parallelism == :multithreading
-        @assert isnothing(threads) || threads > 0 && (threads==1 || iseven(threads))
-        if isnothing(threads)
-            # If not specified, use the current number of Julia threads
-            threads = nthreads()
-        elseif threads > nthreads()
-            @warn "Specified `threads=$threads`, but only $(nthreads()) Julia threads are available."
-            threads = nthreads()
-        end
-        rur_print("Using $threads Julia threads.\n")
-    else
-        @assert !isnothing(procs) "The option `procs` must be specified in `:multiprocessing` mode."
-        nprocs = length(procs)
-        @assert nprocs > 0
-        multiprocessing_smoketest(procs)
-        Distributed.@everywhere procs RationalUnivariateRepresentation._verbose[] = $verbose
-        rur_print("Using $nprocs Julia processes with IDs $procs.\n")
     end
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
     # Convert the system to :degrevlex
-    if (AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
+    if (AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
         sys_z=convert_sys_to_sys_z(sys);
     else 
-        CC,_vars=AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ,AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1])),ordering=:degrevlex)
+        CC,_vars=AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ,AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1])),internal_ordering=:degrevlex)
         sys_z=convert_sys_to_sys_z(map(u->CC(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys));
     end
     rur_print("\nSeparation step");
@@ -1949,11 +1339,6 @@ function to_file(f_name,rur)
            write(f,"]:\n")
        end
     return(nothing);
-end
-
-function parameterization(sys,nn::Int32=Int32(28),use_block::Bool=false;verbose::Bool=false)
-#    qq=zdim_parameterization(sys,nn,,use_block,verbose)
-#    AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
 end
 
 using PrecompileTools
