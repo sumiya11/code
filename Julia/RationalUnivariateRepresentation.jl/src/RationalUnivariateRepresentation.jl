@@ -48,14 +48,6 @@ end
 # Add on to AbstractAlgebra
 #####################################################
 
-function convert_sys_to_sys_z(sys::Vector{AbstractAlgebra.Generic.MPoly{Rational{BigInt}}})
-    sys_z=AbstractAlgebra.Generic.MPoly{BigInt}[]
-   for p in sys
-	 push!(sys_z,AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.ZZ,p*lcm(map(denominator,collect(AbstractAlgebra.coefficients(p))))))
-   end
-   return(sys_z)
-end
-
 function convert_to_mpol_UInt32(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},pr::UInt32)
    sys_Int32=AbstractAlgebra.Generic.MPoly{AbstractAlgebra.GFElem{Int64}}[]
    for p in sys_z push!(sys_Int32,AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.GF(Int64(pr)),p)) end
@@ -92,85 +84,23 @@ end
 # Add on to Groebner
 #####################################################
 
-const _enable_product_ord = Ref{Bool}(true)
-
-# If linform == true and _enable_product_ord[] == true, then the basis of
-#   [sys, f(_Z)]
-# is computed by computing the basis of sys and appending f(_Z) to the result.
-
-# We also tweak manually the order of monomials in f(_Z), since
-# AbstractAlgebra.leading_monomial and friends operate in :degrevlex.
-
-# If linform == true, then we assume that
-# - the last element of the input array is the linear form,
-# - the last variable in the AbstractAlgebra ring is the new variable.
-
-function groebner_apply_linform!(graph,cfs_zp,pr,linform)
-    if linform && _enable_product_ord[]
-        success,gro=Groebner.groebner_applyX!(graph,cfs_zp[1:end-1],pr);
-        gro=vcat(gro,[cfs_zp[end]])
-        # Move the monomial with _Z up front as the largest
-        _form=gro[end]
-        _form=vcat(_form[end],_form[1:end-1])
-        gro[end]=_form
-        return success,gro
-    else
-        success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
-        return success,gro
-    end
-end
-
 function groebner_linform(sys_Int32,linform)
-    if linform && _enable_product_ord[]
-        gro=Groebner.groebner(sys_Int32[1:end-1],ordering=Groebner.DegRevLex(),threaded=:no);
-        if any(f -> AbstractAlgebra.total_degree(AbstractAlgebra.leading_monomial(f)) == 1, gro)
-            @warn "The basis is possibly not inter-reduced. Switching back to degrevlex."
-            _enable_product_ord[] = false  # globally change the setting
-            gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
-            return gro
-        end
-        gro=vcat(gro,sys_Int32[end])  
-        return gro
-    else
-        gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
-        return gro
-    end
+    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
+    return gro
 end
 
 function groebner_learn_linform(sys_Int32,linform)
-    if linform && _enable_product_ord[]
-        graph,gro=Groebner.groebner_learn(sys_Int32[1:end-1],ordering=Groebner.DegRevLex(),threaded=:no);
-        @assert !any(f -> AbstractAlgebra.total_degree(AbstractAlgebra.leading_monomial(f)) == 1, gro)
-        gro=vcat(gro,sys_Int32[end])  
-        return graph,gro
-    else
-        graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
-        return graph,gro
-    end
+    graph,gro=Groebner.groebner_learn(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
+    return graph,gro
 end
 
 function kbase_linform(gro,pr,linform)
-    if linform && _enable_product_ord[]
-        R=AbstractAlgebra.parent(gro[1])
-        vars=AbstractAlgebra.gens(R)
-        @assert length(unique(map(string,vars))) == length(vars)   # variable names are unique
-        ord=Groebner.Lex(vars[end])*Groebner.DegRevLex(vars[1:end-1])
-        quo=Groebner.kbase(gro,ordering=ord);
-        g=sys_mod_p(gro,pr)
-        # Move the monomial with _Z up front as the largest
-        _f=g[end]
-        @assert length(_f.exp) == findfirst(e -> e.data[end] == 1, _f.exp)
-        _f=PolUInt32(vcat(_f.exp[end], _f.exp[1:end-1]), vcat(_f.co[end], _f.co[1:end-1]))
-        g[end] = _f
-        return quo,g
-    else
-        g=sys_mod_p(gro,pr);
-        ltg=map(u->u.exp[1],g);
-        R=AbstractAlgebra.parent(gro[1])
-        q1=compute_quotient_basis(ltg);
-        quo=sort(map(u->R([1],[Vector{Int64}(u.data)]),q1))
-        return quo,g
-    end
+    g=sys_mod_p(gro,pr);
+    ltg=map(u->u.exp[1],g);
+    R=AbstractAlgebra.parent(gro[1])
+    q1=compute_quotient_basis(ltg);
+    quo=sort(map(u->R([1],[Vector{Int64}(u.data)]),q1))
+    return quo,g
 end
 
 #####################################################
@@ -182,6 +112,19 @@ struct PP
     function PP(v::Vector{T}) where {T}
         new(Vector{Int32}(v))
     end
+end
+
+function pp_isless_drl(ea::PP, eb::PP)
+    if sum(ea.data) < sum(eb.data)
+        return true
+    elseif sum(ea.data) != sum(eb.data)
+        return false
+    end
+    i = length(a)
+    @inbounds while i > 1 && a[i] == b[i]
+        i -= 1
+    end
+    @inbounds return a[i] > b[i]
 end
 
 struct PolUInt32
@@ -380,10 +323,19 @@ end
 # vectors add-ons
 ########################################
 
+function convert_coeffs_to_coeffs_z(coeffs::Vector{Vector{Rational{BigInt}}})
+    coeffs_z=Vector{Vector{BigInt}}[]
+   for c in coeffs
+	 push!(coeffs_z,map(numerator, (c .* lcm(map(denominator,c)))))
+   end
+   return coeffs_z
+end
+
 function reduce_mod_p(
     cfs_zz::Vector{Vector{BigInt}},
     prime::UInt32
 )
+    @assert prime < typemax(UInt32)
     prime_zz = BigInt(prime)
     cfs_zp=[Vector{UInt32}(undef, length(cfs_zz[i])) for i in 1:length(cfs_zz)]
     @inbounds for i in 1:length(cfs_zz)
@@ -1117,26 +1069,29 @@ function count_univ(l)
     return(nb)
 end
 
-function prepare_system(sys_z, nn,R,use_block)
-
+function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
     pr=UInt32(Primes.prevprime(2^nn-1));
     arithm=Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    sys=copy(sys_z)
-    sys_Int32=convert_to_mpol_UInt32(sys_z,pr)
+    sys=(copy(monoms), copy(coeffs))
+    
+    flag, sys_Int32 = reduce_mod_p(coeffs,pr)
+    @assert flag
 
     rur_print("\nTest the shape position")
-    
-    gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
-    if !(count_univ(map(w->isuniv(w),map(u->collect(AbstractAlgebra.exponent_vectors(u))[1],gro)))==length(AbstractAlgebra.gens(AbstractAlgebra.parent(gro[1]))))
+    ring = Groebner.PolyRing(ring.nvars, ring.ord, pr)
+    gro=Groebner.groebner(ring, monoms, sys_Int32, threaded=:no);
+    if !(count_univ(map(w->isuniv(w),map(u -> u[1], gro[1]))) == ring.nvars)
         rur_print("\nError :  System is not zero-dimensional \n")
         return(-1,nothing,nothing,nothing,nothing,nothing)
     end
 
-    g=sys_mod_p(gro,pr);
+    # g=sys_mod_p(gro,pr);
+    g = [PolUInt32(PP.(gro[1]), gro[2]) for i in 1:length(gro[1])]
+
     ltg=map(u->u.exp[1],g);
-    RU=parent(sys_Int32[1])
+    # RU=parent(sys_Int32[1])
     q1=compute_quotient_basis(ltg);
-    q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
+    q=sort(q1,lt=pp_isless_drl)
     
     i_xw,t_xw=prepare_table_mxi(ltg,q);
     t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
@@ -1150,29 +1105,31 @@ function prepare_system(sys_z, nn,R,use_block)
         dd0=length(zp_param[1])-1
         i_max=ii
         rur_print("\nSystem has a separating variable (",ii,")")
-        return(dd0,length(q),sys_z,AbstractAlgebra.symbols(R),false,dd0==length(q));
+        return(dd0,length(q),(monoms,coeffs),false,dd0==length(q));
     end
 
     rur_print("\nTest if variables are separating")
     
     for ii in (length(i_xw)-1):-1:1
-      ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
+      ls=copy(symbols)
       ls=swap_elts!(ls,length(ls),ii)
       rur_print("(",ls[length(ls)],")")
-      C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),internal_ordering=:degrevlex);
-      lls=AbstractAlgebra.gens(C)
-      sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
-      sys_Int32=convert_to_mpol_UInt32(sys0,pr)
+    #   C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),internal_ordering=:degrevlex);
+    #   lls=AbstractAlgebra.gens(C)
+      monoms0 = map(u -> swap_elts!(u,length(ls),ii), monoms)
+      # sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
+      # sys_Int32=convert_to_mpol_UInt32(sys0,pr)
+      flag, sys_Int32 = reduce_mod_p(coeffs,pr)
 
-      gro=Groebner.groebner(sys_Int32,ordering=Groebner.DegRevLex(),threaded=:no);
+      gro=Groebner.groebner(ring, monoms0, sys_Int32,threaded=:no);
 
       g=sys_mod_p(gro,pr);
 
       ltg=map(u->u.exp[1],g);
 
-    RU=parent(sys_Int32[1])
-    q1=compute_quotient_basis(ltg);
-    q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
+      RU=parent(sys_Int32[1])
+      q1=compute_quotient_basis(ltg);
+      q=map(u->u.exp[1],sys_mod_p(sort(map(u->RU([1],[Vector{Int64}(u.data)]),q1)),pr))
 
         
       i_xw,t_xw=prepare_table_mxi(ltg,q);
@@ -1262,6 +1219,7 @@ end
 
 """
     zdim_parameterization(sys; options...)
+    zdim_parameterization(monoms, coeffs; options...)
 
 Computes a RUR of a zero-dimensional system.
 
@@ -1290,14 +1248,34 @@ Computes a RUR of a zero-dimensional system.
     where `n` is the number of variables and `f(x)` is an annihilating polynomial of the separating element.
 """
 function zdim_parameterization(
-        sys::Vector{T};
+        sys;
         nn::Int32=Int32(28),
         use_block::Bool=false,
         verbose::Bool=true,
         parallelism=:serial,
         threads=nothing,
-        procs=nothing) where {T <: MPolyRingElem{Rational{BigInt}}}
-    # Check input arguments and configure parallelism
+        procs=nothing)
+    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
+    @assert AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
+    monoms = map(f -> collect(AbstractAlgebra.exponent_vectors(f)), sys)
+    coeffs = map(f -> collect(AbstractAlgebra.coefficients(f)), sys)
+    ring = Groebner.PolyRing(
+        AbstractAlgebra.nvars(AbstractAlgebra.parent(sys[1]))
+        Groebner.DegRevLex(),
+        0
+    )
+    symbols = AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
+    _zdim_parameterization(ring, symbols, monoms, coeffs, nn=nn, verbose=verbose)
+end
+
+function _zdim_parameterization(
+        ring, symbols, monoms, coeffs; 
+        nn::Int32=Int32(28),
+        use_block::Bool=false,
+        verbose::Bool=true,
+        parallelism=:serial,
+        threads=nothing,
+        procs=nothing)
     _verbose[]=verbose
     @assert 1 <= nn <= 32 
     @assert parallelism in (:serial, :multithreading, :multiprocessing)
@@ -1307,16 +1285,9 @@ function zdim_parameterization(
         end
         rur_print("Using serial mode.\n")
     end
-    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
-    # Convert the system to :degrevlex
-    if (AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
-        sys_z=convert_sys_to_sys_z(sys);
-    else 
-        CC,_vars=AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ,AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1])),internal_ordering=:degrevlex)
-        sys_z=convert_sys_to_sys_z(map(u->CC(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys));
-    end
+    coeffs_z = convert_coeffs_to_coeffs_z(coeffs)
     rur_print("\nSeparation step");
-    dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(sys_z,nn,AbstractAlgebra.parent(sys[1]),use_block);
+    dm,Dq,sys_T,_vars,linform,cyclic=prepare_system(ring, symbols, monoms, coeffs_z,nn,use_block);
     if !(dm>0)
         rur_print("\nSomething went wrong");
         return []
