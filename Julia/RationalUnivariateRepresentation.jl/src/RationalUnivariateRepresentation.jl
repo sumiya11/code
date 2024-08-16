@@ -48,16 +48,10 @@ end
 # Add on to AbstractAlgebra
 #####################################################
 
-function convert_to_mpol_UInt32(
-    sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},
-    pr::UInt32,
-)
+function convert_to_mpol_UInt32(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}}, pr::UInt32)
     sys_Int32 = AbstractAlgebra.Generic.MPoly{AbstractAlgebra.GFElem{Int64}}[]
     for p in sys_z
-        push!(
-            sys_Int32,
-            AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.GF(Int64(pr)), p),
-        )
+        push!(sys_Int32, AbstractAlgebra.change_coefficient_ring(AbstractAlgebra.GF(Int64(pr)), p))
     end
     return (sys_Int32)
 end
@@ -65,7 +59,7 @@ end
 function extract_raw_data(sys_z::Vector{AbstractAlgebra.Generic.MPoly{BigInt}})
     expvecs = Vector{Vector{PP}}()
     cfs_zz = Vector{Vector{BigInt}}()
-    for i = 1:length(sys_z)
+    for i in 1:length(sys_z)
         push!(expvecs, map(PP, collect(AbstractAlgebra.exponent_vectors(sys_z[i]))))
         push!(cfs_zz, map(BigInt, collect(AbstractAlgebra.coefficients(sys_z[i]))))
     end
@@ -82,7 +76,7 @@ end
 
 function sys_mod_p(
     sys::Vector{AbstractAlgebra.Generic.MPoly{T}},
-    pr::UInt32,
+    pr::UInt32
 )::Vector{PolUInt32} where {T}
     res = PolUInt32[]
     for p in sys
@@ -90,8 +84,8 @@ function sys_mod_p(
             res,
             PolUInt32(
                 map(u -> PP(u), collect(AbstractAlgebra.exponent_vectors(p))),
-                map(u -> coeff_mod_p(u, pr), collect(AbstractAlgebra.coefficients(p))),
-            ),
+                map(u -> coeff_mod_p(u, pr), collect(AbstractAlgebra.coefficients(p)))
+            )
         )
     end
     return (res)
@@ -102,13 +96,12 @@ end
 #####################################################
 
 function groebner_linform(sys_Int32, linform)
-    gro = Groebner.groebner(sys_Int32, ordering = Groebner.DegRevLex(), threaded = :no)
+    gro = Groebner.groebner(sys_Int32, ordering=Groebner.DegRevLex(), threaded=:no)
     return gro
 end
 
 function groebner_learn_linform(sys_Int32, linform)
-    graph, gro =
-        Groebner.groebner_learn(sys_Int32, ordering = Groebner.DegRevLex(), threaded = :no)
+    graph, gro = Groebner.groebner_learn(sys_Int32, ordering=Groebner.DegRevLex(), threaded=:no)
     return graph, gro
 end
 
@@ -182,7 +175,7 @@ end
 @inline function divides(pp1::PP, pp2::PP)
     a, b = pp1.data, pp2.data
     var = 0
-    @inbounds for j = 1:length(a)
+    @inbounds for j in 1:length(a)
         if a[j] > b[j]
             var = j
         end
@@ -195,7 +188,7 @@ end
 
 function find_divisor(m::PP, lm::Vector{PP})
     pos = length(lm)
-    @inbounds for j = pos:-1:1
+    @inbounds for j in pos:-1:1
         te, v = divides(m, lm[j])
         if te
             return (j)
@@ -206,7 +199,7 @@ end
 
 function find_in_list(m::PP, lm::Vector{PP})
     pos = length(lm)
-    @inbounds for j = pos:-1:1
+    @inbounds for j in pos:-1:1
         if m.data == lm[j].data
             return (j)
         end
@@ -220,15 +213,15 @@ function compute_quotient_basis(ltg::Vector{PP})
     end
     nbv = length(ltg[1].data)
     quo = Vector{PP}()
-    todo = Vector{PP}([PP([Int32(0) for i = 1:nbv])])
-    inspected = Vector{PP}([PP([Int32(0) for i = 1:nbv])])
+    todo = Vector{PP}([PP([Int32(0) for i in 1:nbv])])
+    inspected = Vector{PP}([PP([Int32(0) for i in 1:nbv])])
     pos = 1
     while (length(todo) > 0)
         m = popfirst!(todo)
         pos = find_divisor(m, ltg)
         if pos == 0
             push!(quo, m)
-            @inbounds for i = 1:nbv
+            @inbounds for i in 1:nbv
                 pp = PP(m.data)
                 pp.data[i] += 1
                 if (find_in_list(pp, inspected) == 0)
@@ -301,12 +294,12 @@ end
 
 function prepare_table_mxi(ltg::Vector{PP}, kb::Vector{PP})
     nbv = length(ltg[1].data)
-    tablex = [[Int32(0) for i = 1:length(kb)] for j = 1:nbv]
+    tablex = [[Int32(0) for i in 1:length(kb)] for j in 1:nbv]
     general_stack = Vector{StackVect}()
     nb_stack = 0
     for j in eachindex(kb)
         m = PP(kb[j].data)
-        for ii = 1:nbv
+        for ii in 1:nbv
             i = nbv - ii + 1
             nm = mul_pp_by_var!(m, i)
             pos = findfirst(item -> item.data == nm.data, kb)
@@ -321,7 +314,7 @@ function prepare_table_mxi(ltg::Vector{PP}, kb::Vector{PP})
                         tablex[i][j] = Int32(nb_stack)
                         push!(
                             general_stack,
-                            StackVect(nb_stack, PP(nm.data), Int32(prec), Int32(v)),
+                            StackVect(nb_stack, PP(nm.data), Int32(prec), Int32(v))
                         )
                     else
                         rur_print("\n*** Error search table ***\n")
@@ -335,7 +328,7 @@ function prepare_table_mxi(ltg::Vector{PP}, kb::Vector{PP})
                         tablex[i][j] = Int32(nb_stack)
                         push!(
                             general_stack,
-                            StackVect(nb_stack, PP(ltg[pos].data), Int32(0), Int32(pos)),
+                            StackVect(nb_stack, PP(ltg[pos].data), Int32(0), Int32(pos))
                         )
                     else
                         tablex[i][j] = Int32(prev)
@@ -350,7 +343,7 @@ function prepare_table_mxi(ltg::Vector{PP}, kb::Vector{PP})
                     tablex[i][j] = Int32(nb_stack)
                     push!(
                         general_stack,
-                        StackVect(nb_stack, PP(kb[pos].data), Int32(pos), Int32(0)),
+                        StackVect(nb_stack, PP(kb[pos].data), Int32(pos), Int32(0))
                     )
                 else
                     tablex[i][j] = Int32(prev)
@@ -376,10 +369,10 @@ end
 function reduce_mod_p(cfs_zz::Vector{Vector{BigInt}}, prime::UInt32)
     @assert prime < typemax(UInt32)
     prime_zz = BigInt(prime)
-    cfs_zp = [Vector{UInt32}(undef, length(cfs_zz[i])) for i = 1:length(cfs_zz)]
-    @inbounds for i = 1:length(cfs_zz)
+    cfs_zp = [Vector{UInt32}(undef, length(cfs_zz[i])) for i in 1:length(cfs_zz)]
+    @inbounds for i in 1:length(cfs_zz)
         cfs_zz_i = cfs_zz[i]
-        for j = 1:length(cfs_zz_i)
+        for j in 1:length(cfs_zz_i)
             cfs_zp[i][j] = UInt32(mod(cfs_zz_i[j], prime_zz))
         end
         # if lead vanishes
@@ -400,15 +393,9 @@ function reduce_mod!(vres::Vector{UInt64}, pr::UInt32, arithm)
     end
 end
 
-function vectorize_pol_gro!(
-    p::PolUInt32,
-    kb::Vector{PP},
-    pr::UInt32,
-    arithm,
-    res::Vector{UInt32},
-)
+function vectorize_pol_gro!(p::PolUInt32, kb::Vector{PP}, pr::UInt32, arithm, res::Vector{UInt32})
     pos = length(kb)
-    @inbounds for i = 2:length(p.co)
+    @inbounds for i in 2:length(p.co)
         m = monomial(p, Int32(i))
         while ((pos > 0) && (kb[pos].data != m.data))
             pos = pos - 1
@@ -427,9 +414,9 @@ function compute_fill_quo_gb!(
     gro::Vector{PolUInt32},
     quo::Vector{PP},
     pr::UInt32,
-    arithm,
+    arithm
 )
-    t_v = [Vector{UInt32}() for i = 1:length(t_xw)]
+    t_v = [Vector{UInt32}() for i in 1:length(t_xw)]
     @inbounds for i in eachindex(t_xw)
         if ((t_xw[i].var > 0) && (t_xw[i].prev == 0))
             # var>0 and prev=0 => groebner basis element at position var in the list gro
@@ -451,17 +438,17 @@ function _mul_var_quo_UInt32!(
     pr::UInt32,
     arithm,
     vv::Vector{UInt64},       # buffer
-    vres::Vector{UInt32},
+    vres::Vector{UInt32}
 )     # result
     dim = length(v)
     @assert dim == length(vres)
     pack = Int32(2^(floor(63 - 2 * log(pr - 1) / log(2))))
     resize!(vv, dim)
-    @inbounds for i = 1:dim
+    @inbounds for i in 1:dim
         vv[i] = zero(UInt64)
     end
     continuer = true
-    @inbounds for j = 1:dim
+    @inbounds for j in 1:dim
         iszero(v[j]) && continue
         if (length(t_v[i_xw[ii][j]]) > 1)
             add_mul!(vv, v[j], t_v[i_xw[ii][j]])
@@ -487,7 +474,7 @@ function mul_var_quo_UInt32!(
     pr::UInt32,
     arithm,
     vv::Vector{UInt64},
-    vres::Vector{UInt32},
+    vres::Vector{UInt32}
 )
     f, r = _mul_var_quo_UInt32!(v, ii, t_v, i_xw, pr, arithm, vv, vres)
     return r
@@ -500,7 +487,7 @@ function mul_var_quo_UInt32(
     i_xw::Vector{Vector{Int32}},
     pr::UInt32,
     arithm,
-    vv::Vector{UInt64},
+    vv::Vector{UInt64}
 )
     vres = Vector{UInt32}(undef, length(v))
     f, r = _mul_var_quo_UInt32!(v, ii, t_v, i_xw, pr, arithm, vv, vres)
@@ -513,7 +500,7 @@ function learn_compute_table!(
     i_xw::Vector{Vector{Int32}},
     quo::Vector{PP},
     pr::UInt32,
-    arithm,
+    arithm
 )
     nb = 1
     t_learn = Int32[]
@@ -535,7 +522,7 @@ function learn_compute_table!(
                         pr,
                         arithm,
                         buf,
-                        vv,
+                        vv
                     )
                     if (continuer)
                         t_v[i] = vv
@@ -555,14 +542,13 @@ function learn_compute_table_sl!(
     i_xw::Vector{Vector{Int32}},
     quo::Vector{PP},
     pr::UInt32,
-    arithm,
+    arithm
 )
-
     nb = 1
     t_learn = Int32[]
     buf = Vector{UInt64}()
     to_compute = copy(i_xw[end])
-    for i = 1:(length(i_xw)-1)
+    for i in 1:(length(i_xw) - 1)
         push!(to_compute, i_xw[i][1])
     end
     while (nb > 0)
@@ -582,7 +568,7 @@ function learn_compute_table_sl!(
                         pr,
                         arithm,
                         buf,
-                        vv,
+                        vv
                     )
                     if (continuer)
                         t_v[i] = vv
@@ -603,20 +589,12 @@ function apply_compute_table!(
     i_xw::Vector{Vector{Int32}},
     quo::Vector{PP},
     pr::UInt32,
-    arithm,
+    arithm
 )
     buf = Vector{UInt64}()
     @inbounds for i in t_learn
         if (length(t_v[i]) == 0)
-            t_v[i] = mul_var_quo_UInt32(
-                t_v[t_xw[i].prev],
-                t_xw[i].var,
-                t_v,
-                i_xw,
-                pr,
-                arithm,
-                buf,
-            )
+            t_v[i] = mul_var_quo_UInt32(t_v[t_xw[i].prev], t_xw[i].var, t_v, i_xw, pr, arithm, buf)
         end
     end
     return nothing
@@ -649,7 +627,7 @@ function learn_zdim_quo(
     arithm,
     linform,
     cyclic,
-    dd,
+    dd
 )
     sys_Int32 = convert_to_mpol_UInt32(sys, pr)
     # Sasha: groebner_learn can use multi-threading itself (but let's not use it for now).
@@ -657,25 +635,21 @@ function learn_zdim_quo(
     for pr2 in Primes.nextprimes(UInt32(2^30), 2)
         sys_Int32_2 = convert_to_mpol_UInt32(sys, pr2)
         # Sasha: groebner can use multi-threading (-//-)
-        gb_2 = Groebner.groebner(sys_Int32_2, threaded = :no)
+        gb_2 = Groebner.groebner(sys_Int32_2, threaded=:no)
         length(gro) != length(gb_2) && __throw_not_generic(pr)
-        for j = 1:length(gro)
+        for j in 1:length(gro)
             length(gro[j]) != length(gb_2[j]) && __throw_not_generic(pr)
         end
     end
     quo, g = kbase_linform(gro, pr, linform)
     gb_expvecs = map(poly -> poly.exp, g)
     ltg = map(u -> u.exp[1], g)
-    q = map(
-        u -> u.exp[1],
-        sys_mod_p(map(u -> AbstractAlgebra.leading_monomial(u), quo), pr),
-    )
+    q = map(u -> u.exp[1], sys_mod_p(map(u -> AbstractAlgebra.leading_monomial(u), quo), pr))
     i_xw, t_xw = prepare_table_mxi(ltg, q)
     t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
     if (cyclic)
         t_learn = learn_compute_table_sl!(t_v, t_xw, i_xw, q, pr, arithm)
-        success, zp_param =
-            zdim_parameterization(t_v, i_xw, pr, Int32(dd), Int32(1), arithm)
+        success, zp_param = zdim_parameterization(t_v, i_xw, pr, Int32(dd), Int32(1), arithm)
         if (success)
             rur_print("\nApply cyclic optimization ")
         else
@@ -701,11 +675,11 @@ function apply_zdim_quo!(
     gb_expvecs::Vector{Vector{PP}},
     cfs_zp::Vector{Vector{UInt32}},
     sys,
-    linform::Bool,
+    linform::Bool
 )
     success, gro = Groebner.groebner_applyX!(graph, cfs_zp, pr)
     if (success)
-        g = [PolUInt32(gb_expvecs[i], gro[i]) for i = 1:length(gb_expvecs)]  # :^)
+        g = [PolUInt32(gb_expvecs[i], gro[i]) for i in 1:length(gb_expvecs)]  # :^)
         t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
         apply_compute_table!(t_v, t_learn, t_xw, i_xw, q, pr, arithm)
         return success, t_v
@@ -715,14 +689,9 @@ function apply_zdim_quo!(
     end
 end
 
-function zdim_mx(
-    t_v::Vector{Vector{Int32}},
-    i_xw::Vector{Vector{Int32}},
-    i::Int32,
-    d::Int32,
-)
+function zdim_mx(t_v::Vector{Vector{Int32}}, i_xw::Vector{Vector{Int32}}, i::Int32, d::Int32)
     res = Vector{Int32}[]
-    for j = 1:d
+    for j in 1:d
         push!(res, t_v[i_xw[i][j]])
     end
     return (res)
@@ -743,26 +712,26 @@ function gauss_reduct(
     paquet::Int32,
     pr::UInt32,
     arithm,
-    b::Vector{UInt64},
+    b::Vector{UInt64}
 )   # buffer
     i = Int32(0)
     j = Int32(0)
     last_nn = Int32(-1)
     pivot = UInt32(0)
     resize!(b, dv)
-    @inbounds for ell = 1:dv
+    @inbounds for ell in 1:dv
         b[ell] = UInt64(v[ell])
     end
-    @inbounds for i = 1:(dg-1)
-        b[i+1] = Groebner.mod_p(b[i+1], arithm)
-        iszero(b[i+1]) && continue
+    @inbounds for i in 1:(dg - 1)
+        b[i + 1] = Groebner.mod_p(b[i + 1], arithm)
+        iszero(b[i + 1]) && continue
         if (length(gred[i]) == 0)
             last_nn = i % Int32
             break
         end
-        pivot = (UInt64(pr) - b[i+1]) % UInt32
+        pivot = (UInt64(pr) - b[i + 1]) % UInt32
         add_mul!(b, pivot, gred[i])
-        b[i+1] = pivot
+        b[i + 1] = pivot
         if (j < paquet)
             j += Int32(1)
         else
@@ -771,17 +740,17 @@ function gauss_reduct(
         end
     end
     if (j > 0)
-        @inbounds for k = 1:dv
+        @inbounds for k in 1:dv
             v[k] = Groebner.mod_p(b[k], arithm) % UInt32
         end
     else
-        @inbounds for k = 1:dv
+        @inbounds for k in 1:dv
             v[k] = b[k] % UInt32
         end
     end
     if (last_nn == -1)
-        @inbounds for ii = dg:(dv-1)
-            if (v[ii+1] != 0)
+        @inbounds for ii in dg:(dv - 1)
+            if (v[ii + 1] != 0)
                 last_nn = ii % Int32
                 break
             end
@@ -805,11 +774,11 @@ function first_variable(
     i_xw::Vector{Vector{Int32}},
     ii::Int32,
     pr::UInt32,
-    arithm,
+    arithm
 )
     pack = Int32(2^(floor(63 - 2 * log(pr - 1) / log(2))))
     d = Int32(length(i_xw[ii]))
-    free_set = [append!([UInt32(1)], [UInt32(0) for i = 2:d])]
+    free_set = [append!([UInt32(1)], [UInt32(0) for i in 2:d])]
     if (length(t_v[i_xw[ii][1]]) > 1)
         v = t_v[i_xw[ii][1]]
     else
@@ -818,10 +787,10 @@ function first_variable(
     end
     push!(free_set, v)
     # index[deg]=pos (pos=position in the gred with the convention that 0 is not stored)
-    index = [Int32(i) for i = 1:d]
+    index = [Int32(i) for i in 1:d]
     # normalization values
-    hom = [UInt32(1) for i = 1:d]
-    gred = [Vector{UInt32}() for i = 1:d]
+    hom = [UInt32(1) for i in 1:d]
+    gred = [Vector{UInt32}() for i in 1:d]
 
     i = Int32(2)
     continuer = 1
@@ -831,13 +800,13 @@ function first_variable(
     while ((i < d) && (v[i] == 0))
         i += 1
     end
-    gred[i-1] = Vector{UInt32}(v)
-    if (gred[i-1][1] != 0)
-        gred[i-1][1] = pr - gred[i-1][1]
+    gred[i - 1] = Vector{UInt32}(v)
+    if (gred[i - 1][1] != 0)
+        gred[i - 1][1] = pr - gred[i - 1][1]
     end
-    if (gred[i-1][i] != 1)
-        hom[i-1] = invmod(gred[i-1][i], pr) % UInt32
-        make_monic_row!(gred[i-1], hom[i-1], pr, arithm)
+    if (gred[i - 1][i] != 1)
+        hom[i - 1] = invmod(gred[i - 1][i], pr) % UInt32
+        make_monic_row!(gred[i - 1], hom[i - 1], pr, arithm)
     end
     # T^0 is stored at gred[0] virtually
     index[1] = i - 1
@@ -851,7 +820,7 @@ function first_variable(
     @inbounds while (continuer == 1)
         v = mul_var_quo_UInt32(v, ii, t_v, i_xw, pr, arithm, buf1)
         resize!(w, length(v))
-        for ell = 1:length(v)
+        for ell in 1:length(v)
             w[ell] = v[ell]
         end
         # reduce with gred[0]
@@ -868,7 +837,7 @@ function first_variable(
                 dg = Int32(new_i + 1)
             end
             index[deg] = Int32(new_i)
-            hom[new_i] = invmod(gred[new_i][new_i+1], pr) % UInt32
+            hom[new_i] = invmod(gred[new_i][new_i + 1], pr) % UInt32
             make_monic_row!(gred[new_i], hom[new_i], pr, arithm)
             deg += Int32(1)
         else
@@ -878,12 +847,10 @@ function first_variable(
     # set v[i] cofficient of T^(i-1) in the min poly
     v = Vector{UInt32}(undef, deg)
     v[1] = w[1]
-    @inbounds for i = 2:deg
+    @inbounds for i in 2:deg
         v[i] =
-            Groebner.mod_p(
-                (w[index[i-1]+1] % UInt64) * (hom[index[i-1]] % UInt64),
-                arithm,
-            ) % UInt32
+            Groebner.mod_p((w[index[i - 1] + 1] % UInt64) * (hom[index[i - 1]] % UInt64), arithm) %
+            UInt32
     end
     return (v, gred, index, dg, hom, free_set)
 end
@@ -898,21 +865,21 @@ function biv_lex(
     free_set::Vector{Vector{UInt32}},
     ii::Int32,
     pr::UInt32,
-    arithm,
+    arithm
 )
     pack = Int32(2^(floor(63 - 2 * log(pr - 1) / log(2))))
     d = Int32(length(i_xw[length(i_xw)]))
     new_free_set = copy(free_set)
     deg = length(free_set)
     new_generators = Vector{Vector{Int32}}()
-    new_monomial_free_set = [(Int32(i - 1), Int32(0)) for i = 1:deg]
+    new_monomial_free_set = [(Int32(i - 1), Int32(0)) for i in 1:deg]
     new_monomial_basis = copy(new_monomial_free_set)
-    new_leading_monomials = Vector{Tuple{Int32,Int32}}()
+    new_leading_monomials = Vector{Tuple{Int32, Int32}}()
     buf1 = Vector{UInt64}()
     buf2 = Vector{UInt64}()
     while (length(new_free_set) > 0)
         tmp_set = Vector{Vector{UInt32}}()
-        tmp_mon_set = Vector{Tuple{Int32,Int32}}()
+        tmp_mon_set = Vector{Tuple{Int32, Int32}}()
         @inbounds for j in eachindex(new_free_set)
             curr_mon = new_monomial_free_set[j]
             curr_mon = (curr_mon[1], curr_mon[2] + Int32(1))
@@ -930,17 +897,17 @@ function biv_lex(
                     dg = Int32(new_i + 1)
                 end
                 index[deg] = Int32(new_i)
-                hom[new_i] = invmod(gred[new_i][new_i+1], pr) % UInt32
+                hom[new_i] = invmod(gred[new_i][new_i + 1], pr) % UInt32
                 make_monic_row!(gred[new_i], hom[new_i], pr, arithm)
                 deg += Int32(1)
             else
                 v = Vector{UInt32}(undef, deg)
                 v[1] = w[1]
-                @inbounds for i = 2:deg
+                @inbounds for i in 2:deg
                     v[i] =
                         Groebner.mod_p(
-                            (w[index[i-1]+1] % UInt64) * (hom[index[i-1]] % UInt64),
-                            arithm,
+                            (w[index[i - 1] + 1] % UInt64) * (hom[index[i - 1]] % UInt64),
+                            arithm
                         ) % UInt32
                 end
                 push!(new_generators, copy(v))
@@ -961,29 +928,29 @@ function convert_biv_lex_2_biv_pol(n_g, m_b, lt_g, pr)
         pp = n_g[kk]
         p_mat = Vector{Vector{UInt32}}()
         ldeg2 = Int32(0)
-        lco = [UInt32(0) for i = 1:length(m_b)]
+        lco = [UInt32(0) for i in 1:length(m_b)]
         for i in eachindex(pp)
             deg2 = m_b[i][2]
             if deg2 > ldeg2
                 push!(p_mat, lco)
-                for j = (ldeg2+1):(deg2-1)
+                for j in (ldeg2 + 1):(deg2 - 1)
                     push!(p_math, Vector{UInt32}())
                 end
-                lco = [UInt32(0) for j = 1:length(m_b)]
+                lco = [UInt32(0) for j in 1:length(m_b)]
                 ldeg2 = deg2
             end
-            lco[m_b[i][1]+1] = pp[i]
+            lco[m_b[i][1] + 1] = pp[i]
         end
         deg2 = lt_g[kk][2]
         if (deg2 == ldeg2)
-            lco[lt_g[kk][1]+1] = UInt32(1)
+            lco[lt_g[kk][1] + 1] = UInt32(1)
         else
             push!(p_mat, lco)
-            for i = (ldeg2+1):(deg2-1)
+            for i in (ldeg2 + 1):(deg2 - 1)
                 push!(p_math, Vector{UInt32}())
             end
-            lco = [UInt32(0) for i = 1:length(m_b)]
-            lco[lt_g[kk][1]+1] = UInt32(1)
+            lco = [UInt32(0) for i in 1:length(m_b)]
+            lco[lt_g[kk][1] + 1] = UInt32(1)
         end
         push!(p_mat, lco)
         push!(l_base, p_mat)
@@ -997,11 +964,11 @@ end
 
 function check_separation_biv(bli, f, C)
     k = length(bli) - 1
-    akk = C(bli[k+1])
+    akk = C(bli[k + 1])
     invakk = Nemo.invmod(k * akk, f)
     b = C(bli[k]) * invakk
-    for i = (k-1):-1:1
-        tmp = Nemo.mod((k - i + 1) * C(bli[i]) - (i) * b * C(bli[i+1]), f)
+    for i in (k - 1):-1:1
+        tmp = Nemo.mod((k - i + 1) * C(bli[i]) - (i) * b * C(bli[i + 1]), f)
         if (tmp != 0)
             return (false)
         end
@@ -1015,12 +982,12 @@ function zdim_parameterization(
     pr::UInt32,
     dd::Int32,
     check::Int32,
-    arithm,
+    arithm
 )
     res = Vector{Vector{UInt32}}()
     ii = Int32(length(i_xw))
     v, gred, index, dg, hom, free_set = first_variable(t_v, i_xw, ii, pr, arithm)
-    C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
+    C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached=false), cached=false)
     f = C(v) + _Z^(length(v))
     ifp = Nemo.derivative(f)
     f = f / Nemo.gcd(f, ifp)
@@ -1032,7 +999,7 @@ function zdim_parameterization(
         flag = (Int32(Nemo.degree(f)) == dd)
     end
     if (flag)
-        @inbounds for j = (ii-1):-1:1
+        @inbounds for j in (ii - 1):-1:1
             m_b, lt_b, n_g = biv_lex(
                 t_v,
                 i_xw,
@@ -1043,16 +1010,16 @@ function zdim_parameterization(
                 copy(free_set),
                 Int32(j),
                 pr,
-                arithm,
+                arithm
             )
             bl = convert_biv_lex_2_biv_pol(n_g, m_b, lt_b, pr)
             s1 = C([Int32(0)])
             s0 = C([Int32(0)])
             pro = C([Int32(1)])
             ft = C(f)
-            @inbounds for i = 1:length(bl)
+            @inbounds for i in 1:length(bl)
                 d1 = length(bl[i]) - 1
-                lc1 = C(bl[i][d1+1])
+                lc1 = C(bl[i][d1 + 1])
                 co0 = C(bl[i][d1])
                 f2 = Nemo.gcd(ft, lc1)
                 f1 = ft / f2
@@ -1076,13 +1043,7 @@ function zdim_parameterization(
             push!(res, map(u -> coeff_mod_p(u, pr), collect(Nemo.coefficients(s0))))
         end
     else
-        rur_print(
-            "Bad prime number for parameterization ",
-            Int32(Nemo.degree(f)),
-            "(",
-            dd,
-            ")",
-        )
+        rur_print("Bad prime number for parameterization ", Int32(Nemo.degree(f)), "(", dd, ")")
     end
     return (flag, res, ii)
 end
@@ -1090,7 +1051,7 @@ end
 function zz_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{BigInt}}
     zzm = Vector{Vector{BigInt}}(undef, length(zpm))
     @inbounds for i in eachindex(zpm)
-        zzm[i] = [BigInt(0) for j = 1:length(zpm[i])]
+        zzm[i] = [BigInt(0) for j in 1:length(zpm[i])]
     end
     return (zzm)
 end
@@ -1098,7 +1059,7 @@ end
 function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{BigInt}}}
     zzm = Vector{Vector{Rational{BigInt}}}(undef, length(zpm))
     @inbounds for i in eachindex(zpm)
-        zzm[i] = [Rational{BigInt}(0) for j = 1:length(zpm[i])]
+        zzm[i] = [Rational{BigInt}(0) for j in 1:length(zpm[i])]
     end
     return (zzm)
 end
@@ -1114,7 +1075,7 @@ function param_modular_image(
     cfs_zz,
     pr::UInt32,
     dd,
-    linform::Bool,
+    linform::Bool
 )
     arithm = Groebner.ArithmeticZp(UInt64, UInt32, pr)
     redflag, cfs_zp = reduce_mod_p(cfs_zz, pr)
@@ -1133,7 +1094,7 @@ function param_modular_image(
         gb_expvecs,
         cfs_zp,
         sys_z,
-        linform,
+        linform
     )
     if !success
         rur_print("\n*** bad prime for Gbasis detected ***\n")
@@ -1161,7 +1122,7 @@ function param_many_modular_images(
     linform::Bool,
     prms_range,
     t_globl_success,
-    t_globl_zp_params,
+    t_globl_zp_params
 )
     for prm_id in prms_range
         pr = prms[prm_id]
@@ -1176,7 +1137,7 @@ function param_many_modular_images(
             cfs_zz,
             pr,
             dd,
-            linform,
+            linform
         )
         !success && return nothing
         t_globl_success[prm_id] = success
@@ -1190,7 +1151,7 @@ function general_param_serial(
     nn,
     dd,
     linform::Bool,
-    cyclic::Bool,
+    cyclic::Bool
 )::Vector{Vector{Rational{BigInt}}}
     qq_m = Vector{Vector{Rational{BigInt}}}()
     t_pr = Vector{UInt32}()
@@ -1220,7 +1181,7 @@ function general_param_serial(
             cfs_zz,
             pr,
             dd,
-            linform,
+            linform
         )
         if !success
             kk -= 1
@@ -1242,7 +1203,7 @@ function general_param_serial(
             rur_print("-")
             zz_m = zz_mat_same_dims([t_param[1][1]])
             qq_m = qq_mat_same_dims([t_param[1][1]])
-            tt = [[t_param[ij][1]] for ij = 1:length(t_pr)]
+            tt = [[t_param[ij][1]] for ij in 1:length(t_pr)]
             Groebner.crt_vec_full!(zz_m, zz_p, tt, t_pr)
             aa = Groebner.ratrec_vec_full!(qq_m, zz_m, zz_p)
             if (aa)
@@ -1269,7 +1230,7 @@ function general_param(
     cyclic::Bool,
     parallelism::Symbol,
     threads,
-    procs,
+    procs
 )
     if parallelism == :serial
         general_param_serial(sys_z, nn, dd, linform, cyclic)
@@ -1319,19 +1280,19 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
 
     rur_print("\nTest the shape position")
     ring = Groebner.PolyRing(ring.nvars, ring.ord, pr)
-    gro = Groebner.groebner(ring, monoms, sys_Int32, threaded = :no)
+    gro = Groebner.groebner(ring, monoms, sys_Int32, threaded=:no)
     if !(count_univ(map(w -> isuniv(w), map(u -> u[1], gro[1]))) == ring.nvars)
         rur_print("\nError :  System is not zero-dimensional \n")
         return (-1, nothing, nothing, nothing, nothing, nothing)
     end
 
     # g=sys_mod_p(gro,pr);
-    g = [PolUInt32(PP.(gro[1]), gro[2]) for i = 1:length(gro[1])]
+    g = [PolUInt32(PP.(gro[1]), gro[2]) for i in 1:length(gro[1])]
 
     ltg = map(u -> u.exp[1], g)
     # RU=parent(sys_Int32[1])
     q1 = compute_quotient_basis(ltg)
-    q = sort(q1, lt = pp_isless_drl)
+    q = sort(q1, lt=pp_isless_drl)
 
     i_xw, t_xw = prepare_table_mxi(ltg, q)
     t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
@@ -1350,7 +1311,7 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
 
     rur_print("\nTest if variables are separating")
 
-    for ii = (length(i_xw)-1):-1:1
+    for ii in (length(i_xw) - 1):-1:1
         ls = copy(symbols)
         ls = swap_elts!(ls, length(ls), ii)
         rur_print("(", ls[length(ls)], ")")
@@ -1361,7 +1322,7 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
         # sys_Int32=convert_to_mpol_UInt32(sys0,pr)
         flag, sys_Int32 = reduce_mod_p(coeffs, pr)
 
-        gro = Groebner.groebner(ring, monoms0, sys_Int32, threaded = :no)
+        gro = Groebner.groebner(ring, monoms0, sys_Int32, threaded=:no)
 
         g = sys_mod_p(gro, pr)
 
@@ -1369,19 +1330,14 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
 
         RU = parent(sys_Int32[1])
         q1 = compute_quotient_basis(ltg)
-        q = map(
-            u -> u.exp[1],
-            sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr),
-        )
-
+        q = map(u -> u.exp[1], sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr))
 
         i_xw, t_xw = prepare_table_mxi(ltg, q)
         t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
         t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, pr, arithm)
         ii = Int32(length(i_xw))
 
-        flag, zp_param, uu =
-            zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
+        flag, zp_param, uu = zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
 
         if (flag)
             if ((length(zp_param[1]) - 1) > dd0)
@@ -1389,14 +1345,7 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
                 i_max = ii
             end
             rur_print("\nSystem has a separating variable (", ls[length(ls)], ")")
-            return (
-                dd0,
-                length(q),
-                sys0,
-                AbstractAlgebra.symbols(C),
-                false,
-                dd0 == length(q),
-            )
+            return (dd0, length(q), sys0, AbstractAlgebra.symbols(C), false, dd0 == length(q))
         end
     end
 
@@ -1408,22 +1357,22 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
     C, ls2 = AbstractAlgebra.polynomial_ring(
         AbstractAlgebra.ZZ,
         push!(ls, :_Z),
-        internal_ordering = :degrevlex,
+        internal_ordering=:degrevlex
     )
     lls = AbstractAlgebra.gens(C)
     sys0 = map(
         u -> C(
             collect(AbstractAlgebra.coefficients(u)),
-            map(u -> push!(u, 0), collect(AbstractAlgebra.exponent_vectors(u))),
+            map(u -> push!(u, 0), collect(AbstractAlgebra.exponent_vectors(u)))
         ),
-        sys_z,
+        sys_z
     )
 
-    sep = [BigInt(0) for i = 1:length(lls)]
+    sep = [BigInt(0) for i in 1:length(lls)]
     sep[length(lls)] = 1
     vv = length(lls) - 1
     cc = BigInt(1)
-    sep[length(lls)-1] = -BigInt(1)
+    sep[length(lls) - 1] = -BigInt(1)
     vv -= 1
     dd = -1
     while (!flag)
@@ -1442,28 +1391,20 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
             gro = groebner_linform(sys_Int32, linform)
             quo, g = kbase_linform(gro, pr, linform)
         else
-            gro = Groebner.groebner(
-                sys_Int32,
-                ordering = Groebner.DegRevLex(),
-                threaded = :no,
-            )
+            gro = Groebner.groebner(sys_Int32, ordering=Groebner.DegRevLex(), threaded=:no)
             g = sys_mod_p(gro, pr)
         end
         ltg = map(u -> u.exp[1], g)
 
         RU = parent(sys_Int32[1])
         q1 = compute_quotient_basis(ltg)
-        q = map(
-            u -> u.exp[1],
-            sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr),
-        )
+        q = map(u -> u.exp[1], sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr))
 
         i_xw, t_xw = prepare_table_mxi(ltg, q)
         t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
         t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, pr, arithm)
         ii = Int32(length(i_xw))
-        flag, zp_param, uu =
-            zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
+        flag, zp_param, uu = zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
         if (!flag)
             rur_print(" (", uu, ",", vv, ")")
             if (sep[uu] < 0)
@@ -1521,12 +1462,12 @@ Computes a RUR of a zero-dimensional system.
 """
 function zdim_parameterization(
     sys;
-    nn::Int32 = Int32(28),
-    use_block::Bool = false,
-    verbose::Bool = true,
-    parallelism = :serial,
-    threads = nothing,
-    procs = nothing,
+    nn::Int32=Int32(28),
+    use_block::Bool=false,
+    verbose::Bool=true,
+    parallelism=:serial,
+    threads=nothing,
+    procs=nothing
 )
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
     @assert AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
@@ -1534,10 +1475,10 @@ function zdim_parameterization(
     coeffs = map(f -> collect(AbstractAlgebra.coefficients(f)), sys)
     ring = Groebner.PolyRing(
         AbstractAlgebra.nvars(AbstractAlgebra.parent(sys[1]))Groebner.DegRevLex(),
-        0,
+        0
     )
     symbols = AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
-    _zdim_parameterization(ring, symbols, monoms, coeffs, nn = nn, verbose = verbose)
+    _zdim_parameterization(ring, symbols, monoms, coeffs, nn=nn, verbose=verbose)
 end
 
 function _zdim_parameterization(
@@ -1545,12 +1486,12 @@ function _zdim_parameterization(
     symbols,
     monoms,
     coeffs;
-    nn::Int32 = Int32(28),
-    use_block::Bool = false,
-    verbose::Bool = true,
-    parallelism = :serial,
-    threads = nothing,
-    procs = nothing,
+    nn::Int32=Int32(28),
+    use_block::Bool=false,
+    verbose::Bool=true,
+    parallelism=:serial,
+    threads=nothing,
+    procs=nothing
 )
     _verbose[] = verbose
     @assert 1 <= nn <= 32
@@ -1578,10 +1519,10 @@ end
 function to_file(f_name, rur)
     cof = lcm(map(v -> lcm(map(u -> denominator(u), v)), rur))
     C, _Z = Nemo.polynomial_ring(Nemo.ZZ)
-    rur_z = [C(map(u -> Nemo.ZZ(numerator(u * cof)), rur[i])) for i = 1:length(rur)]
+    rur_z = [C(map(u -> Nemo.ZZ(numerator(u * cof)), rur[i])) for i in 1:length(rur)]
     open(f_name, "w") do f
         write(f, "rur:=[", string(rur_z[1]))
-        for i = 2:length(rur)
+        for i in 2:length(rur)
             write(f, ",\n", string(rur_z[i]))
         end
         write(f, "]:\n")
