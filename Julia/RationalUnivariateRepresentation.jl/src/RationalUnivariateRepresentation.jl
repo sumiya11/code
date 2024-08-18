@@ -106,11 +106,13 @@ function groebner_learn_linform(sys_Int32, linform)
 end
 
 function kbase_linform(gro, pr, linform)
-    g = sys_mod_p(gro, pr)
+    # g = sys_mod_p(gro, pr)
+    g = [PolUInt32(PP.(gro[1][i]), gro[2][i]) for i in 1:length(gro[1])]
     ltg = map(u -> u.exp[1], g)
-    R = AbstractAlgebra.parent(gro[1])
+    # R = AbstractAlgebra.parent(gro[1])
     q1 = compute_quotient_basis(ltg)
-    quo = sort(map(u -> R([1], [Vector{Int64}(u.data)]), q1))
+    # quo = sort(map(u -> R([1], [Vector{Int64}(u.data)]), q1))
+    quo = sort(q1, lt=(e1,e2) -> pp_isless_drl(e1.data, e2.data))
     return quo, g
 end
 
@@ -125,17 +127,18 @@ struct PP
     end
 end
 
-function pp_isless_drl(ea::PP, eb::PP)
-    if sum(ea.data) < sum(eb.data)
+function pp_isless_drl(ea::Vector, eb::Vector)
+    @assert length(ea) == length(eb)
+    if sum(ea) < sum(eb)
         return true
-    elseif sum(ea.data) != sum(eb.data)
+    elseif sum(ea) != sum(eb)
         return false
     end
-    i = length(a)
-    @inbounds while i > 1 && a[i] == b[i]
+    i = length(ea)
+    @inbounds while i > 1 && ea[i] == eb[i]
         i -= 1
     end
-    @inbounds return a[i] > b[i]
+    @inbounds return ea[i] > eb[i]
 end
 
 struct PolUInt32
@@ -359,7 +362,7 @@ end
 ########################################
 
 function convert_coeffs_to_coeffs_z(coeffs::Vector{Vector{Rational{BigInt}}})
-    coeffs_z = Vector{Vector{BigInt}}[]
+    coeffs_z = Vector{Vector{BigInt}}()
     for c in coeffs
         push!(coeffs_z, map(numerator, (c .* lcm(map(denominator, c)))))
     end
@@ -622,34 +625,40 @@ end
 @noinline __throw_not_generic(pr) = throw("Basis modulo $pr may be not generic enough. ")
 
 function learn_zdim_quo(
-    sys::Vector{AbstractAlgebra.Generic.MPoly{BigInt}},
+    ring,
+    sys,
     pr::UInt32,
     arithm,
     linform,
     cyclic,
     dd
 )
-    sys_Int32 = convert_to_mpol_UInt32(sys, pr)
+    ring_pr = Groebner.PolyRing(ring.nvars, ring.ord, pr)
+    # sys_Int32 = convert_to_mpol_UInt32(sys, pr)
+    flag, sys_Int32 = reduce_mod_p(sys[2], pr)
+    @assert flag
     # Sasha: groebner_learn can use multi-threading itself (but let's not use it for now).
-    graph, gro = groebner_learn_linform(sys_Int32, linform)
-    for pr2 in Primes.nextprimes(UInt32(2^30), 2)
-        sys_Int32_2 = convert_to_mpol_UInt32(sys, pr2)
-        # Sasha: groebner can use multi-threading (-//-)
-        gb_2 = Groebner.groebner(sys_Int32_2, threaded=:no)
-        length(gro) != length(gb_2) && __throw_not_generic(pr)
-        for j in 1:length(gro)
-            length(gro[j]) != length(gb_2[j]) && __throw_not_generic(pr)
-        end
-    end
+    # graph, gro = groebner_learn_linform(sys_Int32, linform)
+    graph, (gro...) = Groebner.groebner_learn(ring_pr, sys[1], sys_Int32)
+    # for pr2 in Primes.nextprimes(UInt32(2^30), 2)
+    #     sys_Int32_2 = convert_to_mpol_UInt32(sys, pr2)
+    #     # Sasha: groebner can use multi-threading (-//-)
+    #     gb_2 = Groebner.groebner(sys_Int32_2, threaded=:no)
+    #     length(gro) != length(gb_2) && __throw_not_generic(pr)
+    #     for j in 1:length(gro)
+    #         length(gro[j]) != length(gb_2[j]) && __throw_not_generic(pr)
+    #     end
+    # end
     quo, g = kbase_linform(gro, pr, linform)
     gb_expvecs = map(poly -> poly.exp, g)
     ltg = map(u -> u.exp[1], g)
-    q = map(u -> u.exp[1], sys_mod_p(map(u -> AbstractAlgebra.leading_monomial(u), quo), pr))
+    # q = map(u -> u.exp[1], sys_mod_p(map(u -> AbstractAlgebra.leading_monomial(u), quo), pr))
+    q = quo
     i_xw, t_xw = prepare_table_mxi(ltg, q)
     t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
     if (cyclic)
         t_learn = learn_compute_table_sl!(t_v, t_xw, i_xw, q, pr, arithm)
-        success, zp_param = zdim_parameterization(t_v, i_xw, pr, Int32(dd), Int32(1), arithm)
+        success, zp_param = __zdim_parameterization(t_v, i_xw, pr, Int32(dd), Int32(1), arithm)
         if (success)
             rur_print("\nApply cyclic optimization ")
         else
@@ -665,6 +674,7 @@ function learn_zdim_quo(
 end
 
 function apply_zdim_quo!(
+    ring,
     graph,
     t_learn::Vector{Int32},
     q::Vector{PP},
@@ -677,9 +687,13 @@ function apply_zdim_quo!(
     sys,
     linform::Bool
 )
-    success, gro = Groebner.groebner_applyX!(graph, cfs_zp, pr)
+    @info "" ring
+    @info "" sys[1]
+    @info "" cfs_zp
+    success, (gro...) = Groebner.groebner_apply!(graph, ring, sys[1], cfs_zp)
     if (success)
-        g = [PolUInt32(gb_expvecs[i], gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+        @assert length(gb_expvecs) == length(gro[2])
+        g = [PolUInt32(gb_expvecs[i], gro[2][i]) for i in 1:length(gb_expvecs)]  # :^)
         t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
         apply_compute_table!(t_v, t_learn, t_xw, i_xw, q, pr, arithm)
         return success, t_v
@@ -976,7 +990,7 @@ function check_separation_biv(bli, f, C)
     return (true)
 end
 
-function zdim_parameterization(
+function __zdim_parameterization(
     t_v::Vector{Vector{UInt32}},
     i_xw::Vector{Vector{Int32}},
     pr::UInt32,
@@ -990,9 +1004,11 @@ function zdim_parameterization(
     C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached=false), cached=false)
     f = C(v) + _Z^(length(v))
     ifp = Nemo.derivative(f)
-    f = f / Nemo.gcd(f, ifp)
+    f = divexact(f, Nemo.gcd(f, ifp))
     ifp = Nemo.derivative(f)
     push!(res, map(u -> coeff_mod_p(u, pr), collect(Nemo.coefficients(f))))
+    @info "" dd Nemo.degree(f)
+    @info "" f
     if (dd < 0)
         flag = true
     else
@@ -1065,6 +1081,7 @@ function qq_mat_same_dims(zpm::Vector{Vector{UInt32}})::Vector{Vector{Rational{B
 end
 
 function param_modular_image(
+    ring,
     graph,
     t_learn,
     q,
@@ -1072,18 +1089,19 @@ function param_modular_image(
     t_xw::Vector{StackVect},
     gb_expvecs,
     sys_z,
-    cfs_zz,
     pr::UInt32,
     dd,
     linform::Bool
 )
+    ring_pr = Groebner.PolyRing(ring.nvars, ring.ord, UInt64(pr))
     arithm = Groebner.ArithmeticZp(UInt64, UInt32, pr)
-    redflag, cfs_zp = reduce_mod_p(cfs_zz, pr)
+    redflag, cfs_zp = reduce_mod_p(sys_z[2], pr)
     if !redflag
         rur_print("\n*** bad prime for lead detected ***\n")
         return false, nothing
     end
     success, t_v = apply_zdim_quo!(
+        ring_pr,
         graph,
         t_learn,
         q,
@@ -1100,7 +1118,7 @@ function param_modular_image(
         rur_print("\n*** bad prime for Gbasis detected ***\n")
         return false, nothing
     end
-    success, zp_param = zdim_parameterization(t_v, i_xw, pr, Int32(dd), Int32(0), arithm)
+    success, zp_param = __zdim_parameterization(t_v, i_xw, pr, Int32(dd), Int32(0), arithm)
     if !success
         rur_print("\n*** bad prime for RUR detected ***\n")
         return false, nothing
@@ -1108,51 +1126,21 @@ function param_modular_image(
     return true, zp_param
 end
 
-function param_many_modular_images(
-    graph,
-    t_learn,
-    q,
-    i_xw::Vector{Vector{Int32}},
-    t_xw::Vector{StackVect},
-    gb_expvecs,
-    sys_z,
-    cfs_zz,
-    prms::Vector{UInt32},
-    dd,
-    linform::Bool,
-    prms_range,
-    t_globl_success,
-    t_globl_zp_params
-)
-    for prm_id in prms_range
-        pr = prms[prm_id]
-        success, zp_param = param_modular_image(
-            graph,
-            t_learn,
-            q,
-            i_xw,
-            t_xw,
-            gb_expvecs,
-            sys_z,
-            cfs_zz,
-            pr,
-            dd,
-            linform
-        )
-        !success && return nothing
-        t_globl_success[prm_id] = success
-        t_globl_zp_params[prm_id] = zp_param
-    end
-    return nothing
-end
-
 function general_param_serial(
+    ring,
     sys_z,
     nn,
     dd,
     linform::Bool,
     cyclic::Bool
 )::Vector{Vector{Rational{BigInt}}}
+    for j in 1:length(sys_z[1])
+        perm = collect(1:length(sys_z[1][j]))
+        sort!(perm, lt=(e1, e2) -> pp_isless_drl(sys_z[1][j][e1], sys_z[1][j][e2]), rev=true)
+        sys_z[1][j] = sys_z[1][j][perm]
+        sys_z[2][j] = sys_z[2][j][perm]
+    end
+
     qq_m = Vector{Vector{Rational{BigInt}}}()
     t_pr = Vector{UInt32}()
     t_param = Vector{Vector{Vector{UInt32}}}()
@@ -1160,9 +1148,9 @@ function general_param_serial(
     arithm = Groebner.ArithmeticZp(UInt64, UInt32, pr)
     rur_print("\nLearn ")
     graph, t_learn, t_v, q, i_xw, t_xw, pr, gb_expvecs =
-        learn_zdim_quo(sys_z, pr, arithm, linform, cyclic, dd)
+        learn_zdim_quo(ring, sys_z, pr, arithm, linform, cyclic, dd)
     backup = deepcopy(graph)
-    expvecs, cfs_zz = extract_raw_data(sys_z)
+    # expvecs, cfs_zz = extract_raw_data(sys_z)
     continuer = true
     bloc_p = Int32(2)
     lift_level = 0
@@ -1171,6 +1159,7 @@ function general_param_serial(
         kk += 1
         pr = UInt32(Primes.prevprime(pr - 1))
         success, zp_param = param_modular_image(
+            ring,
             graph,
             t_learn,
             q,
@@ -1178,7 +1167,6 @@ function general_param_serial(
             t_xw,
             gb_expvecs,
             sys_z,
-            cfs_zz,
             pr,
             dd,
             linform
@@ -1223,6 +1211,7 @@ function general_param_serial(
 end
 
 function general_param(
+    ring,
     sys_z,
     nn,
     dd,
@@ -1233,7 +1222,7 @@ function general_param(
     procs
 )
     if parallelism == :serial
-        general_param_serial(sys_z, nn, dd, linform, cyclic)
+        general_param_serial(ring, sys_z, nn, dd, linform, cyclic)
     elseif parallelism == :multithreading
         # TODO(Sasha)
         # general_param_multithreading(sys_z,nn,dd,linform,cyclic,threads)
@@ -1279,27 +1268,27 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
     @assert flag
 
     rur_print("\nTest the shape position")
-    ring = Groebner.PolyRing(ring.nvars, ring.ord, pr)
-    gro = Groebner.groebner(ring, monoms, sys_Int32, threaded=:no)
+    ring_pr = Groebner.PolyRing(ring.nvars, ring.ord, pr)
+    gro = Groebner.groebner(ring_pr, monoms, sys_Int32, threaded=:no)
     if !(count_univ(map(w -> isuniv(w), map(u -> u[1], gro[1]))) == ring.nvars)
         rur_print("\nError :  System is not zero-dimensional \n")
         return (-1, nothing, nothing, nothing, nothing, nothing)
     end
 
     # g=sys_mod_p(gro,pr);
-    g = [PolUInt32(PP.(gro[1]), gro[2]) for i in 1:length(gro[1])]
+    g = [PolUInt32(PP.(gro[1][i]), gro[2][i]) for i in 1:length(gro[1])]
 
     ltg = map(u -> u.exp[1], g)
     # RU=parent(sys_Int32[1])
     q1 = compute_quotient_basis(ltg)
-    q = sort(q1, lt=pp_isless_drl)
+    q = sort(q1, lt=(e1,e2) -> pp_isless_drl(e1.data, e2.data))
 
     i_xw, t_xw = prepare_table_mxi(ltg, q)
     t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
     t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, pr, arithm)
     ii = Int32(length(i_xw))
 
-    flag, zp_param, uu = zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
+    flag, zp_param, uu = __zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
 
     dd0 = 0
     if (flag)
@@ -1317,27 +1306,38 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
         rur_print("(", ls[length(ls)], ")")
         #   C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),internal_ordering=:degrevlex);
         #   lls=AbstractAlgebra.gens(C)
-        monoms0 = map(u -> swap_elts!(u, length(ls), ii), monoms)
+
+        monoms0 = map(u -> map(e -> swap_elts!(e, length(ls), ii), u), copy(monoms))
+
         # sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
         # sys_Int32=convert_to_mpol_UInt32(sys0,pr)
         flag, sys_Int32 = reduce_mod_p(coeffs, pr)
+        @assert flag
+        for j in 1:length(monoms0)
+            perm = collect(1:length(monoms0[j]))
+            sort!(perm, lt=(e1, e2) -> pp_isless_drl(monoms0[j][e1], monoms0[j][e2]), rev=true)
+            monoms0[j] = monoms0[j][perm]
+            sys_Int32[j] = sys_Int32[j][perm]
+        end
 
-        gro = Groebner.groebner(ring, monoms0, sys_Int32, threaded=:no)
+        gro = Groebner.groebner(ring_pr, monoms0, sys_Int32, threaded=:no, ordering=Groebner.DegRevLex())
 
-        g = sys_mod_p(gro, pr)
+        # g = sys_mod_p(gro, pr)
+        g = [PolUInt32(PP.(gro[1][i]), gro[2][i]) for i in 1:length(gro[1])]
 
         ltg = map(u -> u.exp[1], g)
 
-        RU = parent(sys_Int32[1])
+        # RU = parent(sys_Int32[1])
         q1 = compute_quotient_basis(ltg)
-        q = map(u -> u.exp[1], sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr))
+        q = sort(q1, lt=(e1,e2) -> pp_isless_drl(e1.data, e2.data))
+        # q = map(u -> u.exp[1], sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr))
 
         i_xw, t_xw = prepare_table_mxi(ltg, q)
         t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
         t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, pr, arithm)
         ii = Int32(length(i_xw))
 
-        flag, zp_param, uu = zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
+        flag, zp_param, uu = __zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
 
         if (flag)
             if ((length(zp_param[1]) - 1) > dd0)
@@ -1345,7 +1345,7 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
                 i_max = ii
             end
             rur_print("\nSystem has a separating variable (", ls[length(ls)], ")")
-            return (dd0, length(q), sys0, AbstractAlgebra.symbols(C), false, dd0 == length(q))
+            return (dd0, length(q), sys0, ls, false, dd0 == length(q))
         end
     end
 
@@ -1353,21 +1353,26 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
 
     dd0 = 0
 
-    ls = Vector{Symbol}(AbstractAlgebra.symbols(R))
-    C, ls2 = AbstractAlgebra.polynomial_ring(
-        AbstractAlgebra.ZZ,
-        push!(ls, :_Z),
-        internal_ordering=:degrevlex
-    )
-    lls = AbstractAlgebra.gens(C)
-    sys0 = map(
-        u -> C(
-            collect(AbstractAlgebra.coefficients(u)),
-            map(u -> push!(u, 0), collect(AbstractAlgebra.exponent_vectors(u)))
-        ),
-        sys_z
-    )
-
+    @assert !(:_Z in ls)
+    ls = copy(symbols)
+    # _C, _ls2 = AbstractAlgebra.polynomial_ring(
+    #     AbstractAlgebra.GF(pr),
+    #     vcat(ls, :_Z),
+    #     internal_ordering=:degrevlex
+    # )
+    ring_T = Groebner.PolyRing(ring.nvars + 1, ring.ord, ring.ch)
+    lls = vcat(ls, :_Z)
+    monoms0 = map(e -> map(ee -> vcat(ee, 0), e), sys[1])
+    coeffs0 = sys[2]
+    sys0 = (monoms0, coeffs0)
+    # sys0 = map(
+    #     u -> C(
+    #         collect(AbstractAlgebra.coefficients(u)),
+    #         map(u -> push!(u, 0), collect(AbstractAlgebra.exponent_vectors(u)))
+    #     ),
+    #     sys_z
+    # )
+    
     sep = [BigInt(0) for i in 1:length(lls)]
     sep[length(lls)] = 1
     vv = length(lls) - 1
@@ -1375,36 +1380,55 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
     sep[length(lls) - 1] = -BigInt(1)
     vv -= 1
     dd = -1
+    _expmap = Dict(i => (a = zeros(Int, length(lls)); a[i] = 1; a) for i in 1:length(lls))
     while (!flag)
-        sys = copy(sys0)
-        lf = C(BigInt(0))
+        sys = (copy(sys0[1]), copy(sys0[2]))
+        lf_monoms = empty(sys[1][1])
+        lf_coeffs = empty(sys[2][1])
         for j in eachindex(lls)
-            lf += sep[j] * lls[j]
+            if !iszero(sep[j])
+                push!(lf_monoms, _expmap[j])
+                push!(lf_coeffs, sep[j])
+            end
         end
-        rur_print("\nTry ", lf)
-        push!(sys, lf)
+        rur_print("\nTry ", sep)
+        push!(sys[1], lf_monoms)
+        push!(sys[2], lf_coeffs)
 
-        sys_Int32 = convert_to_mpol_UInt32(sys, pr)
+        ring_T_pr = Groebner.PolyRing(ring_T.nvars, ring_T.ord, pr)
+        # sys_Int32 = convert_to_mpol_UInt32(sys, pr)
+        flag, sys_Int32 = reduce_mod_p(sys[2], pr)
+
         linform = false
-        if (use_block)
-            linform = true    # if a linear form was appended
-            gro = groebner_linform(sys_Int32, linform)
-            quo, g = kbase_linform(gro, pr, linform)
-        else
-            gro = Groebner.groebner(sys_Int32, ordering=Groebner.DegRevLex(), threaded=:no)
-            g = sys_mod_p(gro, pr)
+        # if (use_block)
+        #     linform = true    # if a linear form was appended
+        #     gro = groebner_linform(sys_Int32, linform)
+        #     quo, g = kbase_linform(gro, pr, linform)
+        # else
+                
+        for j in 1:length(sys[1])
+            perm = collect(1:length(sys[1][j]))
+            sort!(perm, lt=(e1, e2) -> pp_isless_drl(sys[1][j][e1], sys[1][j][e2]), rev=true)
+            sys[1][j] = sys[1][j][perm]
+            sys[2][j] = sys[2][j][perm]
         end
+
+        gro = Groebner.groebner(ring_T_pr, map(s -> map(ss -> UInt64.(ss), s), sys[1]), sys_Int32; ordering=Groebner.DegRevLex())
+        # g = sys_mod_p(gro, pr)
+        g = [PolUInt32(PP.(gro[1][i]), gro[2][i]) for i in 1:length(gro[1])]
+        # end
         ltg = map(u -> u.exp[1], g)
 
-        RU = parent(sys_Int32[1])
+        # RU = parent(sys_Int32[1])
         q1 = compute_quotient_basis(ltg)
-        q = map(u -> u.exp[1], sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr))
+        # q = map(u -> u.exp[1], sys_mod_p(sort(map(u -> RU([1], [Vector{Int64}(u.data)]), q1)), pr))
+        q = sort(q1, lt=(e1,e2) -> pp_isless_drl(e1.data, e2.data))
 
         i_xw, t_xw = prepare_table_mxi(ltg, q)
         t_v = compute_fill_quo_gb!(t_xw, g, q, pr, arithm)
         t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, pr, arithm)
         ii = Int32(length(i_xw))
-        flag, zp_param, uu = zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
+        flag, zp_param, uu = __zdim_parameterization(t_v, i_xw, pr, Int32(-1), Int32(1), arithm)
         if (!flag)
             rur_print(" (", uu, ",", vv, ")")
             if (sep[uu] < 0)
@@ -1415,7 +1439,7 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
             vv = uu
             if (vv < 1)
                 rur_print("\n Error in the choice of the separating form \n")
-                return (-1, -1, sys, AbstractAlgebra.symbols(C), linform)
+                return (ring, -1, -1, sys, lls, linform)
             end
         else
             dd = length(zp_param[1]) - 1
@@ -1424,10 +1448,10 @@ function prepare_system(ring, symbols, monoms, coeffs, nn, use_block)
 
     if (dd == dd0)
         rur_print("\nSystem is in fact a separating variable (", ii, ")")
-        return (dd0, length(q), sys_z, AbstractAlgebra.symbols(R), false, dd == length(q))
+        return (ring, dd0, length(q), sys_z, symbols, false, dd == length(q))
     end
-    rur_print("\nSeparating form : ", sys[length(sys)], "\n")
-    return (dd, length(q), sys, AbstractAlgebra.symbols(C), false, dd == length(q))
+    rur_print("\nSeparating form : ", sys[1][length(sys[1])], ", ", sys[2][length(sys[2])], "\n")
+    return (ring_T, dd, length(q), sys, lls, false, dd == length(q))
 end
 
 """
@@ -1470,11 +1494,16 @@ function zdim_parameterization(
     procs=nothing
 )
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
-    @assert AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex
+    if AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) != :degrevlex
+        R = AbstractAlgebra.parent(sys[1])
+        R, xs = AbstractAlgebra.polynomial_ring(AbstractAlgebra.base_ring(R), map(string, AbstractAlgebra.gens(R)), internal_ordering=:degrevlex)
+        sys = map(f -> AbstractAlgebra.evaluate(f, xs), sys)
+    end
     monoms = map(f -> collect(AbstractAlgebra.exponent_vectors(f)), sys)
     coeffs = map(f -> collect(AbstractAlgebra.coefficients(f)), sys)
     ring = Groebner.PolyRing(
-        AbstractAlgebra.nvars(AbstractAlgebra.parent(sys[1]))Groebner.DegRevLex(),
+        AbstractAlgebra.nvars(AbstractAlgebra.parent(sys[1])),
+        Groebner.DegRevLex(),
         0
     )
     symbols = AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1]))
@@ -1504,14 +1533,14 @@ function _zdim_parameterization(
     end
     coeffs_z = convert_coeffs_to_coeffs_z(coeffs)
     rur_print("\nSeparation step")
-    dm, Dq, sys_T, _vars, linform, cyclic =
+    ring_T, dm, Dq, sys_T, _vars, linform, cyclic =
         prepare_system(ring, symbols, monoms, coeffs_z, nn, use_block)
     if !(dm > 0)
         rur_print("\nSomething went wrong")
         return []
     end
     rur_print("\nStart the computation (cyclic = ", cyclic, ")")
-    qq_m = general_param(sys_T, nn, dm, linform, cyclic, parallelism, threads, procs)
+    qq_m = general_param(ring_T, sys_T, nn, dm, linform, cyclic, parallelism, threads, procs)
     rur_print("\n")
     return qq_m
 end
@@ -1534,3 +1563,7 @@ using PrecompileTools
 include("precompile.jl")
 
 end # module
+
+using AbstractAlgebra
+include((@__DIR__)*"/../../../Data/Systems/caprasse.jl")
+rur = RationalUnivariateRepresentation.zdim_parameterization(sys)

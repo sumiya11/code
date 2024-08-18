@@ -14,9 +14,9 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
 
 [compat]
-AbstractAlgebra = "0.36"
+Nemo = "0.46"
+AbstractAlgebra = "0.42"
 Groebner = "0.7.0"
-Nemo = "0.40"
 PrecompileTools = "1"
 Primes = "0.5"
 julia = "1.6"
