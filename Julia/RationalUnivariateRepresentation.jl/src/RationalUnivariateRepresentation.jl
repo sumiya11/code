@@ -740,9 +740,10 @@ function apply_zdim_quo!(graph,
                          cfs_zp::Vector{Vector{UInt32}},
                          sys,
                          linform::Bool)
-    success,gro=Groebner.groebner_applyX!(graph,cfs_zp,pr);
+    sys_zp = convert_to_mpol_UInt32(sys, pr)
+    success,gro=Groebner.groebner_apply!(graph,sys_zp);
     if (success)
-        g = [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
+	g = sys_mod_p(gro, pr) # [PolUInt32(gb_expvecs[i],gro[i]) for i in 1:length(gb_expvecs)]  # :^)
         t_v=compute_fill_quo_gb!(t_xw,g,q,pr,arithm);
         apply_compute_table!(t_v,t_learn,t_xw,i_xw,q,pr,arithm);
         return success,t_v
@@ -1408,16 +1409,16 @@ function general_param_serial(sys_z, nn, dd, linform::Bool,cyclic::Bool)::Vector
             zz_m=zz_mat_same_dims([t_param[1][1]]);
             qq_m=qq_mat_same_dims([t_param[1][1]]);
             tt=[[t_param[ij][1]] for ij=1:length(t_pr)]
-            Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr);
-            aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p)
+	    Groebner.crt_vec_full!(zz_m,zz_p,tt,t_pr,[falses(length(_x)) for _x in zz_m]);
+	    aa=Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p,[falses(length(_x)) for _x in zz_m])
             if (aa) lift_level=1 end
         end
         if (lift_level==1)
             rur_print("+");
             zz_m=zz_mat_same_dims(t_param[1]);
             qq_m=qq_mat_same_dims(t_param[1]);
-            Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr);
-            continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p);
+	    Groebner.crt_vec_full!(zz_m,zz_p,t_param,t_pr,[falses(length(_x)) for _x in zz_m]);
+	    continuer=!Groebner.ratrec_vec_full!(qq_m,zz_m,zz_p,[falses(length(_x)) for _x in zz_m]);
         end
         bloc_p=Int32(max(floor(length(t_pr)/10),2))
     end;
