@@ -1919,10 +1919,10 @@ function zdim_parameterization(
     end
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys[1])) == AbstractAlgebra.QQ
     # Convert the system to :degrevlex
-    if (AbstractAlgebra.ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
+    if (AbstractAlgebra.internal_ordering(AbstractAlgebra.parent(sys[1])) == :degrevlex)
         sys_z=convert_sys_to_sys_z(sys);
     else 
-        CC,_vars=AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ,AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1])),ordering=:degrevlex)
+        CC,_vars=AbstractAlgebra.polynomial_ring(AbstractAlgebra.QQ,AbstractAlgebra.symbols(AbstractAlgebra.parent(sys[1])),internal_ordering=:degrevlex)
         sys_z=convert_sys_to_sys_z(map(u->CC(collect(AbstractAlgebra.coefficients(u)),collect(AbstractAlgebra.exponent_vectors(u))),sys));
     end
     rur_print("\nSeparation step");
