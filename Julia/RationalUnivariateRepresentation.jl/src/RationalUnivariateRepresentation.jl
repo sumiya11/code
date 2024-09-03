@@ -773,7 +773,7 @@ end
 #rows are normalized
 
 # Run "_gauss_reduct_jam[] = 1" to disable jamming
-const _gauss_reduct_jam = Ref{Int}(2)
+const _gauss_reduct_jam = Ref{Int}(1)
 
 function gauss_reduct(
         v::Vector{UInt32},
@@ -1749,7 +1749,7 @@ function prepare_system(sys_z, nn,R,use_block)
       ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
       ls=swap_elts!(ls,length(ls),ii)
       rur_print("(",ls[length(ls)],")")
-      C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),ordering=:degrevlex);
+      C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls),internal_ordering=:degrevlex);
       lls=AbstractAlgebra.gens(C)
       sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->swap_elts!(u,length(ls),ii),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
       sys_Int32=convert_to_mpol_UInt32(sys0,pr)
@@ -1789,7 +1789,7 @@ function prepare_system(sys_z, nn,R,use_block)
     dd0=0
     
     ls=Vector{Symbol}(AbstractAlgebra.symbols(R))
-    C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),ordering=:degrevlex);
+    C,ls2=AbstractAlgebra.polynomial_ring(AbstractAlgebra.ZZ,push!(ls,:_Z),internal_ordering=:degrevlex);
     lls=AbstractAlgebra.gens(C)
     sys0=map(u->C(collect(AbstractAlgebra.coefficients(u)),map(u->push!(u,0),collect(AbstractAlgebra.exponent_vectors(u)))),sys_z);
 
