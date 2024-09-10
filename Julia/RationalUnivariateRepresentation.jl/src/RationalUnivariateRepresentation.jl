@@ -1152,7 +1152,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         bloc_p = align_to(bloc_p, ALIGN_BLOC_TO)
     end
     rur_print("\n")
-    return qq_m
+    return qq_m,sep_lin
 end
 
 # ************************************************************************
@@ -1189,7 +1189,8 @@ function zdim_parameterization(
         sys_ori;
         nn::Int32=Int32(28),
         verbose::Bool=true,
-        parallelism=:serial)
+        parallelism=:serial,
+	get_separating_element::Bool=false)
     _verbose[]=verbose
     @assert 1 <= nn <= 32 
     @assert parallelism in (:serial, :multithreading)
@@ -1198,8 +1199,12 @@ function zdim_parameterization(
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
     co = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
-    res = _zdim_multi_modular_RUR!(de, co, nn , parallelism)
-    return(res)
+    res,sep = _zdim_multi_modular_RUR!(de, co, nn , parallelism)
+    if (get_separating_element) 
+       return(res,sep)
+    else
+       return(res)
+    end
 end
 
 using PrecompileTools
