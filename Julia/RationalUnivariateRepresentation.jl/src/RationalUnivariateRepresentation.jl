@@ -895,7 +895,7 @@ function _zdim_modular_RUR(de, co, arithm, learn = false)
             if (!flag) 
                 #  naive strategy          sep_lin = [rand(-100:100) for i = 1:nbv]
                 rur_print(" (",uu,",",vv,")")
-                if (sep_lin[uu]<0) sep_lin[uu]=-sep[uu]
+                if (sep_lin[uu]<0) sep_lin[uu]=-sep_lin[uu]
                 else sep_lin[uu]=-sep_lin[uu]-1 end
                 vv=uu
                 if (vv<1)
@@ -1202,4 +1202,8 @@ function zdim_parameterization(
     return(res)
 end
 
-end
+using PrecompileTools
+include("precompile.jl")
+
+end # module
+
