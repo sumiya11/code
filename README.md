@@ -44,9 +44,10 @@ using RationalUnivariateRepresentation
 include("Data/Systems/caprasse.jl")
 
 # Find a RUR of solutions
-rur = zdim_parameterization(sys)
+rur,sep = zdim_parameterization(sys)
 ```
-Note that the polynomials of the RUR are given as vectors of coefficients to allow conversions in your favorite package.
+The polynomials of the RUR are given as vectors of coefficients to allow conversions in your favorite package.
+sep is the separating form used.
 
 ## Maple
 
