@@ -1,7 +1,7 @@
 name = "RationalUnivariateRepresentation"
 uuid = "17246082-4fa7-4287-87d4-6a5617fca855"
 authors = ["Alexander Demin <asdemin_2@edu.hse.ru>", "Fabrice Rouillier <Fabrice.Rouillier@inria.fr>", "Joao Ruiz <joao.ruiz@imj-prg.fr>"]
-version = "0.0.1"
+version = "0.0.2"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -12,6 +12,7 @@ PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 ThreadPools = "b189fb0b-2eb5-4ed4-bc0c-d34c51242431"
+TimerOuputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
 AbstractAlgebra = "0.42"
@@ -20,3 +21,4 @@ Nemo = "0.46"
 PrecompileTools = "1"
 Primes = "0.5"
 julia = "1.6"
+TimerOuputs = "0.5"

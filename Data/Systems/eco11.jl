@@ -1,4 +1,4 @@
-R,(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10)=polynomial_ring(QQ, ["x0","x1","x2","x3","x4","x5","x6","x7","x8","x9","x10"],ordering=:degrevlex)
+R,(x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10)=polynomial_ring(QQ, ["x0","x1","x2","x3","x4","x5","x6","x7","x8","x9","x10"])
 
 sys=[x0*x1*x10+x1*x2*x10+x2*x3*x10+x3*x4*x10+x4*x5*x10+x5*x6*x10+x6*x7*x10+x7*x8*x10+x8*x9*x10+x0*x10-1,
 x0*x2*x10+x1*x3*x10+x2*x4*x10+x3*x5*x10+x4*x6*x10+x5*x7*x10+x6*x8*x10+x7*x9*x10+x1*x10-2,
