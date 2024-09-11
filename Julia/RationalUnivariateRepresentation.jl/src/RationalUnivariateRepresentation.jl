@@ -984,33 +984,45 @@ function _list_zdim_modular_RUR_LV_apply_serial!(de, cco, lp, dd, ltg, q, i_xw, 
     return (success, res)
 end
 
-function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
+function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite, threads)
     success = Vector{Bool}(undef, length(lp))
     res = Vector{Vector{Vector{ModularCoeff}}}(undef, length(lp))
 
-    @assert length(lp) % composite == 0
-    @threads :static for i in 1:composite:length(lp)
-        t_graph = graph[threadid()]
-        arithm_Nx = map(pr -> ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr)), lp[i:i+composite-1])
-        co_Nx = map(pr -> map(v -> modular_coeffs_vect(v, pr), cco), lp[i:i+composite-1])
-        flag1, gb_Nx = _gb_4_rur_apply!(t_graph, de, co_Nx, arithm_Nx)
-        j = 1
-        while j <= composite
-            !flag1 && (success[i+j-1] = false; continue)
-            pr = lp[i+j-1]
-            arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
-            flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb_Nx[j], arithm, dd, ltg, q, i_xw, t_xw, t_learn, t_graph)
-            !flag2 && (success[i+j-1] = false; continue)
-            success[i+j-1] = true
-            res[i+j-1] = l_zp_param[1]
-            j += 1
+    @assert length(lp) % (threads * composite) == 0
+    tstep = div(length(lp), threads)
+    @threads :static for T in 1:threads
+        for i in (1+(T-1)*tstep):composite:((T)*tstep)
+            t_graph = graph[threadid()]
+            arithm_Nx = map(pr -> ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr)), lp[i:i+composite-1])
+            co_Nx = map(pr -> map(v -> modular_coeffs_vect(v, pr), cco), lp[i:i+composite-1])
+            flag1, gb_Nx = _gb_4_rur_apply!(t_graph, de, co_Nx, arithm_Nx)
+            j = 1
+            while j <= composite
+                !flag1 && (success[i+j-1] = false; continue)
+                pr = lp[i+j-1]
+                arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
+                flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb_Nx[j], arithm, dd, ltg, q, i_xw, t_xw, t_learn, t_graph)
+                !flag2 && (success[i+j-1] = false; continue)
+                success[i+j-1] = true
+                res[i+j-1] = l_zp_param[1]
+                j += 1
+            end
         end
     end
 
     return (success, res)
 end
 
-TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit_pr=pr_max_bitsize,parallelism=:serial,composite=4)
+function rur_check(de, cco, pr, qq_m)
+    co = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), pr), pr) % UInt32, _c), cco)
+    arithm = ModularArithZp(UInt64, UInt32, UInt32(pr))
+    flag, rur1, _, _, _, _, _, _ = _zdim_modular_RUR_LV(de, co, arithm)
+    @assert flag
+    rur2 = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), pr), pr) % UInt32, _c), qq_m)
+    rur1[1] == rur2
+end
+
+TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit_pr=pr_max_bitsize,parallelism=:serial,composite=4,threads=1)
     nbv_ori = length(de[1][1])
     pr = ModularCoeff(PrevPrime(2^bit_pr - 1))
     rur_print("primes of bitsize ", bit_pr, "\n")
@@ -1057,7 +1069,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         end
     end
 
-    rur_print("Multi-modular computation : ")
+    rur_print("Multi-modular computation ($threads threads): ")
     t_pr = Vector{ModularCoeff}()
     t_param = Vector{Vector{Vector{ModularCoeff}}}()
     continuer = true
@@ -1078,7 +1090,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
     if parallelism!=:serial
         TimerOutputs.disable_timer!(to)
         graph = map(_ -> deepcopy(graph), 1:nthreads())
-        ALIGN_BLOC_TO *= nthreads()
+        ALIGN_BLOC_TO *= threads
     end
 
     align_to(x,n) = (x + (n - 1)) & (~(n - 1))
@@ -1091,7 +1103,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         if parallelism==:serial
              success, l_zp_param = _list_zdim_modular_RUR_LV_apply_serial!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
         elseif parallelism==:multithreading
-            success, l_zp_param = _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
+            success, l_zp_param = _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite, threads)
         else
             error("Unknown parallelism strategy ",parallelism)
         end
@@ -1110,6 +1122,9 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         if !continuer
             TimerOutputs.@timeit to "crt" Groebner.crt_vec_full!(zz_m, zz_p, t_param, t_pr, crt_mask)
             TimerOutputs.@timeit to "rat rec" continuer = !Groebner.ratrec_vec_full!(qq_m, zz_m, zz_p, ratrec_mask)
+            if !continuer
+                continuer = !rur_check(de, cco, PrevPrime(pr - 1), qq_m)
+            end
         end
 
         bloc_p = max(floor(Int, length(t_pr) / 10), 2)
@@ -1128,36 +1143,17 @@ end
 # Abstract Algebra Interface
 # ************************************************************************
 
-function zdim_RUR(sys, c = 0,max_prime_bitsize=pr_max_bitsize,parallelism=:serial)
-    TimerOutputs.enable_timer!(to)
-    de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
-    de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
-    co = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
-    if (c > 0)
-        if (c < 2^32)
-            co = map(v -> map(u -> (u < 0 ? ModularCoeff(c - ((-u) % c)) : ModularCoeff(u % c)), v), co)
-            arithm = ModularArithZp(UInt64, UInt32, c)
-            res = _zdim_modular_RUR(de, co, arithm)
-        else
-            error("Characteristic greater than 32 is not allowed")
-        end
-    elseif (c == 0)
-        res = _zdim_multi_modular_RUR!(de, co, max_prime_bitsize, parallelism)
-    else
-        error("Negative characteristic is not allowed")
-    end
-    return (res)
-end
-
 function zdim_parameterization(
         sys_ori;
         nn::Int32=Int32(28),
         verbose::Bool=true,
         parallelism=:serial,
+        threads=(parallelism == :multithreading ? nthreads() : 1),
 	    get_separating_element::Bool=false,
         composite=4)
-    @assert 1 <= nn <= 32 
-    @assert parallelism in (:serial, :multithreading)
+    @assert 1 <= nn <= 32
+    @assert parallelism in (:serial, :multithreading) && 1 <= threads <= nthreads()
+    parallelism == :serial && threads > 1 && rur_print("WARN: threads=$threads was ignored\n")
     @assert 1 <= composite && ispow2(composite)
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
     _verbose[]=verbose
@@ -1166,7 +1162,7 @@ function zdim_parameterization(
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
     co = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
-    res,sep = _zdim_multi_modular_RUR!(de, co, nn , parallelism, composite)
+    res,sep = _zdim_multi_modular_RUR!(de, co, nn , parallelism, composite, threads)
     if (get_separating_element) 
        return(res,sep)
     else
