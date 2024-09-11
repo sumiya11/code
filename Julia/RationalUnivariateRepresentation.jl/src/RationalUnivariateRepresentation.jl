@@ -911,22 +911,6 @@ function _zdim_modular_RUR(de, co, arithm, learn = false)
     end
 end
 
-function zz_mat_same_dims(zpm)::Vector{Vector{BigInt}}
-    zzm = Vector{Vector{BigInt}}(undef, length(zpm))
-    @inbounds for i in eachindex(zpm)
-        zzm[i] = [BigInt(0) for j = 1:length(zpm[i])]
-    end
-    return (zzm)
-end
-
-function qq_mat_same_dims(zpm)::Vector{Vector{Rational{BigInt}}}
-    zzm = Vector{Vector{Rational{BigInt}}}(undef, length(zpm))
-    @inbounds for i in eachindex(zpm)
-        zzm[i] = [Rational{BigInt}(0) for j = 1:length(zpm[i])]
-    end
-    return (zzm)
-end
-
 function learn_compute_table_cyclic!(t_v, t_xw, i_xw, quo, arithm)
     nb = 1
     t_learn = Int32[]
@@ -1072,10 +1056,9 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
     rur_print("Multi-modular computation ($threads threads): ")
     t_pr = Vector{ModularCoeff}()
     t_param = Vector{Vector{Vector{ModularCoeff}}}()
-    continuer = true
 
-    zz_m = zz_mat_same_dims(l_zp_param[1])
-    qq_m = qq_mat_same_dims(l_zp_param[1])
+    zz_m = [[BigInt(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
+    qq_m = [[Rational{BigInt}(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
 
     witness = reduce(vcat, [[(poly,rand(1:length(l_zp_param[1][poly]))) for _ in 1:ceil(log2(length(l_zp_param[1][poly])))] for poly in 1:length(l_zp_param[1])])
     crt_mask = [falses(length(_x)) for _x in zz_m]
@@ -1096,6 +1079,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
     align_to(x,n) = (x + (n - 1)) & (~(n - 1))
     bloc_p = align_to(bloc_p, ALIGN_BLOC_TO)
 
+    continuer = true
     while (continuer)
         l_pr = PrevPrimes(pr - 1, bloc_p)
         pr = l_pr[end]
@@ -1109,7 +1093,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         end
 
         for i in eachindex(success)
-            !success[i] && (rur_print("bad prime $(l_pr[i])-"); continue)
+            !success[i] && (rur_print("\nbad prime $(l_pr[i])\n"); continue)
             push!(t_pr, l_pr[i])
             push!(t_param, l_zp_param[i])
         end
