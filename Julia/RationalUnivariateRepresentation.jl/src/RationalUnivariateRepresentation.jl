@@ -30,9 +30,6 @@ import TimerOutputs
 import AbstractAlgebra
 import Base.Threads: nthreads, @threads, threadid
 
-const COMPOSITE = Ref{Bool}(true)
-#const PARALLEL  = Ref{Bool}(false)
-
 const to = TimerOutputs.TimerOutput()
 
 # ************************************************************************
@@ -962,87 +959,58 @@ function learn_compute_table_cyclic!(t_v, t_xw, i_xw, quo, arithm)
     return (t_learn)
 end
 
-function _list_zdim_modular_RUR_LV_apply_serial!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph)
+function _list_zdim_modular_RUR_LV_apply_serial!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
     success = Vector{Bool}(undef, length(lp))
     res = Vector{Vector{Vector{ModularCoeff}}}(undef, length(lp))
 
-    if COMPOSITE[]
-        @assert length(lp) % 4 == 0
-        for i in 1:4:length(lp)
-            arithm_4x = map(pr -> ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr)), lp[i:i+3])
-            co_4x = map(pr -> map(v -> modular_coeffs_vect(v, pr), cco), lp[i:i+3])
-            flag1, gb_4x = _gb_4_rur_apply!(graph, de, co_4x, arithm_4x)
-            j = 1
-            while j <= 4
-                !flag1 && (success[i+j-1] = false; continue)
-                pr = lp[i+j-1]
-                arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
-                flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb_4x[j], arithm, dd, ltg, q, i_xw, t_xw, t_learn, graph)
-                !flag2 && (success[i+j-1] = false; continue)
-                success[i+j-1] = true
-                res[i+j-1] = l_zp_param[1]
-                j += 1
-            end
-        end
-    else
-        for i in 1:length(lp)
-            pr = lp[i]
-            co = map(v -> modular_coeffs_vect(v, pr), cco)
+    @assert length(lp) % composite == 0
+    for i in 1:composite:length(lp)
+        arithm_Nx = map(pr -> ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr)), lp[i:i+composite-1])
+        co_Nx = map(pr -> map(v -> modular_coeffs_vect(v, pr), cco), lp[i:i+composite-1])
+        flag1, gb_Nx = _gb_4_rur_apply!(graph, de, co_Nx, arithm_Nx)
+        j = 1
+        while j <= composite
+            !flag1 && (success[i+j-1] = false; continue)
+            pr = lp[i+j-1]
             arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
-            flag1, gb = _gb_4_rur_apply!(graph, de, co, arithm)
-            !flag1 && (success[i] = false; continue)
-            flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb, arithm, dd, ltg, q, i_xw, t_xw, t_learn, graph)
-            !flag2 && (success[i] = false; continue)
-            success[i] = true
-            res[i] = l_zp_param[1]
+            flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb_Nx[j], arithm, dd, ltg, q, i_xw, t_xw, t_learn, graph)
+            !flag2 && (success[i+j-1] = false; continue)
+            success[i+j-1] = true
+            res[i+j-1] = l_zp_param[1]
+            j += 1
         end
     end
 
     return (success, res)
 end
 
-function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph)
+function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
     success = Vector{Bool}(undef, length(lp))
     res = Vector{Vector{Vector{ModularCoeff}}}(undef, length(lp))
 
-    if COMPOSITE[]
-        @assert length(lp) % 4 == 0
-        @threads :static for i in 1:4:length(lp)
-            t_graph = graph[threadid()]
-            arithm_4x = map(pr -> ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr)), lp[i:i+3])
-            co_4x = map(pr -> map(v -> modular_coeffs_vect(v, pr), cco), lp[i:i+3])
-            flag1, gb_4x = _gb_4_rur_apply!(t_graph, de, co_4x, arithm_4x)
-            j = 1
-            while j <= 4
-                !flag1 && (success[i+j-1] = false; continue)
-                pr = lp[i+j-1]
-                arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
-                flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb_4x[j], arithm, dd, ltg, q, i_xw, t_xw, t_learn, t_graph)
-                !flag2 && (success[i+j-1] = false; continue)
-                success[i+j-1] = true
-                res[i+j-1] = l_zp_param[1]
-                j += 1
-            end
-        end
-    else
-        @threads :static for i in 1:length(lp)
-            t_graph = graph[threadid()]
-            pr = lp[i]
-            co = map(v -> modular_coeffs_vect(v, pr), cco)
+    @assert length(lp) % composite == 0
+    @threads :static for i in 1:composite:length(lp)
+        t_graph = graph[threadid()]
+        arithm_Nx = map(pr -> ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr)), lp[i:i+composite-1])
+        co_Nx = map(pr -> map(v -> modular_coeffs_vect(v, pr), cco), lp[i:i+composite-1])
+        flag1, gb_Nx = _gb_4_rur_apply!(t_graph, de, co_Nx, arithm_Nx)
+        j = 1
+        while j <= composite
+            !flag1 && (success[i+j-1] = false; continue)
+            pr = lp[i+j-1]
             arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
-            flag1, gb = _gb_4_rur_apply!(t_graph, de, co, arithm)
-            !flag1 && (success[i] = false; continue)
-            flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb, arithm, dd, ltg, q, i_xw, t_xw, t_learn, t_graph)
-            !flag2 && (success[i] = false; continue)
-            success[i] = true
-            res[i] = l_zp_param[1]
+            flag2, l_zp_param = _zdim_modular_RUR_LV_apply!(de, gb_Nx[j], arithm, dd, ltg, q, i_xw, t_xw, t_learn, t_graph)
+            !flag2 && (success[i+j-1] = false; continue)
+            success[i+j-1] = true
+            res[i+j-1] = l_zp_param[1]
+            j += 1
         end
     end
 
     return (success, res)
 end
 
-TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit_pr=pr_max_bitsize,parallelism=:serial)
+TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit_pr=pr_max_bitsize,parallelism=:serial,composite=4)
     nbv_ori = length(de[1][1])
     pr = ModularCoeff(PrevPrime(2^bit_pr - 1))
     rur_print("primes of bitsize ", bit_pr, "\n")
@@ -1105,16 +1073,12 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
     append!(t_param, l_zp_param)
    
     bloc_p = 2
-    ALIGN_BLOC_TO = 1
+    ALIGN_BLOC_TO = 1 * composite
    
     if parallelism!=:serial
         TimerOutputs.disable_timer!(to)
         graph = map(_ -> deepcopy(graph), 1:nthreads())
         ALIGN_BLOC_TO *= nthreads()
-    end
-
-    if COMPOSITE[]
-        ALIGN_BLOC_TO *= 4
     end
 
     align_to(x,n) = (x + (n - 1)) & (~(n - 1))
@@ -1125,9 +1089,9 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         pr = l_pr[end]
 
         if parallelism==:serial
-             success, l_zp_param = _list_zdim_modular_RUR_LV_apply_serial!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph)
+             success, l_zp_param = _list_zdim_modular_RUR_LV_apply_serial!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
         elseif parallelism==:multithreading
-            success, l_zp_param = _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph)   
+            success, l_zp_param = _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
         else
             error("Unknown parallelism strategy ",parallelism)
         end
@@ -1190,16 +1154,19 @@ function zdim_parameterization(
         nn::Int32=Int32(28),
         verbose::Bool=true,
         parallelism=:serial,
-	get_separating_element::Bool=false)
-    _verbose[]=verbose
+	    get_separating_element::Bool=false,
+        composite=4)
     @assert 1 <= nn <= 32 
     @assert parallelism in (:serial, :multithreading)
+    @assert 1 <= composite && ispow2(composite)
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
+    _verbose[]=verbose
+    TimerOutputs.enable_timer!(to)
     sys=sys_ori.*(map(v->lcm(map(w->denominator(w),collect(AbstractAlgebra.coefficients(v)))),sys_ori))
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
     co = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
-    res,sep = _zdim_multi_modular_RUR!(de, co, nn , parallelism)
+    res,sep = _zdim_multi_modular_RUR!(de, co, nn , parallelism, composite)
     if (get_separating_element) 
        return(res,sep)
     else
