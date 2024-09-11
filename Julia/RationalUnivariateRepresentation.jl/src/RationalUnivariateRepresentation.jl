@@ -106,7 +106,7 @@ end
 
 TimerOutputs.@timeit to "Groebner learn" function _gb_4_rur_learn(de, co, arithm)
     ri = Groebner.PolyRing(length(de[1][1]), Groebner.DegRevLex(), Groebner.divisor(arithm))
-    graph, gro_exp, gro_coeffs = Groebner.groebner_learn(ri, de, co, loglevel=:warn, ordering = Groebner.DegRevLex(), threaded = :no)
+    graph, gro_exp, gro_coeffs = Groebner.groebner_learn(ri, de, co, ordering = Groebner.DegRevLex(), threaded = :no)
     return (graph, gro_exp, gro_coeffs)
 end
 
@@ -114,11 +114,11 @@ TimerOutputs.@timeit to "Groebner Apply" function _gb_4_rur_apply!(graph, de, co
     if arithm isa Vector  # apply with composite numbers
         ri = map(a -> Groebner.PolyRing(length(de[1][1]), Groebner.DegRevLex(), Groebner.divisor(a)), arithm)
         batch = tuple(map(ri_co -> (ri_co[1], de, ri_co[2]), zip(ri, co))...)
-        success, gro_coeffs = Groebner.groebner_apply!(graph, batch, loglevel=:warn, ordering = Groebner.DegRevLex(), threaded = :no)
+        success, gro_coeffs = Groebner.groebner_apply!(graph, batch, ordering = Groebner.DegRevLex(), threaded = :no)
         return (success, gro_coeffs)
     else  # apply scalar
         ri = Groebner.PolyRing(length(de[1][1]), Groebner.DegRevLex(), Groebner.divisor(arithm))
-        success, gro_coeffs = Groebner.groebner_apply!(graph, ri, de, co, loglevel=:warn, ordering = Groebner.DegRevLex(), threaded = :no)
+        success, gro_coeffs = Groebner.groebner_apply!(graph, ri, de, co, ordering = Groebner.DegRevLex(), threaded = :no)
         return (success, gro_coeffs)
     end
 end
@@ -145,7 +145,7 @@ end
 
 function divides(a::PP, b::PP)
     var = 0
-    @inbounds for j = 1:length(a)
+    @inbounds for j in 1:length(a)
         if a[j] > b[j]
             var = j
         end
@@ -158,7 +158,7 @@ end
 
 function find_divisor(m::PP, lm::Vector{PP})
     pos = length(lm)
-    @inbounds for j = pos:-1:1
+    @inbounds for j in pos:-1:1
         te, v = divides(m, lm[j])
         if te
             return (j)
@@ -169,7 +169,7 @@ end
 
 function find_in_list(m::PP, lm::Vector{PP})
     pos = length(lm)
-    @inbounds for j = pos:-1:1
+    @inbounds for j in pos:-1:1
         if m == lm[j]
             return (j)
         end
@@ -183,15 +183,15 @@ function compute_quotient_basis(ltg::Vector{PP})
     end
     nbv = length(ltg[1])
     quo = Vector{PP}()
-    todo = Vector{PP}([PP([Deg(0) for i = 1:nbv])])
-    inspected = Vector{PP}([PP([Deg(0) for i = 1:nbv])])
+    todo = Vector{PP}([PP([Deg(0) for i in 1:nbv])])
+    inspected = Vector{PP}([PP([Deg(0) for i in 1:nbv])])
     pos = 1
     while (length(todo) > 0)
         m = popfirst!(todo)
         pos = find_divisor(m, ltg)
         if pos == 0
             push!(quo, m)
-            @inbounds for i = 1:nbv
+            @inbounds for i in 1:nbv
                 pp = PP(m)
                 pp[i] += 1
                 if (find_in_list(pp, inspected) == 0)
@@ -297,7 +297,7 @@ end
 
 function vectorize_pol_gro!(p_exps, p_coeffs, kb, arithm::ModularArithmetic{Accum,Coeff}, res) where {Accum,Coeff}
     pos = length(kb)
-    @inbounds for i = 2:length(p_coeffs)
+    @inbounds for i in 2:length(p_coeffs)
         m = p_exps[i]
         while ((pos > 0) && (kb[pos] != m))
             pos = pos - 1
@@ -330,12 +330,12 @@ end
 
 function prepare_table_mxi(ltg, kb)
     nbv = length(ltg[1])
-    tablex = [[Int32(0) for i = 1:length(kb)] for j = 1:nbv]
+    tablex = [[Int32(0) for i in 1:length(kb)] for j in 1:nbv]
     general_stack = Vector{StackVect}()
     nb_stack = 0
     for j in eachindex(kb)
         m = PP(kb[j])
-        for ii = 1:nbv
+        for ii in 1:nbv
             i = nbv - ii + 1
             nm = mul_pp_by_var!(m, i)
             pos = findfirst(item -> item == nm, kb)
@@ -398,11 +398,11 @@ TimerOutputs.@timeit to "Mul Var Quo" function _mul_var_quo!(
     @assert dim == length(vres)
     pack = pack_value(arithm)
     resize!(vv, dim)
-    @inbounds for i = 1:dim
+    @inbounds for i in 1:dim
         vv[i] = zero(Accum)
     end
     continuer = true
-    @inbounds for j = 1:dim
+    @inbounds for j in 1:dim
         iszero(v[j]) && continue
         if (length(t_v[i_xw[ii][j]]) > 1)
             add_mul!(vv, v[j], t_v[i_xw[ii][j]])
@@ -487,10 +487,10 @@ TimerOutputs.@timeit to "Gauss Reduct" function gauss_reduct(
     j = Int32(0)
     last_nn = Int32(-1)
     resize!(b, dv)
-    @inbounds for ell = 1:dv
+    @inbounds for ell in 1:dv
         b[ell] = Accum(v[ell])
     end
-    @inbounds for i = 1:(dg-1)
+    @inbounds for i in 1:(dg-1)
         b[i+1] = ModularImage(b[i+1], arithm)
         iszero(b[i+1]) && continue
         if (length(gred[i]) == 0)
@@ -508,16 +508,16 @@ TimerOutputs.@timeit to "Gauss Reduct" function gauss_reduct(
         end
     end
     if (j > 0)
-        @inbounds for k = 1:dv
+        @inbounds for k in 1:dv
             v[k] = ModularImage(b[k], arithm) % Coeff
         end
     else
-        @inbounds for k = 1:dv
+        @inbounds for k in 1:dv
             v[k] = b[k] % Coeff
         end
     end
     if (last_nn == -1)
-        @inbounds for ii = dg:(dv-1)
+        @inbounds for ii in dg:(dv-1)
             if (!iszero(v[ii+1]))
                 last_nn = ii % Int32
                 break
@@ -539,7 +539,7 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
 ) where {Accum,Coeff}
     pack = pack_value(arithm)
     d = Int32(length(i_xw[ii]))
-    free_set = [append!([one(Coeff)], [zero(Coeff) for i = 2:d])]
+    free_set = [append!([one(Coeff)], [zero(Coeff) for i in 2:d])]
     if (length(t_v[i_xw[ii][1]]) > 1)
         v = t_v[i_xw[ii][1]]
     else
@@ -548,10 +548,10 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
     end
     push!(free_set, v)
     # index[deg]=pos (pos=position in the gred with the convention that 0 is not stored)
-    index = [Int32(i) for i = 1:d]
+    index = [Int32(i) for i in 1:d]
     # normalization values
-    hom = [one(Coeff) for i = 1:d]
-    gred = [Vector{Coeff}() for i = 1:d]
+    hom = [one(Coeff) for i in 1:d]
+    gred = [Vector{Coeff}() for i in 1:d]
 
     i = Int32(2)
     continuer = 1
@@ -581,7 +581,7 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
     @inbounds while (continuer == 1)
         v = mul_var_quo(v, ii, t_v, i_xw, arithm, buf1)
         resize!(w, length(v))
-        for ell = 1:length(v)
+        for ell in 1:length(v)
             w[ell] = v[ell]
         end
         #reduce with gred[0]
@@ -608,7 +608,7 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
     #set v[i] cofficient of T^(i-1) in the min poly
     v = Vector{Coeff}(undef, deg)
     v[1] = w[1]
-    @inbounds for i = 2:deg
+    @inbounds for i in 2:deg
         v[i] = Coeff(ModularImage(Accum(w[index[i-1]+1]) * Accum(hom[index[i-1]]), arithm))
     end
     return (v, gred, index, dg, hom, free_set)
@@ -620,7 +620,7 @@ TimerOutputs.@timeit to "Biv Lex" function biv_lex(t_v, i_xw, gred, index, dg, h
     new_free_set = copy(free_set)
     deg = length(free_set)
     new_generators = Vector{Vector{Int32}}()
-    new_monomial_free_set = [(Int32(i - 1), Int32(0)) for i = 1:deg]
+    new_monomial_free_set = [(Int32(i - 1), Int32(0)) for i in 1:deg]
     new_monomial_basis = copy(new_monomial_free_set)
     new_leading_monomials = Vector{Tuple{Int32,Int32}}()
     buf1 = Vector{AccModularCoeff}()
@@ -651,10 +651,8 @@ TimerOutputs.@timeit to "Biv Lex" function biv_lex(t_v, i_xw, gred, index, dg, h
             else
                 v = Vector{ModularCoeff}(undef, deg)
                 v[1] = w[1]
-                @inbounds for i = 2:deg
-                    v[i] = ModularCoeff(
-                        ModularImage((AccModularCoeff(w[index[i-1]+1])) * (AccModularCoeff(hom[index[i-1]])), arithm),
-                    )
+                @inbounds for i in 2:deg
+                    v[i] = ModularCoeff(ModularImage((AccModularCoeff(w[index[i-1]+1])) * (AccModularCoeff(hom[index[i-1]])), arithm))
                 end
                 push!(new_generators, copy(v))
                 push!(new_leading_monomials, curr_mon)
@@ -675,15 +673,15 @@ function convert_biv_lex_2_biv_pol(n_g, m_b, lt_g)
         pp = n_g[kk]
         p_mat = Vector{Vector{ModularCoeff}}()
         ldeg2 = Int32(0)
-        lco = [ModularCoeff(0) for i = 1:length(m_b)]
+        lco = [ModularCoeff(0) for i in 1:length(m_b)]
         for i in eachindex(pp)
             deg2 = m_b[i][2]
             if deg2 > ldeg2
                 push!(p_mat, lco)
-                for j = (ldeg2+1):(deg2-1)
+                for j in (ldeg2+1):(deg2-1)
                     push!(p_math, Vector{ModularCoeff}())
                 end
-                lco = [ModularCoeff(0) for j = 1:length(m_b)]
+                lco = [ModularCoeff(0) for j in 1:length(m_b)]
                 ldeg2 = deg2
             end
             lco[m_b[i][1]+1] = pp[i]
@@ -693,10 +691,10 @@ function convert_biv_lex_2_biv_pol(n_g, m_b, lt_g)
             lco[lt_g[kk][1]+1] = ModularCoeff(1)
         else
             push!(p_mat, lco)
-            for i = (ldeg2+1):(deg2-1)
+            for i in (ldeg2+1):(deg2-1)
                 push!(p_math, Vector{ModularCoeff}())
             end
-            lco = [ModularCoeff(0) for i = 1:length(m_b)]
+            lco = [ModularCoeff(0) for i in 1:length(m_b)]
             lco[lt_g[kk][1]+1] = ModularCoeff(1)
         end
         push!(p_mat, lco)
@@ -710,7 +708,7 @@ function check_separation_biv(bli, f, C)
     akk = C(bli[k+1])
     invakk = Nemo.invmod(k * akk, f)
     b = C(bli[k]) * invakk
-    for i = (k-1):-1:1
+    for i in (k-1):-1:1
         tmp = Nemo.mod((k - i + 1) * C(bli[i]) - (i) * b * C(bli[i+1]), f)
         if (tmp != 0)
             return (false)
@@ -751,7 +749,7 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
     end
     # end of the first loop over several primes
     if (flag)
-        @inbounds for j = (ii-1):-1:1
+        @inbounds for j in (ii-1):-1:1
             m_b, lt_b, n_g = biv_lex(t_v, i_xw, gred, index, dg, hom, free_set, Int32(j), arithm)
             bl = [convert_biv_lex_2_biv_pol(n_g, m_b, lt_b)]
             nbp = 0
@@ -766,7 +764,7 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
                 f = C(l_res[nbp][1])
                 ft = C(l_res[nbp][1])
                 ifp = Nemo.derivative(ft)
-                @inbounds for i = 1:length(bl[nbp])
+                @inbounds for i in 1:length(bl[nbp])
                     d1 = length(bl[nbp][i]) - 1
                     lc1 = C(bl[nbp][i][d1+1])
                     co0 = C(bl[nbp][i][d1])
@@ -797,8 +795,11 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
         rur_print("Bad prime number for parameterization (", dd, ",", length(v), ")")
         #error("Bad prime number for parameterization ")
     end
-    if (check>0) return(flag,l_res,ii)
-    else return (flag, l_res) end
+    if (check > 0)
+        return (flag, l_res, ii)
+    else
+        return (flag, l_res)
+    end
 end
 
 
@@ -815,8 +816,8 @@ function _zdim_modular_RUR_LV(de, cco, arithm)
     rur_print("Learn comp Table - ")
     t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, arithm)
     rur_print("Learn Parameterization \n")
-    flag, zp_param,uu = zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
-    return (flag, zp_param, ltg, q, i_xw, t_xw, t_learn,uu)
+    flag, zp_param, uu = zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
+    return (flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu)
 end
 
 function _zdim_modular_RUR_LV_apply!(de, co, arithm, dd, ltg, q, i_xw, t_xw, t_learn, graph)
@@ -837,7 +838,7 @@ end
 swap_vars(p::Vector{PP}, ii, jj) = map(u -> swap_vars(u, ii, jj), p)
 swap_vars(de::Vector{Vector{PP}}, ii, jj) = map(u -> swap_vars(u, ii, jj), de)
 
-extend_vars(m::PP, ii) = (vcat(m, [Deg(0) for i = 1:ii]))
+extend_vars(m::PP, ii) = (vcat(m, [Deg(0) for i in 1:ii]))
 extend_vars(p::Vector{PP}, ii) = map(u -> extend_vars(u, ii), p)
 extend_vars(de::Vector{Vector{PP}}, ii) = map(u -> extend_vars(u, ii), de)
 
@@ -850,13 +851,13 @@ end
 function extend_system_with_sepform(de, co, lt, minus_sep_lin)
     nbv = length(de[1][1])
     dde = extend_vars(de, 1)
-    pp = [Deg(0) for j = 1:(nbv+1)]
+    pp = [Deg(0) for j in 1:(nbv+1)]
     pp[nbv+1] = 1
     co_sep_pol = [lt]
     exp_sep_pol = [pp]
-    for i = 1:(nbv)
+    for i in 1:(nbv)
         if !iszero(minus_sep_lin[i])
-            pp = [Deg(0) for j = 1:(nbv+1)]
+            pp = [Deg(0) for j in 1:(nbv+1)]
             pp[i] = 1
             push!(exp_sep_pol, pp)
             push!(co_sep_pol, minus_sep_lin[i])
@@ -877,31 +878,34 @@ function _zdim_modular_RUR(de, co, arithm, learn = false)
         dde = swap_vars(de, ii, nbv)
         flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(dde, co, arithm)
     end
-    sep_lin = [0 for i = 1:nbv]
+    sep_lin = [0 for i in 1:nbv]
     if (flag)
         sep_lin[ii] = 1
     else
-        sep_lin=[ 0 for i=1:nbv]
-        sep_lin[nbv]=1
-        sep_lin[nbv-1]=-1
-        vv=nbv-2
+        sep_lin = [0 for i in 1:nbv]
+        sep_lin[nbv] = 1
+        sep_lin[nbv-1] = -1
+        vv = nbv - 2
         # naive strategy  sep_lin = [rand(-100:100) for i = 1:nbv]
         while (!flag)
-            dde, cco = extend_system_with_sepform(de,co,ModularCoeff(1),modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
-            flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)           
-            if (!flag) 
+            dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
+            flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
+            if (!flag)
                 #  naive strategy          sep_lin = [rand(-100:100) for i = 1:nbv]
-                rur_print(" (",uu,",",vv,")")
-                if (sep_lin[uu]<0) sep_lin[uu]=-sep_lin[uu]
-                else sep_lin[uu]=-sep_lin[uu]-1 end
-                vv=uu
-                if (vv<1)
-                    rur_print("\n Error in the choice of the separating form \n") 
-                    return(-1,-1,sys,AbstractAlgebra.symbols(C),linform)
+                rur_print(" (", uu, ",", vv, ")")
+                if (sep_lin[uu] < 0)
+                    sep_lin[uu] = -sep_lin[uu]
+                else
+                    sep_lin[uu] = -sep_lin[uu] - 1
+                end
+                vv = uu
+                if (vv < 1)
+                    rur_print("\n Error in the choice of the separating form \n")
+                    return (-1, -1, sys, AbstractAlgebra.symbols(C), linform)
                 end
             else
-                dd=length(zp_param[1])-1
-            end  
+                dd = length(zp_param[1]) - 1
+            end
         end
     end
     if (learn)
@@ -918,7 +922,7 @@ function learn_compute_table_cyclic!(t_v, t_xw, i_xw, quo, arithm)
     #xnwi, i=1..D
     to_compute = copy(i_xw[end])
     #xiw1 i=1..n-1
-    for i = 1:(length(i_xw)-1)
+    for i in 1:(length(i_xw)-1)
         push!(to_compute, i_xw[i][1])
     end
     while (nb > 0)
@@ -998,19 +1002,26 @@ function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw
 end
 
 function rur_check(de, cco, pr, qq_m)
-    co = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), pr), pr) % UInt32, _c), cco)
-    arithm = ModularArithZp(UInt64, UInt32, UInt32(pr))
+    co = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), pr), pr) % ModularCoeff, _c), cco)
+    arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
     flag, rur1, _, _, _, _, _, _ = _zdim_modular_RUR_LV(de, co, arithm)
     @assert flag
-    rur2 = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), pr), pr) % UInt32, _c), qq_m)
+    rur2 = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), pr), pr) % ModularCoeff, _c), qq_m)
     rur1[1] == rur2
 end
 
-TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit_pr=pr_max_bitsize,parallelism=:serial,composite=4,threads=1)
+TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
+    de,
+    cco,
+    bit_pr = pr_max_bitsize,
+    parallelism = :serial,
+    composite = 4,
+    threads = 1,
+)
     nbv_ori = length(de[1][1])
     pr = ModularCoeff(PrevPrime(2^bit_pr - 1))
     rur_print("primes of bitsize ", bit_pr, "\n")
-    arithm = ModularArithZp(UInt64, UInt32, pr)
+    arithm = ModularArithZp(AccModularCoeff, ModularCoeff, pr)
     co = map(v -> modular_coeffs_vect(v, pr), cco)
     flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR(de, co, arithm, true)
     dd = length(l_zp_param[1][1]) - 1
@@ -1057,26 +1068,29 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
     t_pr = Vector{ModularCoeff}()
     t_param = Vector{Vector{Vector{ModularCoeff}}}()
 
+    append!(t_pr, pr)
+    append!(t_param, l_zp_param)
+    
     zz_m = [[BigInt(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
     qq_m = [[Rational{BigInt}(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
 
-    witness = reduce(vcat, [[(poly,rand(1:length(l_zp_param[1][poly]))) for _ in 1:ceil(log2(length(l_zp_param[1][poly])))] for poly in 1:length(l_zp_param[1])])
+    witness = reduce(
+        vcat,
+        [[(j, rand(1:length(l_zp_param[1][j]))) for _ in 1:ceil(log2(length(l_zp_param[1][j])))] for j in 1:length(l_zp_param[1])],
+    )
     crt_mask = [falses(length(_x)) for _x in zz_m]
     ratrec_mask = [falses(length(_x)) for _x in zz_m]
 
-    append!(t_pr, pr)
-    append!(t_param, l_zp_param)
-   
     bloc_p = 2
     ALIGN_BLOC_TO = 1 * composite
-   
-    if parallelism!=:serial
+
+    if parallelism != :serial
         TimerOutputs.disable_timer!(to)
         graph = map(_ -> deepcopy(graph), 1:nthreads())
         ALIGN_BLOC_TO *= threads
     end
 
-    align_to(x,n) = (x + (n - 1)) & (~(n - 1))
+    align_to(x, n) = (x + (n - 1)) & (~(n - 1))
     bloc_p = align_to(bloc_p, ALIGN_BLOC_TO)
 
     continuer = true
@@ -1084,12 +1098,13 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         l_pr = PrevPrimes(pr - 1, bloc_p)
         pr = l_pr[end]
 
-        if parallelism==:serial
-             success, l_zp_param = _list_zdim_modular_RUR_LV_apply_serial!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
-        elseif parallelism==:multithreading
-            success, l_zp_param = _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite, threads)
+        if parallelism == :serial
+            success, l_zp_param = _list_zdim_modular_RUR_LV_apply_serial!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite)
+        elseif parallelism == :multithreading
+            success, l_zp_param =
+                _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite, threads)
         else
-            error("Unknown parallelism strategy ",parallelism)
+            error("Unknown parallelism strategy ", parallelism)
         end
 
         for i in eachindex(success)
@@ -1097,12 +1112,12 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
             push!(t_pr, l_pr[i])
             push!(t_param, l_zp_param[i])
         end
-        
+
         rur_print(length(t_pr), "-")
         zz_p = BigInt(1)
         TimerOutputs.@timeit to "crt partial" Groebner.crt_vec_partial!(zz_m, zz_p, t_param, t_pr, witness, crt_mask)
         TimerOutputs.@timeit to "rat rec partial" continuer = !Groebner.ratrec_vec_partial!(qq_m, zz_m, zz_p, witness, ratrec_mask)
-        
+
         if !continuer
             TimerOutputs.@timeit to "crt" Groebner.crt_vec_full!(zz_m, zz_p, t_param, t_pr, crt_mask)
             TimerOutputs.@timeit to "rat rec" continuer = !Groebner.ratrec_vec_full!(qq_m, zz_m, zz_p, ratrec_mask)
@@ -1115,7 +1130,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(de, cco, bit
         bloc_p = align_to(bloc_p, ALIGN_BLOC_TO)
     end
     rur_print("\n")
-    return qq_m,sep_lin
+    return qq_m, sep_lin
 end
 
 # ************************************************************************
@@ -1128,29 +1143,30 @@ end
 # ************************************************************************
 
 function zdim_parameterization(
-        sys_ori;
-        nn::Int32=Int32(28),
-        verbose::Bool=true,
-        parallelism=:serial,
-        threads=(parallelism == :multithreading ? nthreads() : 1),
-	    get_separating_element::Bool=false,
-        composite=4)
+    sys_ori;
+    nn::Int32 = Int32(28),
+    verbose::Bool = true,
+    parallelism = :serial,
+    threads = (parallelism == :multithreading ? nthreads() : 1),
+    get_separating_element::Bool = false,
+    composite = 4,
+)
     @assert 1 <= nn <= 32
     @assert parallelism in (:serial, :multithreading) && 1 <= threads <= nthreads()
     parallelism == :serial && threads > 1 && rur_print("WARN: threads=$threads was ignored\n")
     @assert 1 <= composite && ispow2(composite)
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
-    _verbose[]=verbose
+    _verbose[] = verbose
     TimerOutputs.enable_timer!(to)
-    sys=sys_ori.*(map(v->lcm(map(w->denominator(w),collect(AbstractAlgebra.coefficients(v)))),sys_ori))
+    sys = sys_ori .* (map(v -> lcm(map(w -> denominator(w), collect(AbstractAlgebra.coefficients(v)))), sys_ori))
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
     co = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
-    res,sep = _zdim_multi_modular_RUR!(de, co, nn , parallelism, composite, threads)
-    if (get_separating_element) 
-       return(res,sep)
+    res, sep = _zdim_multi_modular_RUR!(de, co, nn, parallelism, composite, threads)
+    if (get_separating_element)
+        return (res, sep)
     else
-       return(res)
+        return (res)
     end
 end
 
@@ -1158,4 +1174,3 @@ using PrecompileTools
 include("precompile.jl")
 
 end # module
-
