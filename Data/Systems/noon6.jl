@@ -1,4 +1,4 @@
-R,(x1,x2,x3,x4,x5,x6,t)=polynomial_ring(QQ, ["x1","x2","x3","x4","x5","x6","t"],ordering=:degrevlex)
+R,(x1,x2,x3,x4,x5,x6,t)=polynomial_ring(QQ, ["x1","x2","x3","x4","x5","x6","t"])
 
 sys=[10*x1^2*x6+10*x2^2*x6+10*x3^2*x6+10*x4^2*x6+10*x5^2*x6-11*x6+10,
 10*x1^2*x5+10*x2^2*x5+10*x3^2*x5+10*x4^2*x5+10*x5*x6^2-11*x5+10,

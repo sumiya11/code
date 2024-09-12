@@ -975,7 +975,6 @@ end
 function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite, threads)
     success = Vector{Bool}(undef, length(lp))
     res = Vector{Vector{Vector{ModularCoeff}}}(undef, length(lp))
-
     @assert length(lp) % (threads * composite) == 0
     tstep = div(length(lp), threads)
     @threads :static for T in 1:threads
@@ -997,7 +996,6 @@ function _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, lp, dd, ltg, q, i_xw
             end
         end
     end
-
     return (success, res)
 end
 
