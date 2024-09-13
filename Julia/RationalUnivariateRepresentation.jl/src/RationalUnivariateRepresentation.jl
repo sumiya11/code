@@ -1171,4 +1171,6 @@ end
 using PrecompileTools
 include("precompile.jl")
 
+export zdim_parameterization
+
 end # module
