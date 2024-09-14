@@ -292,17 +292,17 @@ param_zerodim:=proc(sys,vars)
      if (is_cyclic) then
         if (p=vars[nops(vars)]) then
 	   print("Shape Lemma");
-	   return(param_zerodim_internal_mm(sys,vars,param_shape_lemma_radicalize_zp));
+	   return(param_zerodim_internal_mm(sys,vars,param_shape_lemma_radicalize_zp),p);
 	else
 	   print("Cyclic quotient algebra");
-	   return(param_zerodim_internal_mm([op(sys),p],[op(vars),_Z],param_shape_lemma_radicalize_zp)):
+	   return(param_zerodim_internal_mm([op(sys),p],[op(vars),_Z],param_shape_lemma_radicalize_zp),p):
 	fi:
      else
      	print("General case",vars,p);
 	if (vars[nops(vars)]=p) then
-	  return(param_zerodim_internal_mm(sys,vars,param_general_zp)):	  
+	  return(param_zerodim_internal_mm(sys,vars,param_general_zp),p):	  
 	else
-	  return(param_zerodim_internal_mm([op(sys),p],[op(vars),_Z],param_general_zp)):
+	  return(param_zerodim_internal_mm([op(sys),p],[op(vars),_Z],param_general_zp),p):
 	fi:
      fi:
 end:
@@ -325,15 +325,24 @@ end:
 # ******************************************************************************
 
 rur:=proc(sys::depends(list(polynom(integer))),
-          vars::list(name):=[op(indets(sys))])
-     local rr,m,de,i:
-     rr:=param_zerodim(sys,vars):
+          vars::list(name):=[op(indets(sys))],
+	  get_separating_form:=false)
+     local rr,m,de,i,sep:
+     rr,sep:=param_zerodim(sys,vars):
      m:=lcm(op(map(u->denom(u),rr))):
      de:=expand(m*diff(rr[1],op(indets(rr[1])))):
-     if (has(vars,op(indets(rr[1])))) then 
-        return(numer(rr[1])=0,[seq(vars[i]=expand(m*rr[i+1])/de,i=1..(nops(vars)-1)),vars[nops(vars)]=vars[nops(vars)]*de/de]):
+     if (has(vars,op(indets(rr[1])))) then
+     	if (get_separating_form) then
+		return(numer(rr[1])=0,[seq(vars[i]=expand(m*rr[i+1])/de,i=1..(nops(vars)-1)),vars[nops(vars)]=vars[nops(vars)]*de/de],sep):
+	else
+		return(numer(rr[1])=0,[seq(vars[i]=expand(m*rr[i+1])/de,i=1..(nops(vars)-1)),vars[nops(vars)]=vars[nops(vars)]*de/de]):
+	end
      else
-        return(numer(rr[1])=0,[seq(vars[i]=expand(m*rr[i+1])/de,i=1..(nops(vars)))]):        
+     	if (get_separating_form) then
+		return(numer(rr[1])=0,[seq(vars[i]=expand(m*rr[i+1])/de,i=1..(nops(vars)))],sep):
+	else
+		return(numer(rr[1])=0,[seq(vars[i]=expand(m*rr[i+1])/de,i=1..(nops(vars)))]):
+	end:
      end:
 end:
 
