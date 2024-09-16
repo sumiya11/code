@@ -30,11 +30,13 @@ local
      tri_sep_restrict_zp,biv_test_sep_gblex_zp,test_sep_gblex_zp,lin_extract_gblex_zp,
      param_shape_lemma_radicalize_zp,find_sep_elt,param_general_zp,pack_compute_seq,
      param_zerodim_internal_mm,param_zerodim,isolate_zerodim,
-     gb_drl_zp,gb_lex_2_biv,gb_lex_zp,tri_split_zp,tri_lin_extract_zp,biv_lin_extract_gblex_zp,find_sep_elt_ori:
+     gb_drl_zp,gb_lex_2_biv,gb_lex_zp,tri_split_zp,tri_lin_extract_zp,biv_lin_extract_gblex_zp,find_sep_elt_ori,verbose:
 
 # ******************************************************************************
 # Groebner Engine: direct call to the limgb package 
 # ******************************************************************************
+
+verbose:=false:
 
 gb_drl_zp:=proc(sys,vars,pr)
     return(libmgb:-gbasis(pr,0,vars,sys));
@@ -230,7 +232,7 @@ param_zerodim_internal_mm:=proc(sys,vars,param_engine_zp)
  i:=1:
  while evalb(reco_p = FAIL) do
    pack2:=max(2,ceil(i*10/100));
-   print(i,pack2);
+   if (verbose) then  print(i,pack2): fi:
    pr,p_pr,lift_p:=pack_compute_seq(sys,vars,pr,param_engine_zp,pack2):
    lift_0:=chrem([lift_0,lift_p],[prod_pr,p_pr]):
    prod_pr:=prod_pr*p_pr:
@@ -248,34 +250,36 @@ find_sep_elt:=proc(sys,vars)
   local pr,gdrl,glex,sys2,vars2,p,roll,i,is_cyclic,ii,ori,sep,stop_comp,uu,dd:
   roll:=rand(-10..10):
   pr:=prevprime(2^31);
-  vars2:=vars:
-  glex:=gb_lex_zp(sys,vars,pr):
-
   stop_comp:=false:
   ii:=nops(vars);
   while ((ii>0) and (not(stop_comp))) do
-  	stop_comp:=evalb(test_sep_gblex_zp(glex,vars,pr)<1):
   	p:=vars[ii]:
+	vars2:=vars:
+	vars2[nops(vars2)]:=vars[ii]:
+	vars2[ii]:=vars[nops(vars)]:
+	glex:=gb_lex_zp(sys,vars2,pr):
+  	stop_comp:=evalb(test_sep_gblex_zp(glex,vars2,pr)<1):
         ii:=ii-1:
   end:
-
-  sep:=[seq(0,i=1..nops(vars))]:
-  sep[nops(vars)]:=-1:
-  dd:=-1:
-  while (not(stop_comp)) do
-    p:=_Z+add(vars[i]*sep[i],i=1..(nops(vars))):
-    sys2:=[op(sys),p]:
-    vars2:=[op(vars),_Z]:
-    glex:=gb_lex_zp(sys2,vars2,pr):
-    uu:=test_sep_gblex_zp(glex,vars2,pr):
-    if (uu>0) then
+  if not((stop_comp)) then 
+    sep:=[seq(0,i=1..nops(vars))]:
+    sep[nops(vars)]:=-1:
+    dd:=-1:
+    while (not(stop_comp)) do
+      p:=_Z+add(vars[i]*sep[i],i=1..(nops(vars))):
+      sys2:=[op(sys),p]:
+      vars2:=[op(vars),_Z]:
+      glex:=gb_lex_zp(sys2,vars2,pr):
+      uu:=test_sep_gblex_zp(glex,vars2,pr):
+      if (uu>0) then
         if (sep[uu]<0) then sep[uu]:=-sep[uu]:
         else sep[uu]:=-sep[uu]-1 end
-    else
+      else
         stop_comp:=true:
+      end:
     end:
   end:
-  if (nops(glex)=nops(vars)) then
+  if (nops(glex)=nops(vars2)) then
      is_cyclic:=evalb(0=add(degree(glex[ii],vars2[nops(vars2)-ii+1])-1,ii=2..(nops(vars2))));
   else
      is_cyclic:=false:
@@ -291,14 +295,14 @@ param_zerodim:=proc(sys,vars)
      p,is_cyclic:=find_sep_elt(sys,vars):
      if (is_cyclic) then
         if (p=vars[nops(vars)]) then
-	   print("Shape Lemma");
+	   if (verbose) then print("Shape Lemma"); fi:
 	   return(param_zerodim_internal_mm(sys,vars,param_shape_lemma_radicalize_zp),p);
 	else
-	   print("Cyclic quotient algebra");
+	   if (verbose) then print("Cyclic quotient algebra"); end:
 	   return(param_zerodim_internal_mm([op(sys),p],[op(vars),_Z],param_shape_lemma_radicalize_zp),p):
 	fi:
      else
-     	print("General case",vars,p);
+     	if (verbose) then print("General case",vars,p); fi:
 	if (vars[nops(vars)]=p) then
 	  return(param_zerodim_internal_mm(sys,vars,param_general_zp),p):	  
 	else
@@ -325,9 +329,11 @@ end:
 # ******************************************************************************
 
 rur:=proc(sys::depends(list(polynom(integer))),
-          vars::list(name):=[op(indets(sys))],
-	  get_separating_form:=false)
+          {vars::list(name):=[op(indets(sys))],
+	  get_separating_form:=false,
+	  print_info:=false},$)
      local rr,m,de,i,sep:
+     verbose:=print_info:
      rr,sep:=param_zerodim(sys,vars):
      m:=lcm(op(map(u->denom(u),rr))):
      de:=expand(m*diff(rr[1],op(indets(rr[1])))):
@@ -347,8 +353,9 @@ rur:=proc(sys::depends(list(polynom(integer))),
 end:
 
 isolate:=proc(sys::depends(list(polynom(integer))),
-              vars::list(name):=[op(indets(sys))],{precision::nonnegint:=Digits},$)
+              vars::list(name):=[op(indets(sys))],{precision::nonnegint:=Digits,print_info:=false},$)
      local liso,prec,res,interv,i:
+     verbose:=print_info:
      liso:=isolate_zerodim(sys,vars,precision):
      res:=[]:
      for interv in liso do
