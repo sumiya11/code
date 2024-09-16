@@ -802,7 +802,6 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
     end
 end
 
-
 function _zdim_modular_RUR_LV(de, cco, arithm)
     rur_print("Gb - ")
     ex, co = _gb_4_rur(de, cco, arithm)
@@ -1008,6 +1007,80 @@ function rur_check(de, cco, pr, qq_m)
     rur1[1] == rur2
 end
 
+# Uses Groebner
+function ratrec_try!(zz, den, nemo_modulo, nemo_N, nemo_D, zp, p)
+    rem_nemo = mod(den * zz, nemo_modulo)
+    flag, pq = Groebner.ratrec_nemo(rem_nemo, nemo_modulo, nemo_N, nemo_D)
+    !flag && return false, one(pq)
+    PQ = pq // den
+    zp != mod(numerator(PQ) * invmod(denominator(PQ), p), p) && return false, one(pq)
+    true, PQ
+end
+
+# Uses Groebner and Nemo
+function crt_and_ratrec!(
+    table_qq::Vector{Vector{Rational{BigInt}}},
+    table_zz::Vector{Vector{BigInt}},
+    tables_zp::Vector{Vector{Vector{ModularCoeff}}},
+    moduli::Vector{ModularCoeff},
+    rur_mod_p::Vector{Vector{ModularCoeff}},
+    p::ModularCoeff,
+    idx_prev::Vector{Int},
+    den::BigInt
+)
+    modulo = prod(BigInt, moduli)
+
+    n1, n2 = BigInt(), BigInt()
+    mults = [BigInt(0) for _ in 1:length(moduli)]
+    rems = Vector{UInt64}(undef, length(moduli))
+    Groebner.crt_precompute!(modulo, n1, n2, mults, map(UInt64, moduli))
+
+    nemo_modulo = Nemo.ZZ(modulo)
+    nemo_N = Nemo.ZZ(isqrt(modulo >> 1))
+    nemo_D = div(modulo, nemo_N)
+    nemo_N_9to1 = Nemo.ZZ(ceil(BigInt, (div(modulo,2))^(9/10)))
+    nemo_D_9to1 = Nemo.ZZ(ceil(BigInt, (div(modulo,2))^(1/10)))
+
+    @inbounds for i in 1:length(table_zz)
+        for j in (idx_prev[i]):-1:1
+            # CRT
+            for k in 1:length(moduli)
+                rems[k] = UInt64(tables_zp[k][i][j])
+            end
+            Groebner.crt!(modulo, table_zz[i][j], n1, n2, rems, mults)
+
+            # Rat. Rec.
+            flag1, flag2, flag3 = false,false,false
+            PQ1, PQ2, PQ3 = table_qq[1][1], table_qq[1][1], table_qq[1][1]
+
+            # order matters!
+            flag1, PQ1 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_9to1, nemo_D_9to1, rur_mod_p[i][j], p)
+            if !flag1
+                flag2, PQ2 = ratrec_try!(table_zz[i][j], 1, nemo_modulo, nemo_N, nemo_D, rur_mod_p[i][j], p)
+                if !flag2
+                    flag3, PQ3 = ratrec_try!(table_zz[i][j], den, nemo_modulo, den*nemo_N, div(nemo_D, den), rur_mod_p[i][j], p)
+                end
+            end
+
+            !(flag1 || flag2 || flag3) && return false, den
+
+            if flag1
+                PQ = PQ1
+            elseif flag2
+                PQ = PQ2
+            else # flag3
+                PQ = PQ3
+            end
+
+            table_qq[i][j] = PQ
+            den = lcm(den, denominator(PQ))
+
+            idx_prev[i] = j - 1
+        end
+    end
+    true, den
+end
+
 TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     de,
     cco,
@@ -1072,24 +1145,26 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     zz_m = [[BigInt(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
     qq_m = [[Rational{BigInt}(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
 
-    witness = reduce(
-        vcat,
-        [[(j, rand(1:length(l_zp_param[1][j]))) for _ in 1:ceil(log2(length(l_zp_param[1][j])))] for j in 1:length(l_zp_param[1])],
-    )
-    crt_mask = [falses(length(_x)) for _x in zz_m]
-    ratrec_mask = [falses(length(_x)) for _x in zz_m]
-
-    bloc_p = 2
-    ALIGN_BLOC_TO = 1 * composite
+    align_to(x, n) = (x + (n - 1)) & (~(n - 1))
+    BLOC_ALIGNMENT = 1 * composite
 
     if parallelism != :serial
         TimerOutputs.disable_timer!(to)
         graph = map(_ -> deepcopy(graph), 1:nthreads())
-        ALIGN_BLOC_TO *= threads
+        BLOC_ALIGNMENT *= threads
     end
 
-    align_to(x, n) = (x + (n - 1)) & (~(n - 1))
-    bloc_p = align_to(bloc_p, ALIGN_BLOC_TO)
+    bloc_p = align_to(2, BLOC_ALIGNMENT)
+
+    prpr = ModularCoeff(PrevPrime(2^(pr_max_bitsize-1)))
+    co_mod_p = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), prpr), prpr) % ModularCoeff, _c), cco)
+    arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(prpr))
+    flag, _rur_mod_p, _, _, _, _, _, _ = _zdim_modular_RUR_LV(de, co_mod_p, arithm)
+    rur_mod_p = Vector{Vector{ModularCoeff}}(_rur_mod_p[1])
+    @assert flag
+
+    den = BigInt(1)
+    idx_prev = [length(l_zp_param[1][i]) for i in 1:length(l_zp_param[1])]
 
     continuer = true
     while (continuer)
@@ -1101,8 +1176,6 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         elseif parallelism == :multithreading
             success, l_zp_param =
                 _list_zdim_modular_RUR_LV_apply_parallel!(de, cco, l_pr, dd, ltg, q, i_xw, t_xw, t_learn, graph, composite, threads)
-        else
-            error("Unknown parallelism strategy ", parallelism)
         end
 
         for i in eachindex(success)
@@ -1112,20 +1185,16 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         end
 
         rur_print(length(t_pr), "-")
-        zz_p = BigInt(1)
-        TimerOutputs.@timeit to "crt partial" Groebner.crt_vec_partial!(zz_m, zz_p, t_param, t_pr, witness, crt_mask)
-        TimerOutputs.@timeit to "rat rec partial" continuer = !Groebner.ratrec_vec_partial!(qq_m, zz_m, zz_p, witness, ratrec_mask)
 
+        TimerOutputs.@timeit to "crt+rat.rec." flag, den = crt_and_ratrec!(qq_m, zz_m, t_param, t_pr, rur_mod_p, prpr, idx_prev, den)
+        continuer = !flag
         if !continuer
-            TimerOutputs.@timeit to "crt" Groebner.crt_vec_full!(zz_m, zz_p, t_param, t_pr, crt_mask)
-            TimerOutputs.@timeit to "rat rec" continuer = !Groebner.ratrec_vec_full!(qq_m, zz_m, zz_p, ratrec_mask)
-            if !continuer
-                continuer = !rur_check(de, cco, PrevPrime(pr - 1), qq_m)
-            end
+            rur_print("check-")
+            !rur_check(de, cco, PrevPrime(pr - 1), qq_m) && error("check failed")
         end
 
         bloc_p = max(floor(Int, length(t_pr) / 10), 2)
-        bloc_p = align_to(bloc_p, ALIGN_BLOC_TO)
+        bloc_p = align_to(bloc_p, BLOC_ALIGNMENT)
     end
     rur_print("\n")
     return qq_m, sep_lin
