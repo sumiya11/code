@@ -8,12 +8,12 @@ addprocs(3)
 @info procs()  # 1+3 in total
 
 # can also do "@everywhere using Pkg; Pkg.develop(path=(@__DIR__)*"/../Julia/RationalUnivariateRepresentation.jl/")"
-@everywhere include("/home/demin/code/Julia/RationalUnivariateRepresentation.jl/src/RationalUnivariateRepresentation.jl")
+@everywhere include("/opt/Git/NewRUR/Julia/RationalUnivariateRepresentation.jl/src/RationalUnivariateRepresentation.jl")
 
 ### Compute ###
 
 using AbstractAlgebra
-include("/home/demin/code/Data/Systems/katsura11.jl")
+include("/opt/Git/NewRUR/Data/Systems/katsura11.jl")
 
 # Run only on this process
 @time rur1 = RationalUnivariateRepresentation.zdim_parameterization(sys, parallelism=:multiprocessing, procs=[1])
