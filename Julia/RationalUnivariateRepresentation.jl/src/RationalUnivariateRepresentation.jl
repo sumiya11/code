@@ -679,7 +679,7 @@ function convert_biv_lex_2_biv_pol(n_g, m_b, lt_g)
             if deg2 > ldeg2
                 push!(p_mat, lco)
                 for j in (ldeg2+1):(deg2-1)
-                    push!(p_math, Vector{ModularCoeff}())
+                    push!(p_mat, Vector{ModularCoeff}())
                 end
                 lco = [ModularCoeff(0) for j in 1:length(m_b)]
                 ldeg2 = deg2
@@ -692,7 +692,7 @@ function convert_biv_lex_2_biv_pol(n_g, m_b, lt_g)
         else
             push!(p_mat, lco)
             for i in (ldeg2+1):(deg2-1)
-                push!(p_math, Vector{ModularCoeff}())
+                push!(p_mat, Vector{ModularCoeff}())
             end
             lco = [ModularCoeff(0) for i in 1:length(m_b)]
             lco[lt_g[kk][1]+1] = ModularCoeff(1)
