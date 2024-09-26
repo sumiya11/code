@@ -663,7 +663,6 @@ TimerOutputs.@timeit to "Biv Lex" function biv_lex(t_v, i_xw, gred, index, dg, h
         new_monomial_free_set = copy(tmp_mon_set)
         append!(new_monomial_basis, copy(tmp_mon_set))
     end
-    #    rur_print("{",length(new_monomial_basis),"}")
     return (new_monomial_basis, new_leading_monomials, new_generators)
 end
 
@@ -732,13 +731,13 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
     end
     flag = true
     l_res = []
+    # push all the first polynomials
     for pr in l_pr
         res = []
         C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
         f = C(v) + _Z^(length(v))
         ifp = Nemo.derivative(f)
         f = f / Nemo.gcd(f, ifp)
-        ifp = Nemo.derivative(f)
         push!(res, map(u -> coeff_mod_p(u), collect(Nemo.coefficients(f))))
         push!(l_res, res)
         if (dd < 0)
@@ -747,20 +746,17 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
             flag = (flag && (Int32(Nemo.degree(f)) == dd))
         end
     end
-    # end of the first loop over several primes
     if (flag)
-        @inbounds for j in (ii-1):-1:1
+        @inbounds for j in 1:(ii-1)
             m_b, lt_b, n_g = biv_lex(t_v, i_xw, gred, index, dg, hom, free_set, Int32(j), arithm)
             bl = [convert_biv_lex_2_biv_pol(n_g, m_b, lt_b)]
             nbp = 0
-            # as above we can process with a loop over several primes to get
             for pr in l_pr
                 nbp += 1
                 C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
                 s1 = C([Int32(0)])
                 s0 = C([Int32(0)])
                 pro = C([Int32(1)])
-                #                ft=C(f)
                 f = C(l_res[nbp][1])
                 ft = C(l_res[nbp][1])
                 ifp = Nemo.derivative(ft)
@@ -770,7 +766,6 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
                     co0 = C(bl[nbp][i][d1])
                     f2 = Nemo.gcd(ft, lc1)
                     f1 = ft / f2
-                    # in some non radical case
                     if (Nemo.degree(f1) > 0)
                         if (check > 0)
                             flag = check_separation_biv(bl[nbp][i], f1, C)
@@ -787,7 +782,6 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
                 is1 = Nemo.invmod(s1, f)
                 s0 = Nemo.mulmod(s0, is1, f)
                 s0 = -Nemo.mulmod(s0, ifp, f)
-                #                push!(res,map(u->coeff_mod_p(u),collect(Nemo.coefficients(s0))))
                 push!(l_res[nbp], map(u -> coeff_mod_p(u), collect(Nemo.coefficients(s0))))
             end
         end
@@ -1206,9 +1200,14 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         bloc_p = align_to(bloc_p, BLOC_ALIGNMENT)
     end
     rur_print("\n")
+    if (length(qq_m)==length(sep_lin))
+      sv=findlast(item -> isone(item), sep_lin)
+      #x*derivative(qq_m[1])
+      p=[(i-1)*qq_m[1][i] for i in 1:length(qq_m[1])]
+      insert!(qq_m,sv+1,p)
+    end
     return qq_m, sep_lin
 end
-
 # ************************************************************************
 # User Interfaces
 # ************************************************************************
