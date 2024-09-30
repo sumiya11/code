@@ -1017,6 +1017,7 @@ function crt_and_ratrec!(
     idx_prev::Vector{Int},
     den::BigInt
 )
+
     modulo = prod(BigInt, moduli)
 
     n1, n2 = BigInt(), BigInt()
@@ -1029,6 +1030,8 @@ function crt_and_ratrec!(
     nemo_D = div(modulo, nemo_N)
     nemo_N_9to1 = Nemo.ZZ(ceil(BigInt, (div(modulo,2))^(9/10)))
     nemo_D_9to1 = Nemo.ZZ(ceil(BigInt, (div(modulo,2))^(1/10)))
+    nemo_N_99to1 = Nemo.ZZ(ceil(BigInt, (div(modulo,2))^(99/100)))
+    nemo_D_99to1 = Nemo.ZZ(ceil(BigInt, (div(modulo,2))^(1/100)))
     nemo_D_const = Nemo.ZZ(2)^(ceil(BigInt,(1/1000)*log2(modulo))) * Nemo.ZZ(101)
     nemo_N_const = div(modulo, 2*nemo_D_const)
 
@@ -1042,30 +1045,36 @@ function crt_and_ratrec!(
             Groebner.crt!(modulo, table_zz[i][j], n1, n2, rems, mults)
 
             # Rat. Rec.
-            flag1, flag2, flag3 = false,false,false
-            PQ1, PQ2, PQ3 = table_qq[1][1], table_qq[1][1], table_qq[1][1]
+            flag1, flag2, flag3, flag4 = false,false,false,false
+	    PQ1, PQ2, PQ3, PQ4 = table_qq[1][1],table_qq[1][1],table_qq[1][1],table_qq[1][1]
 
             # order matters!
 	    # 1. Try unbalanced reconstruct with known denominator
 	    # 2. Try very unbalanced reconstruct with known denominator (kind of CRT)
-	    # 3. Fall back to balanced reconstruct
-            flag1, PQ1 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_9to1, nemo_D_9to1, rur_mod_p[i][j], p)
+	    # 3. Try standard balanced reconstruct
+            # 4. Try unbalanced reconstruct but take the denominator from the previous coefficient
+	    flag1, PQ1 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_9to1, nemo_D_9to1, rur_mod_p[i][j], p)
             if !flag1
 		flag2, PQ2 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_const, nemo_D_const, rur_mod_p[i][j], p)
                 if !flag2
 		    flag3, PQ3 = ratrec_try!(table_zz[i][j], 1, nemo_modulo, nemo_N, nemo_D, rur_mod_p[i][j], p)
-                end
+		    if !flag3 && j < length(table_qq[i])
+			flag4, PQ4 = ratrec_try!(table_zz[i][j], denominator(table_qq[i][j+1]), nemo_modulo, nemo_N_99to1, nemo_D_99to1, rur_mod_p[i][j], p)
+		    end
+		end
             end
 
-	    !(flag1 || flag2 || flag3) && (success = false; break)
+	    !(flag1 || flag2 || flag3 || flag4) && (success = false; break)
 
 	    if flag1
                 PQ = PQ1
             elseif flag2
                 PQ = PQ2
-            else # flag3
+            elseif flag3
                 PQ = PQ3
-            end
+	    else
+		PQ = PQ4
+	    end
 
             table_qq[i][j] = PQ
             den = lcm(den, denominator(PQ))
@@ -1189,7 +1198,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
             !rur_check(de, cco, PrevPrime(pr - 1), qq_m) && error("check failed")
         end
 
-	# @info "$idx_prev, log(den)=$(round(log2(den)))"
+	# @info "$idx_prev, log2(den)=$(ceil(Int,round(log2(den))))"
 
         bloc_p = max(floor(Int, length(t_pr) / 10), 2)
         bloc_p = align_to(bloc_p, BLOC_ALIGNMENT)
