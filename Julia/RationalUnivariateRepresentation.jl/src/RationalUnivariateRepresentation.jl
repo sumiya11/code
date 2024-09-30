@@ -614,7 +614,7 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
     return (v, gred, index, dg, hom, free_set)
 end
 
-TimerOutputs.@timeit to "Biv Lex" function biv_lex(t_v, i_xw, gred, index, dg, hom, free_set, ii, arithm)
+TimerOutputs.@timeit to "Biv Lex" function biv_lex!(t_v, i_xw, gred, index, dg, hom, free_set, ii, arithm)
     pack = pack_value(arithm)
     d = Int32(length(i_xw[length(i_xw)]))
     new_free_set = copy(free_set)
@@ -666,8 +666,16 @@ TimerOutputs.@timeit to "Biv Lex" function biv_lex(t_v, i_xw, gred, index, dg, h
     return (new_monomial_basis, new_leading_monomials, new_generators)
 end
 
+# this function takes
+#  m_b   : a monomial basis with only bivariate elements
+#  lt_g  the leading terms with only bivaraite elements
+#  n_g : the tails of the polynomials as vectors in m_b
+# and returns a list of matrices
+# each matrix being the representation of
+# lt_g[i]-sum n_g[i][j]*m_b[j]
+
 function convert_biv_lex_2_biv_pol(n_g, m_b, lt_g)
-    l_base = Vector{Vector{Vector{Int32}}}()
+    l_base = Vector{Vector{Vector{ModularCoeff}}}()
     for kk in eachindex(n_g)
         pp = n_g[kk]
         p_mat = Vector{Vector{ModularCoeff}}()
@@ -720,57 +728,45 @@ end
 function zdim_parameterization(t_v, i_xw, dd, check, arithm)
     res = Vector{Vector{ModularCoeff}}()
     ii = Int32(length(i_xw))
-    v, gred, index, dg, hom, free_set = first_variable(t_v, i_xw, ii, arithm)
-    # here we can process with a loop over several primes to get f and ifp
-    # as vectors of Composite numbers : just convert the vector v to a list of vectors
-
-    if ModularCoeff isa CNCoeff
-        l_pr = ModularPrime(arithm).data
-    else
-        l_pr = [ModularPrime(arithm)]
-    end
+    v, gred_ori, index_ori, dg_ori, hom_ori, free_set_ori = first_variable(t_v, i_xw, ii, arithm)
+    pr = ModularPrime(arithm)
+    
     flag = true
-    l_res = []
-    # push all the first polynomials
-    for pr in l_pr
-        res = []
-        C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
-        f = C(v) + _Z^(length(v))
-        ifp = Nemo.derivative(f)
-        f = f / Nemo.gcd(f, ifp)
-        push!(res, map(u -> coeff_mod_p(u), collect(Nemo.coefficients(f))))
-        push!(l_res, res)
-        if (dd < 0)
-            flag = true
-        else
-            flag = (flag && (Int32(Nemo.degree(f)) == dd))
-        end
-    end
+    res = []
+    C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
+    f = C(v) + _Z^(length(v))
+    ifp = Nemo.derivative(f)
+    f = f / Nemo.gcd(f, ifp)
+    push!(res, map(u -> coeff_mod_p(u), collect(Nemo.coefficients(f))))
+    flag = ((dd<0) ? true :  (flag && (Int32(Nemo.degree(f)) == dd)))
+
     if (flag)
         @inbounds for j in 1:(ii-1)
-            m_b, lt_b, n_g = biv_lex(t_v, i_xw, gred, index, dg, hom, free_set, Int32(j), arithm)
-            bl = [convert_biv_lex_2_biv_pol(n_g, m_b, lt_b)]
-            nbp = 0
-            for pr in l_pr
-                nbp += 1
-                C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
-                s1 = C([Int32(0)])
-                s0 = C([Int32(0)])
-                pro = C([Int32(1)])
-                f = C(l_res[nbp][1])
-                ft = C(l_res[nbp][1])
-                ifp = Nemo.derivative(ft)
-                @inbounds for i in 1:length(bl[nbp])
-                    d1 = length(bl[nbp][i]) - 1
-                    lc1 = C(bl[nbp][i][d1+1])
-                    co0 = C(bl[nbp][i][d1])
+            gred=copy(gred_ori);
+            index=copy(index_ori);
+            dg=dg_ori;
+            hom=copy(hom_ori);
+            free_set=copy(free_set_ori)
+            m_b, lt_b, n_g = biv_lex!(t_v, i_xw, gred, index, dg, hom, free_set, Int32(j), arithm)
+            bl = convert_biv_lex_2_biv_pol(n_g, m_b, lt_b)
+            C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
+            s1 = C([Int32(0)])
+            s0 = C([Int32(0)])
+            pro = C([Int32(1)])
+            f = C(res[1])
+            ft = C(res[1])
+            ifp = Nemo.derivative(ft)
+            @inbounds for i in 1:length(bl)
+                    d1 = length(bl[i]) - 1
+                    lc1 = C(bl[i][d1+1])
+                    co0 = C(bl[i][d1])
                     f2 = Nemo.gcd(ft, lc1)
                     f1 = ft / f2
                     if (Nemo.degree(f1) > 0)
                         if (check > 0)
-                            flag = check_separation_biv(bl[nbp][i], f1, C)
+                            flag = check_separation_biv(bl[i], f1, C)
                             if (!flag)
-                                return (false, [], j)
+                                return (false, nothing , j)
                             end
                         end
                         s1 += Nemo.mulmod(d1 * lc1, pro, f)
@@ -778,37 +774,36 @@ function zdim_parameterization(t_v, i_xw, dd, check, arithm)
                         pro = pro * f1
                     end
                     ft = C(f2)
-                end
-                is1 = Nemo.invmod(s1, f)
-                s0 = Nemo.mulmod(s0, is1, f)
-                s0 = -Nemo.mulmod(s0, ifp, f)
-                push!(l_res[nbp], map(u -> coeff_mod_p(u), collect(Nemo.coefficients(s0))))
-            end
+             end
+             is1 = Nemo.invmod(s1, f)
+             s0 = Nemo.mulmod(s0, is1, f)
+             s0 = -Nemo.mulmod(s0, ifp, f)
+             push!(res, map(u -> coeff_mod_p(u), collect(Nemo.coefficients(s0))))
         end
     else
         rur_print("Bad prime number for parameterization (", dd, ",", length(v), ")")
         #error("Bad prime number for parameterization ")
     end
     if (check > 0)
-        return (flag, l_res, ii)
+        return (flag, [res], ii)
     else
-        return (flag, l_res)
+        return (flag, [res])
     end
 end
 
 function _zdim_modular_RUR_LV(de, cco, arithm)
-    rur_print("Gb - ")
+    rur_print("G-")
     ex, co = _gb_4_rur(de, cco, arithm)
     ltg = map(u -> u[1], ex)
-    rur_print("Quo - ")
+    rur_print("Q-")
     q = compute_quotient_basis(ltg)
-    rur_print("Prep table - ")
+    rur_print("Pt-")
     i_xw, t_xw = prepare_table_mxi(ltg, q)
-    rur_print("Fill Gb - ")
+    rur_print("FG-")
     t_v = compute_fill_quo_gb!(t_xw, ex, co, q, arithm)
-    rur_print("Learn comp Table - ")
+    rur_print("LT-")
     t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, arithm)
-    rur_print("Learn Parameterization \n")
+    rur_print("LP\n")
     flag, zp_param, uu = zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
     return (flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu)
 end
@@ -1190,7 +1185,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         TimerOutputs.@timeit to "crt+rat.rec." flag, den = crt_and_ratrec!(qq_m, zz_m, t_param, t_pr, rur_mod_p, prpr, idx_prev, den)
         continuer = !flag
         if !continuer
-            rur_print("check-")
+            rur_print("\ncheck-")
             !rur_check(de, cco, PrevPrime(pr - 1), qq_m) && error("check failed")
         end
 
@@ -1199,7 +1194,6 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         bloc_p = max(floor(Int, length(t_pr) / 10), 2)
         bloc_p = align_to(bloc_p, BLOC_ALIGNMENT)
     end
-    rur_print("\n")
     if (length(qq_m)==length(sep_lin))
       sv=findlast(item -> isone(item), sep_lin)
       #x*derivative(qq_m[1])

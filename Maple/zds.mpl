@@ -312,10 +312,10 @@ param_zerodim:=proc(sys,vars)
 end:
 
 isolate_zerodim:=proc(sys,vars,prec)
-     local rr,m,constr,i,de,iso:
-     rr:=param_zerodim(sys,vars):
+     local rr,m,constr,i,de,iso,sep:
+     rr,sep:=param_zerodim(sys,vars):
      m:=lcm(op(map(u->denom(u),rr))):
-     constr:=numer([m*diff(rr[1],op(indets(rr[1]))),seq(m*rr[i],i=2..nops(vars))]):
+     constr:=numer([m*diff(rr[1],op(indets(rr[1]))),seq(m*rr[i],i=2..nops(rr))]):
      de:=expand(m*diff(rr[1],op(indets(rr[1])))):
      if (has(vars,op(indets(rr[1])))) then
      	return(fgbrs:-rs_isolate_rur(numer(rr[1]),de,[seq(expand(m*rr[i]),i=2..nops(rr)),expand(op(indets(rr[1]))*de)],op(indets(rr[1])),precision=prec));
