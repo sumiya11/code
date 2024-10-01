@@ -1046,22 +1046,22 @@ function crt_and_ratrec!(
 
             # Rat. Rec.
             flag1, flag2, flag3, flag4 = false,false,false,false
-	    PQ1, PQ2, PQ3, PQ4 = table_qq[1][1],table_qq[1][1],table_qq[1][1],table_qq[1][1]
+	        PQ1, PQ2, PQ3, PQ4 = table_qq[1][1],table_qq[1][1],table_qq[1][1],table_qq[1][1]
 
             # order matters!
-	    # 1. Try unbalanced reconstruct with known denominator
-	    # 2. Try very unbalanced reconstruct with known denominator (kind of CRT)
-	    # 3. Try standard balanced reconstruct
+	        # 1. Try unbalanced reconstruct with known denominator
+	        # 2. Try very unbalanced reconstruct with known denominator (kind of CRT)
+	        # 3. Try standard balanced reconstruct
             # 4. Try unbalanced reconstruct but take the denominator from the previous coefficient
-	    flag1, PQ1 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_9to1, nemo_D_9to1, rur_mod_p[i][j], p)
+	        flag1, PQ1 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_9to1, nemo_D_9to1, rur_mod_p[i][j], p)
             if !flag1
-		flag2, PQ2 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_const, nemo_D_const, rur_mod_p[i][j], p)
+		        flag2, PQ2 = ratrec_try!(table_zz[i][j], den, nemo_modulo, nemo_N_const, nemo_D_const, rur_mod_p[i][j], p)
                 if !flag2
-		    flag3, PQ3 = ratrec_try!(table_zz[i][j], 1, nemo_modulo, nemo_N, nemo_D, rur_mod_p[i][j], p)
-		    if !flag3 && j < length(table_qq[i])
-			flag4, PQ4 = ratrec_try!(table_zz[i][j], denominator(table_qq[i][j+1]), nemo_modulo, nemo_N_99to1, nemo_D_99to1, rur_mod_p[i][j], p)
-		    end
-		end
+		            flag3, PQ3 = ratrec_try!(table_zz[i][j], 1, nemo_modulo, nemo_N, nemo_D, rur_mod_p[i][j], p)
+		            if !flag3 && j < length(table_qq[i])
+			            flag4, PQ4 = ratrec_try!(table_zz[i][j], denominator(table_qq[i][j+1]), nemo_modulo, nemo_N_99to1, nemo_D_99to1, rur_mod_p[i][j], p)
+		            end
+		        end
             end
 
 	    !(flag1 || flag2 || flag3 || flag4) && (success = false; break)
@@ -1073,7 +1073,7 @@ function crt_and_ratrec!(
             elseif flag3
                 PQ = PQ3
 	    else
-		PQ = PQ4
+		    PQ = PQ4
 	    end
 
             table_qq[i][j] = PQ
@@ -1100,8 +1100,9 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     arithm = ModularArithZp(AccModularCoeff, ModularCoeff, pr)
     co = map(v -> modular_coeffs_vect(v, pr), cco)
     flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR(de, co, arithm, true)
+    rur_print("Dimension of the quotient :",length(q),"\n")
     dd = length(l_zp_param[1][1]) - 1
-
+    rur_print("Degree of the radical :",dd,"\n")
     cyclic = (dd == length(q))
 
     if (length(ltg[1]) == nbv_ori)
@@ -1209,6 +1210,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
       p=[(i-1)*qq_m[1][i] for i in 1:length(qq_m[1])]
       insert!(qq_m,sv+1,p)
     end
+    rur_print("Nb Primes used :",length(t_pr),"\n")
     return qq_m, sep_lin
 end
 # ************************************************************************
