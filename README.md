@@ -58,7 +58,7 @@ Note that the output is a little bit more sophisticated than in Julia and is of 
 read("Maple/zds.mpl");
 include("Data/Systems/caprasse.mpl")
 
-ext,coo:=zds:-rur(sys,vars)
+ext,coo:=zds:-rur(sys)
 ```
 
 You can also use the "isolate" function that will isolate the real roots of the system directly.
