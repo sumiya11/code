@@ -1231,7 +1231,7 @@ function zdim_parameterization(
     get_separating_element::Bool = false,
     composite = 4,
 )
-    @assert 1 <= nn <= 32
+    @assert 1 <= nn <= 30
     @assert parallelism in (:serial, :multithreading) && 1 <= threads <= nthreads()
     parallelism == :serial && threads > 1 && rur_print("WARN: threads=$threads was ignored\n")
     @assert 1 <= composite && ispow2(composite)
