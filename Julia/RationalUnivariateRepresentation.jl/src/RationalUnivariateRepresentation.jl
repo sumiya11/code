@@ -546,7 +546,7 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
         v = zeros(Coeff, d)
         v[t_v[i_xw[ii][1]][1]] = one(Coeff)
     end
-    push!(free_set, v)
+    #push!(free_set, v)
     # index[deg]=pos (pos=position in the gred with the convention that 0 is not stored)
     index = [Int32(i) for i in 1:d]
     # normalization values
@@ -561,6 +561,14 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
     while ((i < d) && (v[i] == 0))
         i += 1
     end
+
+    #the case of trivial coordinates
+    if (i==d)
+       return([v[1]],gred, index, dg, hom, free_set)
+    end
+    
+    push!(free_set, v);
+    
     gred[i-1] = Vector{Coeff}(v)
     if (gred[i-1][1] != 0)
         gred[i-1][1] = (ModularPrime(arithm) % Coeff) - gred[i-1][1]
