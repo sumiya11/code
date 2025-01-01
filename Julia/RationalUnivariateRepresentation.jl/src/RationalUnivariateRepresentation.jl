@@ -27,7 +27,7 @@ import Groebner
 import Nemo
 import Primes
 import TimerOutputs
-import AbstractAlgebra
+using  AbstractAlgebra
 import Base.Threads: nthreads, @threads, threadid
 
 const to = TimerOutputs.TimerOutput()
@@ -127,7 +127,7 @@ end
 # Extension for Power products
 # ************************************************************************
 
-total_degree(pp::PP) = sum(pp)
+AbstractAlgebra.total_degree(pp::PP) = sum(pp)
 
 function pp_isless_drl(ea::PP, eb::PP)
     @assert length(ea) == length(eb)
@@ -1221,6 +1221,75 @@ end
 # ************************************************************************
 # Abstract Algebra Interface
 # ************************************************************************
+
+# Copied from https://github.com/SciML/StructuralIdentifiability.jl/blob/85c2f525d4e1eaaebae761319e455c538cf0c843/src/util.jl#L235
+# Thanks to Gleb Pogudin, Ilia Ilmer, Alexander Demin
+function parent_ring_change(
+           poly::MPolyRingElem,
+           new_ring::MPolyRing;
+           matching = :byname,
+           shift = 0,
+       )
+           old_ring = parent(poly)
+           # Construct a mapping for the variable indices.
+           # Zero indicates no image of the old variable in the new ring
+           var_mapping = zeros(Int, max(nvars(old_ring), nvars(new_ring)))
+           if matching === :byname
+               old_symbols, new_symbols = symbols(old_ring), symbols(new_ring)
+               for i in 1:length(old_symbols)
+                   u = old_symbols[i]
+                   found = findfirst(v -> (u === v), new_symbols)
+                   isnothing(found) && continue
+                   var_mapping[i] = found
+               end
+           elseif matching === :byindex
+               var_mapping[1:(nvars(new_ring) - shift)] .= (1 + shift):nvars(new_ring)
+           else
+               throw(Base.ArgumentError("Unknown matching type: $matching"))
+           end
+           # Hoist the compatibility check out of the loop
+           for i in 1:nvars(old_ring)
+               if degree(poly, i) > 0 && iszero(var_mapping[i])
+                   throw(
+                       Base.ArgumentError(
+                           """
+                           The polynomial $poly contains a variable $(gens(old_ring)[i]) not present in the new ring.
+                           New ring variables are $(gens(new_ring)))""",
+                       ),
+                   )
+               end
+           end
+           bring = base_ring(new_ring)
+           exps = Vector{Vector{Int}}(undef, length(poly))
+           coefs = map(c -> bring(c), coefficients(poly))
+           @inbounds for i in 1:length(poly)
+               evec = exponent_vector(poly, i)
+               new_exp = zeros(Int, nvars(new_ring))
+               for i in 1:length(evec)
+                   iszero(var_mapping[i]) && continue
+                   new_exp[var_mapping[i]] = evec[i]
+               end
+               exps[i] = new_exp
+           end
+           return new_ring(coefs, exps)
+end
+
+function preprocess(sys_orig)
+    subs = Dict()
+    ring = parent(sys_orig[1])
+    gb = Groebner.groebner(sys_orig, ordering=Groebner.DegRevLex())
+
+    # remove x_i - Const = 0 from GB
+    trivial_eqs = filter(f -> length(f) == 2 && leading_monomial(f) in gens(ring) && total_degree(monomial(f, 2)) == 0, gb)
+    trivial_vars = map(leading_monomial, trivial_eqs)
+    trivial_subs = .- map(trailing_coefficient, trivial_eqs)
+    sys_orig = map(f -> evaluate(f, trivial_vars, trivial_subs), sys_orig)
+    ring, vars = polynomial_ring(base_ring(ring), string.(filter(x -> !(x in trivial_vars), gens(ring))), internal_ordering=:degrevlex)
+    sys_orig = filter(!iszero, map(f -> parent_ring_change(f, ring), sys_orig))
+    merge!(subs, Dict(trivial_vars .=> trivial_subs))
+
+    sys_orig, subs
+end
 
 function zdim_parameterization(
     sys_ori;
