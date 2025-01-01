@@ -811,8 +811,13 @@ function _zdim_modular_RUR_LV(de, cco, arithm)
     t_v = compute_fill_quo_gb!(t_xw, ex, co, q, arithm)
     rur_print("LT-")
     t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, arithm)
-    rur_print("LP\n")
+    rur_print("LP")
     flag, zp_param, uu = zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
+    if (!flag)
+       rur_print("(U)");
+    else
+       rur_print("(C)");
+    end
     return (flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu)
 end
 
@@ -1115,12 +1120,12 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
 
     if (length(ltg[1]) == nbv_ori)
         if (iszero(sep_lin[nbv_ori]))
-            i = findfirst(item -> !iszero(item), de)
+            i = findfirst(item -> !iszero(item), sep_lin)
             if (isnothing(i))
                 error("Misseformed separating element")
             else
                 de = swap_vars(de, i, nbv_ori)
-                rur_print("Use variable", i, " as separating element\n")
+                rur_print("Use variable ", i, " as separating element\n")
             end
         else
             rur_print("Use last variable as separating element\n")
@@ -1148,7 +1153,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
             rur_print("\nSwitch off cyclic optimization \n")
         end
     end
-
+    
     rur_print("Multi-modular computation ($threads threads): ")
     t_pr = Vector{ModularCoeff}()
     t_param = Vector{Vector{Vector{ModularCoeff}}}()
@@ -1174,9 +1179,11 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     co_mod_p = map(_c -> map(__c -> mod(numerator(__c) * invmod(denominator(__c), prpr), prpr) % ModularCoeff, _c), cco)
     arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(prpr))
     flag, _rur_mod_p, _, _, _, _, _, _ = _zdim_modular_RUR_LV(de, co_mod_p, arithm)
-    rur_mod_p = Vector{Vector{ModularCoeff}}(_rur_mod_p[1])
+
     @assert flag
 
+    rur_mod_p = Vector{Vector{ModularCoeff}}(_rur_mod_p[1])
+ 
     den = BigInt(1)
     idx_prev = [length(l_zp_param[1][i]) for i in 1:length(l_zp_param[1])]
 
