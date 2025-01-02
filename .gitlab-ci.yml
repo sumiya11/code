@@ -10,7 +10,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - ci.inria.fr
     - large
   script:
-    - julia -e 'using Pkg; println(pwd()); println(readdir()); Pkg.develop(path="."); Pkg.build("RationalUnivariateRepresentation");'
+    - julia -e 'using Pkg; println(pwd()); println(readdir()); Pkg.develop(path="code/RationalUnivariateRepresentation.jl"); Pkg.build("RationalUnivariateRepresentation");'
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -18,7 +18,7 @@ unit-test-job:   # This job runs in the test stage.
     - ci.inria.fr
     - large
   script:
-    - julia -e 'using Pkg; Pkg.develop(path="."); Pkg.build("RationalUnivariateRepresentation"); Pkg.test("RationalUnivariateRepresentation"; coverage = true)'  # adapted from https://gitlab.com/gitlab-examples/julia/-/blob/master/.gitlab-ci.yml
+    - julia -e 'using Pkg; Pkg.develop(path="code/RationalUnivariateRepresentation.jl"); Pkg.build("RationalUnivariateRepresentation"); Pkg.test("RationalUnivariateRepresentation"; coverage = true)'  # adapted from https://gitlab.com/gitlab-examples/julia/-/blob/master/.gitlab-ci.yml
     # Comment out below if you do not want coverage results.
     - julia -e 'using Pkg; Pkg.add("Coverage"); 
       import RationalUnivariateRepresentation; cd(joinpath(dirname(pathof(RationalUnivariateRepresentation)), ".."));
