@@ -1306,6 +1306,57 @@ function preprocess(sys_orig)
     sys_orig, subs
 end
 
+function guess_infos(
+    sys_ori;
+    nn::Int32 = Int32(28),
+    verbose::Bool = true,
+    composite = 4,
+)
+    @assert 1 <= nn <= 30
+    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
+    _verbose[] = verbose
+    sys = sys_ori .* (map(v -> lcm(map(w -> denominator(w), collect(AbstractAlgebra.coefficients(v)))), sys_ori))
+    de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
+    de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
+    cco = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
+
+    nbv_ori = length(de[1][1])
+    pr = ModularCoeff(PrevPrime(2^nn - 1))
+    rur_print("primes of bitsize ",nn, "\n")
+    arithm = ModularArithZp(AccModularCoeff, ModularCoeff, pr)
+    co = map(v -> modular_coeffs_vect(v, pr), cco)
+    flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR(de, co, arithm, true)
+    rur_print("Dimension of the quotient :",length(q),"\n")
+    dd = length(l_zp_param[1][1]) - 1
+    rur_print("Degree of the radical :",dd,"\n")
+    return(flag,length(q),dd,sep_lin)
+end
+
+
+function guess_lowest_input_precision(
+    sys_ori;
+    nn::Int32 = Int32(28),
+    verbose::Bool = true,
+    composite = 4,
+)
+    @assert 1 <= nn <= 30
+    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
+    _verbose[] = verbose
+    f,d,dr=guess_infos(sys_ori,verbose=true)
+    nb_digits=1
+    d1=-1
+    dr1=-1
+    sys2=sys_ori
+    R=AbstractAlgebra.parent(sys_ori[1])
+    while ((d1!=d) || (dr1!=dr))
+        nb_digits+=1
+        rur_print("DIgits : ",nb_digits,"\n")
+        sys2=map(u->R(map(u->Rational{BigInt}(round(u*10^nb_digits)//10^nb_digits),collect(coefficients(u))),collect(exponent_vectors(u))),sys_ori);
+        f,d1,dr1=guess_infos(sys2,verbose=true)
+   end
+   return(sys2,nb_digits)
+end
+
 function zdim_parameterization(
     sys_ori;
     nn::Int32 = Int32(28),
@@ -1337,6 +1388,6 @@ end
 using PrecompileTools
 include("precompile.jl")
 
-export zdim_parameterization
+export zdim_parameterization,guess_infos,guess_lowest_input_precision
 
 end # module
