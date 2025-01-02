@@ -558,12 +558,12 @@ TimerOutputs.@timeit to "First Variable" function first_variable(
     dg = Int32(1)
     new_i = Int32(1)
     deg = Int32(0)
-    while ((i < d) && (v[i] == 0))
+    while ((i <= d) && (v[i] == 0))
         i += 1
     end
 
     #the case of trivial coordinates
-    if (i==d)
+    if (i>d)
        return([v[1]],gred, index, dg, hom, free_set)
     end
     
@@ -814,9 +814,9 @@ function _zdim_modular_RUR_LV(de, cco, arithm)
     rur_print("LP")
     flag, zp_param, uu = zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
     if (!flag)
-       rur_print("(U)");
+       rur_print("(U)\n");
     else
-       rur_print("(C)");
+       rur_print("(C)\n");
     end
     return (flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu)
 end
@@ -1338,12 +1338,13 @@ function guess_lowest_input_precision(
     nn::Int32 = Int32(28),
     verbose::Bool = true,
     composite = 4,
+    lowest_prec=2,
 )
     @assert 1 <= nn <= 30
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
     _verbose[] = verbose
     f,d,dr=guess_infos(sys_ori,verbose=true)
-    nb_digits=1
+    nb_digits=lowest_prec-1
     d1=-1
     dr1=-1
     sys2=sys_ori
