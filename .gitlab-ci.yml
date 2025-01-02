@@ -1,4 +1,4 @@
-image: julia:1.10
+image: registry.gitlab.inria.fr/navarop/julia:latest
 
 stages:          # List of stages for jobs, and their order of execution
   - build
