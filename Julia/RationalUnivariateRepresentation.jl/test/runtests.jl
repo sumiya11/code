@@ -6,6 +6,10 @@ import AbstractAlgebra
 # @test rur([x^2 - 5]) == [[-5, 0, 1], [0, 0, 2]]
 # @test rur([x - 5]) == [[-5, 1]]
 
+# Last variable is not separating, but other variables are
+R, (x0,x2,x1) = polynomial_ring(AbstractAlgebra.QQ, ["x0","x2","x1"])
+example = [x0^2 + 2*x1^2 + 2*x2^2 - x0, 2*x0*x1 + 2*x1*x2 - x1, x0 + 2*x1 + 2*x2 - 1]
+
 # Check that RUR is a solution to the original system
 # modulo the minimal polynomial of T.
 p = 2^60 + 33
@@ -17,8 +21,9 @@ for sys in [
 	    Groebner.Examples.rootn(4) .^ 3,  # non-radical
 	    Groebner.Examples.katsuran(8),
 	    Groebner.Examples.noonn(5),
-	    Groebner.Examples.chandran(9)     # large coefficients (20k bits)
-	   ]
+	    Groebner.Examples.chandran(9),    # large coefficients (20k bits)
+	    example,                          # last variable not separating
+	    ]
     rr, sep = zdim_parameterization(sys, get_separating_element=true)
     nv = length(gens(parent(sys[1])))
     @assert length(rr) == nv + 1 && length(sep) == nv
