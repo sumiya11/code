@@ -65,7 +65,7 @@ You can also use the "isolate" function that will isolate the real roots of the 
 ```
 iso:=zds:-isolate(sys,vars):
 ```
-If you wan to get the same behavior as with `RootFinding[Isolate]` then you might apply the following transform 
+If you want to get the same behavior as with `RootFinding[Isolate]` then you might apply the following transform 
 ```
 iso:=map(v->map(u->lhs(u)=evalf((rhs(u)[1]+rhs(u)[2])/2,Digits),[op(v)]),iso);
 ```
