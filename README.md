@@ -62,6 +62,13 @@ ext,coo:=zds:-rur(sys)
 ```
 
 You can also use the "isolate" function that will isolate the real roots of the system directly.
+```
+iso:=zds:-isolate(sys,vars):
+```
+If you wan to get the same behavior as with `RootFinding[Isolate]` then you might apply the following transform 
+```
+iso:=map(v->map(u->lhs(u)=evalf((rhs(u)[1]+rhs(u)[2])/2,Digits),[op(v)]),iso);
+```
 
 **IMPORTANT for fans of Benchmarks** : for those who like performing benchmarks to try to illustrate theoretical informations, it must be precised that for historical reasons, mainly linked to the fact that the algorithm is able to work with approximate coefficients :  
 - the default `RootFinding[Isolate]` package from Maple, when run with the 20-year old algorithm 'RS', is using a small limit (8096 bits) for the hybrid  computations. On large examples, you will get better results by avoiding the switch to the slow algorithm, by modifying this limit to a greater value, either by setting the environment variable USPMAXPREC before launching Maple (the saftest way) or using the function `fgbrs:-rs_set_hybrid_limit(<any integer < 2^31>);`.
