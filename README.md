@@ -2,7 +2,7 @@
 
 We propose two prototypes that implement the computation of Rational Univariate Representations for solving zero-dimensional systems of polynomial equations with rational coefficients.
 
-Given a multivariate system S of polynomial equations depending on $n$ variables $(x_1,..,x_n)$, a Rational Univariate Representation is a linear form $t=a_1x_1+..+a_nx_n$ and a set of $n+1$ univariate polynomials $\{f(T),f_1(T), ... ,f_n(T)\}$, such that $\{(x_1,..,x_n)\; s.t.\; f(u)=0,xi=\frac{f_i(u)}{f_0(u)}\}$, where $f_0$ is the derivative of the squarefreepart of $f$, is in bijection with the roots of $S$, its inverse , from the roots of $S$ to those of $f$, being defined by the linear form $t$.
+Given a multivariate system S of polynomial equations depending on $n$ variables $(x_1,..,x_n)$, a Rational Univariate Representation is a linear form $t=a_1x_1+..+a_nx_n$ and a set of $n+1$ univariate polynomials $\{f(T),f_1(T), ... ,f_n(T)\}$, such that $\{(x_1,..,x_n)\; s.t.\; f(u)=0,x_i=\frac{f_i(u)}{f_0(u)}\}$, where $f_0$ is the derivative of the squarefreepart of $f$, is in bijection with the roots of $S$, its inverse , from the roots of $S$ to those of $f$, being defined by the linear form $t$.
 
 The present source codes are basically proposed to reproduce the results of an [article](https://arxiv.org/abs/2402.07141).
 
