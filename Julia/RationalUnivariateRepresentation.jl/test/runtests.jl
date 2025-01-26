@@ -44,3 +44,17 @@ rr, sep = zdim_parameterization(sys, get_separating_element=true)
 @test sep == [0, 0, 1]
 @test rr == [[1//2, 0, 0, 1], [0, 0, -3], [0, 3], [0, 0, 0, 3]]
 
+# The quotient contains two elements
+begin
+	R, (_z__tpk2__d, _z__tpk1__d, _z__tpk3__d, _z__t29_w_t__d, _z__t29_wˍt_t__d, _z__t29_wˍtt_t__d, _z__t29_wˍttt_t__d) = polynomial_ring(AbstractAlgebra.QQ, ["_z__tpk2__d", "_z__tpk1__d", "_z__tpk3__d", "_z__t29_w_t__d", "_z__t29_wˍt_t__d", "_z__t29_wˍtt_t__d", "_z__t29_wˍttt_t__d"])
+
+	sys = [479//200*_z__tpk2__d*_z__t29_w_t__d - 479//200*_z__tpk1__d - 837//1000, -837//1000*_z__tpk2__d*_z__t29_w_t__d + 479//200*_z__tpk2__d*_z__t29_wˍt_t__d + 837//1000*_z__tpk1__d - 651//250, -651//250*_z__tpk2__d*_z__t29_w_t__d - 837//500*_z__tpk2__d*_z__t29_wˍt_t__d + 479//200*_z__tpk2__d*_z__t29_wˍtt_t__d + 651//250*_z__tpk1__d + 43//25, 43//25*_z__tpk2__d*_z__t29_w_t__d - 7811//1000*_z__tpk2__d*_z__t29_wˍt_t__d - 251//100*_z__tpk2__d*_z__t29_wˍtt_t__d + 479//200*_z__tpk2__d*_z__t29_wˍttt_t__d - 43//25*_z__tpk1__d + 783//50, -479//200*_z__tpk2__d*_z__t29_w_t__d + _z__tpk3__d*_z__t29_w_t__d + _z__t29_wˍt_t__d, 837//1000*_z__tpk2__d*_z__t29_w_t__d - 479//200*_z__tpk2__d*_z__t29_wˍt_t__d + _z__tpk3__d*_z__t29_wˍt_t__d + _z__t29_wˍtt_t__d, 651//250*_z__tpk2__d*_z__t29_w_t__d + 837//500*_z__tpk2__d*_z__t29_wˍt_t__d - 479//200*_z__tpk2__d*_z__t29_wˍtt_t__d + _z__tpk3__d*_z__t29_wˍtt_t__d + _z__t29_wˍttt_t__d]
+
+	rr, sep = zdim_parameterization(sys, get_separating_element=true)
+
+	nv = 7
+	R, _ = QQ["T"]
+	xi = [mod(R(rr[i]) * invmod(derivative(R(rr[1])), R(rr[1])), R(rr[1])) for i in 2:nv+1]
+	@test all(iszero, map(eq -> mod(evaluate(eq, xi), R(rr[1])), sys))
+end
+
