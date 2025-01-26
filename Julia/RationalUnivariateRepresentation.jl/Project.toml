@@ -1,7 +1,7 @@
 name = "RationalUnivariateRepresentation"
 uuid = "17246082-4fa7-4287-87d4-6a5617fca855"
 authors = ["Alexander Demin <asdemin_2@edu.hse.ru>", "Fabrice Rouillier <Fabrice.Rouillier@inria.fr>", "Joao Ruiz <joao.ruiz@imj-prg.fr>"]
-version = "0.0.6"
+version = "0.0.7"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
