@@ -1371,13 +1371,13 @@ function zdim_parameterization(
     @assert parallelism in (:serial, :multithreading) && 1 <= threads <= nthreads()
     parallelism == :serial && threads > 1 && rur_print("WARN: threads=$threads was ignored\n")
     @assert 1 <= composite && ispow2(composite)
-    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
+    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) in (AbstractAlgebra.QQ, Nemo.QQ)
     _verbose[] = verbose
     TimerOutputs.enable_timer!(to)
     sys = sys_ori .* (map(v -> lcm(map(w -> denominator(w), collect(AbstractAlgebra.coefficients(v)))), sys_ori))
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
-    co = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
+    co = map(p -> map(AbstractAlgebra.QQ, collect(AbstractAlgebra.coefficients(p))), sys)
     res, sep = _zdim_multi_modular_RUR!(de, co, nn, parallelism, composite, threads)
     if (get_separating_element)
         return (res, sep)
