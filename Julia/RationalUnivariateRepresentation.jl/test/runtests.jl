@@ -13,6 +13,9 @@ for interface in [Nemo, AbstractAlgebra]
 # Last variable is not separating, but other variables are
 R, (x0,x2,x1) = polynomial_ring(interface.QQ, ["x0","x2","x1"])
 example = [x0^2 + 2*x1^2 + 2*x2^2 - x0, 2*x0*x1 + 2*x1*x2 - x1, x0 + 2*x1 + 2*x2 - 1]
+example2 = [x0^2 - 1]
+
+@test_throws DomainError zdim_parameterization(example2)
 
 p = 2^60 + 33
 gf_p = Nemo.GF(p)

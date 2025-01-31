@@ -181,6 +181,11 @@ function compute_quotient_basis(ltg::Vector{PP})
     if length(ltg) == 0
         return ([])
     end
+    # Thanks Gleb.
+    n = length(ltg[1])
+    if length(filter(e -> count(iszero, e) == n - 1, ltg)) < n
+        throw(DomainError("Input does not define zerodimensional ideal"))
+    end
     nbv = length(ltg[1])
     quo = Vector{PP}()
     todo = Vector{PP}([PP([Deg(0) for i in 1:nbv])])
