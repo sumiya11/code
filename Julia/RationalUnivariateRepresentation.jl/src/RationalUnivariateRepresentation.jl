@@ -741,6 +741,31 @@ end
 function _zdim_parameterization(t_v, i_xw, dd, check, arithm)
     res = Vector{Vector{ModularCoeff}}()
     ii = Int32(length(i_xw))
+
+    # The quotient is {1}.
+    if length(i_xw[1]) == 1
+        @assert all(isone, map(length, t_v))
+        flag = true
+        res = Vector{Vector{ModularCoeff}}()
+        if t_v[1][1] == 0
+            push!(res, ModularCoeff[0, 1])
+        else
+            push!(res, vcat(ModularPrime(arithm) - t_v[1][1], ModularCoeff(1)))
+        end
+        for j in ii-1:-1:1
+            if t_v[j+1][1] == 0
+                push!(res, Vector{ModularCoeff}())
+            else
+                push!(res, [t_v[j+1][1]])
+            end
+        end
+        if (check > 0)
+            return (flag, [res], ii)
+        else
+            return (flag, [res])
+        end
+    end
+
     v, gred_ori, index_ori, dg_ori, hom_ori, free_set_ori = first_variable(t_v, i_xw, ii, arithm)
     pr = ModularPrime(arithm)
     

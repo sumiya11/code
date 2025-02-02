@@ -5,9 +5,8 @@ import AbstractAlgebra
 begin
 	R, (x,) = polynomial_ring(QQ, ["x"])
 	@test zdim_parameterization([x^2 - 5]) == [[-5, 0, 1], [0, 0, 2]]
-
-	# Fails
-	# @test zdim_parameterization([x - 5]) == [[-5, 1]]
+	@test zdim_parameterization([x - 5]) == [[-5, 1], [0, 1]]
+	@test zdim_parameterization([x]) == [[0, 1], [0, 1]]
 end
 
 # Access to core RUR
@@ -15,10 +14,8 @@ begin
 	R, (x,y) = polynomial_ring(AbstractAlgebra.GF(2^30+3), ["x","y"])
 	flag, rur = RationalUnivariateRepresentation.rur_core([x^2 + 1, y^2])
 	@test !flag
-
 	flag, rur = RationalUnivariateRepresentation.rur_core([x + 1, y^2])
 	@test flag && rur == [[0x00000000, 0x00000001], [0x40000002]]
-
 	# Fails
 	# flag, rur = RationalUnivariateRepresentation.rur_core([R(0), x^2 + 1, y^2])
 end
@@ -31,6 +28,8 @@ for interface in [Nemo, AbstractAlgebra]
 R, (x0,x2,x1) = polynomial_ring(interface.QQ, ["x0","x2","x1"])
 example = [x0^2 + 2*x1^2 + 2*x2^2 - x0, 2*x0*x1 + 2*x1*x2 - x1, x0 + 2*x1 + 2*x2 - 1]
 example2 = [x0^2 - 1]
+example3 = [x0,x2,x1]
+example4 = [x0 - big(2)^1000, x2 - 1, x1 + big(2)^1001]
 
 @test_throws DomainError zdim_parameterization(example2)
 
@@ -39,14 +38,16 @@ gf_p = Nemo.GF(p)
 Rqq, _ = polynomial_ring(interface.QQ, "T")
 Rzp, _ = polynomial_ring(gf_p, "T")
 for sys in [
+		example,										# last variable not separating
+		example3,										# trivial
+		example4,										# trivial
 	    Groebner.Examples.hexapod(np=interface),
 	    Groebner.Examples.rootn(4, np=interface) .^ 2,  # non-radical
 	    Groebner.Examples.rootn(4, np=interface) .^ 3,  # non-radical
 	    Groebner.Examples.katsuran(8, np=interface),
 	    Groebner.Examples.noonn(5, np=interface),
 	    Groebner.Examples.chandran(9, np=interface),    # large coefficients (20k bits)
-	    example,                          # last variable not separating
-	    ]
+	]
     rr, sep = zdim_parameterization(sys, get_separating_element=true)
     nv = length(gens(parent(sys[1])))
     @assert length(rr) == nv + 1 && length(sep) == nv
