@@ -27,7 +27,7 @@ import Groebner
 import Nemo
 import Primes
 import TimerOutputs
-using  AbstractAlgebra
+import AbstractAlgebra
 import Base.Threads: nthreads, @threads, threadid
 
 const to = TimerOutputs.TimerOutput()
@@ -127,7 +127,7 @@ end
 # Extension for Power products
 # ************************************************************************
 
-AbstractAlgebra.total_degree(pp::PP) = sum(pp)
+total_degree(pp::PP) = sum(pp)
 
 function pp_isless_drl(ea::PP, eb::PP)
     @assert length(ea) == length(eb)
@@ -738,7 +738,7 @@ function check_separation_biv(bli, f, C)
 end
 
 #Nemo functions : derivative, gcd, degree mulmod invmod 
-function zdim_parameterization(t_v, i_xw, dd, check, arithm)
+function _zdim_parameterization(t_v, i_xw, dd, check, arithm)
     res = Vector{Vector{ModularCoeff}}()
     ii = Int32(length(i_xw))
     v, gred_ori, index_ori, dg_ori, hom_ori, free_set_ori = first_variable(t_v, i_xw, ii, arithm)
@@ -817,7 +817,7 @@ function _zdim_modular_RUR_LV(de, cco, arithm)
     rur_print("LT-")
     t_learn = learn_compute_table!(t_v, t_xw, i_xw, q, arithm)
     rur_print("LP")
-    flag, zp_param, uu = zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
+    flag, zp_param, uu = _zdim_parameterization(t_v, i_xw, Int32(-1), Int32(1), arithm)
     if (!flag)
        rur_print("(U)\n");
     else
@@ -829,7 +829,7 @@ end
 function _zdim_modular_RUR_LV_apply!(de, co, arithm, dd, ltg, q, i_xw, t_xw, t_learn, graph)
     t_v = compute_fill_quo_gb!(t_xw, graph.gb_support, co, q, arithm)
     apply_compute_table!(t_v, t_learn, t_xw, i_xw, q, arithm)
-    success, zp_param = zdim_parameterization(t_v, i_xw, Int32(dd), Int32(0), arithm)
+    success, zp_param = _zdim_parameterization(t_v, i_xw, Int32(dd), Int32(0), arithm)
     return (success, zp_param)
 end
 
@@ -1148,7 +1148,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         rur_print("Test cyclic optimization")
         t_v2 = compute_fill_quo_gb!(t_xw, gex, gco, q, arithm)
         t_learn2 = learn_compute_table_cyclic!(t_v2, t_xw, i_xw, q, arithm)
-        success, l_zp_param2 = zdim_parameterization(t_v2, i_xw, Int32(dd), Int32(1), arithm)
+        success, l_zp_param2 = _zdim_parameterization(t_v2, i_xw, Int32(dd), Int32(1), arithm)
         if (success)
             rur_print("\nApply cyclic optimization \n")
             t_v = t_v2
@@ -1242,11 +1242,26 @@ end
 # Abstract Algebra Interface
 # ************************************************************************
 
+# RUR modulo a prime assuming the last variable is separating
+function rur_core(sys_ori; verbose::Bool = true)
+    _verbose[] = verbose
+    K = AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1]))
+    @assert K isa Nemo.FinField
+    pr = AbstractAlgebra.characteristic(K)
+    @assert pr < 2^32
+    arithm = ModularArithZp(AccModularCoeff, ModularCoeff, ModularCoeff(pr))
+    de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys_ori)
+    de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
+    cco = map(p -> collect(AbstractAlgebra.coefficients(p)), sys_ori)
+    co = map(f -> map(p -> ModularCoeff(AbstractAlgebra.data(p)), f), cco)
+    flag, zp_param, _, _, _, _, _ = _zdim_modular_RUR_LV(de, co, arithm)
+    return (flag, zp_param)
+end
+
 function guess_infos(
     sys_ori;
     nn::Int32 = Int32(28),
     verbose::Bool = true,
-    composite = 4,
 )
     @assert 1 <= nn <= 30
     @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
@@ -1256,7 +1271,6 @@ function guess_infos(
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
     cco = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
 
-    nbv_ori = length(de[1][1])
     pr = ModularCoeff(PrevPrime(2^nn - 1))
     rur_print("primes of bitsize ",nn, "\n")
     arithm = ModularArithZp(AccModularCoeff, ModularCoeff, pr)
