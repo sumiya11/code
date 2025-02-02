@@ -31,6 +31,10 @@ example2 = [x0^2 - 1]
 example3 = [x0,x2,x1]
 example4 = [x0 - big(2)^1000, x2 - 1, x1 + big(2)^1001]
 
+n = 50
+_R, x = polynomial_ring(interface.QQ, ["x$i" for i in 1:n])
+linear_system = Nemo.matrix(interface.QQ, rand(1:10, n, n)) * x - rand(1:10, n)
+
 @test_throws DomainError zdim_parameterization(example2)
 
 p = 2^60 + 33
@@ -41,6 +45,7 @@ for sys in [
 		example,										# last variable not separating
 		example3,										# trivial
 		example4,										# trivial
+		linear_system,
 	    Groebner.Examples.hexapod(np=interface),
 	    Groebner.Examples.rootn(4, np=interface) .^ 2,  # non-radical
 	    Groebner.Examples.rootn(4, np=interface) .^ 3,  # non-radical
@@ -81,4 +86,3 @@ begin
 	xi = [mod(R(rr[i]) * invmod(derivative(R(rr[1])), R(rr[1])), R(rr[1])) for i in 2:nv+1]
 	@test all(iszero, map(eq -> mod(evaluate(eq, xi), R(rr[1])), sys))
 end
-
