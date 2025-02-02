@@ -745,7 +745,7 @@ function _zdim_parameterization(t_v, i_xw, dd, check, arithm)
     pr = ModularPrime(arithm)
     
     flag = true
-    res = []
+    res = Vector{Vector{ModularCoeff}}()
     C, _Z = Nemo.polynomial_ring(Nemo.Native.GF(Int64(pr), cached = false), cached = false)
     f = C(v) + _Z^(length(v))
     ifp = Nemo.derivative(f)
@@ -779,7 +779,7 @@ function _zdim_parameterization(t_v, i_xw, dd, check, arithm)
                         if (check > 0)
                             flag = check_separation_biv(bl[i], f1, C)
                             if (!flag)
-                                return (false, nothing , j)
+                                return (false, [res] , j)
                             end
                         end
                         s1 += Nemo.mulmod(d1 * lc1, pro, f)
@@ -1255,7 +1255,7 @@ function rur_core(sys_ori; verbose::Bool = true)
     cco = map(p -> collect(AbstractAlgebra.coefficients(p)), sys_ori)
     co = map(f -> map(p -> ModularCoeff(AbstractAlgebra.data(p)), f), cco)
     flag, zp_param, _, _, _, _, _ = _zdim_modular_RUR_LV(de, co, arithm)
-    return (flag, zp_param)
+    return (flag, zp_param[1])
 end
 
 function guess_infos(

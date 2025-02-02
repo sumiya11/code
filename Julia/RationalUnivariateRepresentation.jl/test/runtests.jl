@@ -17,7 +17,7 @@ begin
 	@test !flag
 
 	flag, rur = RationalUnivariateRepresentation.rur_core([x + 1, y^2])
-	@test flag && rur == [[[0x00000000, 0x00000001], [0x40000002]]]
+	@test flag && rur == [[0x00000000, 0x00000001], [0x40000002]]
 
 	# Fails
 	# flag, rur = RationalUnivariateRepresentation.rur_core([R(0), x^2 + 1, y^2])
