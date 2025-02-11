@@ -1244,8 +1244,6 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
             !rur_check(de, cco, PrevPrime(pr - 1), qq_m) && error("check failed")
         end
 
-	# @info "$idx_prev, log2(den)=$(ceil(Int,round(log2(den))))"
-
         bloc_p = max(floor(Int, length(t_pr) / 10), 2)
         bloc_p = align_to(bloc_p, BLOC_ALIGNMENT)
     end
@@ -1333,6 +1331,73 @@ function guess_lowest_input_precision(
    return(sys2,nb_digits)
 end
 
+"""
+    zdim_parameterization(system)
+
+Computes a rational univariate representation of a system of polynomials.
+
+## Arguments
+
+- `system`: an array of polynomials over the rationals.
+    The input must form a zero-dimensional ideal, otherwise, an error is raised.
+    Polynomials from these frontends are supported: AbstractAlgebra.jl, Nemo.jl.
+
+## Returns
+
+The function `zdim_parametrization` returns a single object `rur`:
+
+- `rur`: an array of polynomials, a rational univariate representation of the
+    roots of the system; a polynomial is given by an array of its coefficients.
+    Let \$n\$ be the number of indeterminates; `rur` is an array \$f(T), f_1(T),
+    ..., f_n(T)\$, such that \${(x_1,...,x_n) s.t. f(u) = 0, x_i = f_i(u) /
+    f_0(u)}\$, where \$f_0\$ is the derivative of the square-free part of \$f\$,
+    is in bijection with the roots of `system`.
+
+If the optional argument `get_separating_element=true` is set, then the result
+is a tuple (`rur`, `sep`):
+- `sep`: an array of coefficients \$(a_1,..., a_n)\$, which defines the linear
+  form \$T = a_1 x_1 + ... + a_n x_n\$, that is the inverse of the bijection of
+  the roots of the `system` and the roots of \$f(T)\$.
+
+## Possible Options
+
+The function `zdim_parametrization` has the following optional arguments:
+
+- `verbose::Bool`: a bool, whether to print progress statements or not.
+    Default is `true`.
+- `get_separating_element::Bool`: a bool, whether to also return a separating
+    element. Default is `false`.
+- `composite::Int`: an Int, a power of two, the width of composite numbers in
+  multi-modular computation. Default is `4`.
+- `nn::Int32`: the bitsize of primes in multi-modular computation.
+    Must be not exceed `30`. Default is `28`.
+- `parallelism::Symbol`: a symbol, parallelism mode. Available settings are:
+    - `parallelism=:serial`: no multi-threading (default).
+    - `parallelism=:multithreading`: use Julia threads.
+        The number of Julia threads can be specified via `threads` option.
+- `threads::Int`: an integer, the number of threads.
+    Can only be used together with `parallelism=:multithreading`.
+    Default is `Base.Threads.nthreads()`.
+
+## Example
+
+Using RUR.jl with AbstractAlgebra.jl:
+
+```jldoctest
+julia> using AbstractAlgebra, RationalUnivariateRepresentation
+
+julia> R, (x,y,z) = QQ["x","y","z"];
+
+julia> system = [x*y*z - 1, x^2*y - 1, x*z - y];
+
+julia> zdim_parameterization(system, verbose=false)
+4-element Vector{Vector{Rational{BigInt}}}:
+ [-1, 0, 0, 0, 1]
+ [4]
+ [0, 4]
+ [0, 0, 0, 0, 4]
+```
+"""
 function zdim_parameterization(
     sys_ori;
     nn::Int32 = Int32(28),
@@ -1364,6 +1429,6 @@ end
 using PrecompileTools
 include("precompile.jl")
 
-export zdim_parameterization,guess_infos,guess_lowest_input_precision
+export zdim_parameterization, guess_infos, guess_lowest_input_precision
 
 end # module
