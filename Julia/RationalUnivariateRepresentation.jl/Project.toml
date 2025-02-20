@@ -16,7 +16,7 @@ TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
 AbstractAlgebra = "0.42, 0.43, 0.44"
-Groebner = "0.7, 0.8"
+Groebner = "0.7, 0.8, 0.9"
 Nemo = "0.46, 0.47, 0.48"
 PrecompileTools = "1"
 Primes = "0.5"
