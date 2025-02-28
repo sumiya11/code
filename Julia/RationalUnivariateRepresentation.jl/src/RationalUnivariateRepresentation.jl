@@ -181,6 +181,10 @@ function compute_quotient_basis(ltg::Vector{PP})
     if length(ltg) == 0
         return ([])
     end
+    # GB = {1}
+    if length(ltg) == 1 && all(iszero, ltg[1])
+        throw(ErrorException("System has no solutions"))
+    end
     # Thanks Gleb.
     n = length(ltg[1])
     if length(filter(e -> count(iszero, e) == n - 1, ltg)) < n

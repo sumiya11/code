@@ -1,6 +1,13 @@
 using Test, Nemo, Groebner, RationalUnivariateRepresentation
 import AbstractAlgebra
 
+# Errors
+begin
+	R, (x,y) = polynomial_ring(AbstractAlgebra.QQ, ["x","y"])
+	@test_throws DomainError zdim_parameterization([x])
+	@test_throws ErrorException zdim_parameterization([x - 1, x - 2])
+end
+
 # Univariate
 begin
 	R, (x,) = polynomial_ring(QQ, ["x"])
