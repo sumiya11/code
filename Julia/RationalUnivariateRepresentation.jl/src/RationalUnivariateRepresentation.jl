@@ -24,6 +24,7 @@
 module RationalUnivariateRepresentation
 
 import Groebner
+import Random
 import Nemo
 import Primes
 import TimerOutputs
@@ -904,7 +905,7 @@ function extend_system_with_sepform(de, co, lt, minus_sep_lin)
     return (dde, cco)
 end
 
-function _zdim_modular_RUR(de, co, arithm, learn = false)
+function _zdim_modular_RUR_current(de, co, arithm, learn = false)
     nbv = length(de[1][1])
     ii = nbv
     flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(de, co, arithm)
@@ -943,6 +944,57 @@ function _zdim_modular_RUR(de, co, arithm, learn = false)
             end
         end
     end
+    if (learn)
+        return (flag, sep_lin, zp_param, ltg, q, i_xw, t_xw, t_learn)
+    else
+        return (flag, sep_lin, zp_param)
+    end
+end
+
+function _zdim_modular_RUR_deterministic(de, co, arithm, learn = false)
+    nbv = length(de[1][1])
+    ii = nbv
+    sep_lin = [0 for i in 1:nbv]
+    flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(de, co, arithm)
+    D = length(q)
+    if (flag)
+        sep_lin[ii] = 1
+    else
+        for i in 1:div(nbv*D*(D-1), 2)
+            for j in 1:nbv
+                sep_lin[j] = i^(j-1)
+            end
+            dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
+            flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
+            if (!flag)
+                rur_print(" (", i, ")")
+            else
+                dd = length(zp_param[1]) - 1
+                break
+            end
+        end
+    end
+    if (learn)
+        return (flag, sep_lin, zp_param, ltg, q, i_xw, t_xw, t_learn)
+    else
+        return (flag, sep_lin, zp_param)
+    end
+end
+
+function _zdim_modular_RUR_random(de, co, arithm, learn = false)
+    nbv = length(de[1][1])
+    ii = nbv
+    sep_lin = [0 for i in 1:nbv]
+    flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(de, co, arithm)
+    if (flag)
+        sep_lin[ii] = 1
+    else
+        rng = Random.Xoshiro(42)  # to fix the sequence of random numbers
+        sep_lin = [rand(rng, -100:100) for i = 1:nbv]
+        dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
+        flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
+    end
+    @assert flag
     if (learn)
         return (flag, sep_lin, zp_param, ltg, q, i_xw, t_xw, t_learn)
     else
@@ -1140,13 +1192,20 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     parallelism = :serial,
     composite = 4,
     threads = 1,
+    search_strategy = :current,
 )
     nbv_ori = length(de[1][1])
     pr = ModularCoeff(PrevPrime(2^bit_pr - 1))
     rur_print("primes of bitsize ", bit_pr, "\n")
     arithm = ModularArithZp(AccModularCoeff, ModularCoeff, pr)
     co = map(v -> modular_coeffs_vect(v, pr), cco)
-    flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR(de, co, arithm, true)
+    if search_strategy == :current
+        flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_current(de, co, arithm, true)
+    elseif search_strategy == :random
+        flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_random(de, co, arithm, true)
+    else
+        flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_deterministic(de, co, arithm, true)
+    end
     rur_print("Dimension of the quotient :",length(q),"\n")
     dd = length(l_zp_param[1][1]) - 1
     rur_print("Degree of the radical :",dd,"\n")
@@ -1168,6 +1227,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         rur_print("Use non trivial separating element\n")
         de, cco = extend_system_with_sepform(de, cco, BigInt(1), map(u -> -u, sep_lin))
     end
+    rur_print("Separating form: $sep_lin\n")
 
     rur_print("Run Groebner learn\n")
     co = map(v -> modular_coeffs_vect(v, pr), cco)
@@ -1382,6 +1442,12 @@ The function `zdim_parametrization` has the following optional arguments:
 - `threads::Int`: an integer, the number of threads.
     Can only be used together with `parallelism=:multithreading`.
     Default is `Base.Threads.nthreads()`.
+- `search_strategy`: a Symbol, a search strategy. If the last variable 
+    is not separating, search for a separating form using the strategy.
+    One of the following:
+    - `:current` (default): Original strategy.
+    - `:random`: Use a1 x1 +...+ an xn, where ai is selected from [-B, B] for i = 1..n.
+    - `:deterministic`: Try x1 + i x2 +...+ (i)^(n-1) xn for i = 1..n D (D-1) / 2, one by one.
 
 ## Example
 
@@ -1405,6 +1471,7 @@ julia> zdim_parameterization(system, verbose=false)
 function zdim_parameterization(
     sys_ori;
     nn::Int32 = Int32(28),
+    search_strategy = :current,
     verbose::Bool = true,
     parallelism = :serial,
     threads = (parallelism == :multithreading ? nthreads() : 1),
@@ -1412,6 +1479,7 @@ function zdim_parameterization(
     composite = 4,
 )
     @assert 1 <= nn <= 30
+    @assert search_strategy in (:current, :random, :deterministic)
     @assert parallelism in (:serial, :multithreading) && 1 <= threads <= nthreads()
     parallelism == :serial && threads > 1 && rur_print("WARN: threads=$threads was ignored\n")
     @assert 1 <= composite && ispow2(composite)
@@ -1422,7 +1490,7 @@ function zdim_parameterization(
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
     co = map(p -> map(AbstractAlgebra.QQ, collect(AbstractAlgebra.coefficients(p))), sys)
-    res, sep = _zdim_multi_modular_RUR!(de, co, nn, parallelism, composite, threads)
+    res, sep = _zdim_multi_modular_RUR!(de, co, nn, parallelism, composite, threads, search_strategy)
     if (get_separating_element)
         return (res, sep)
     else
@@ -1433,6 +1501,8 @@ end
 using PrecompileTools
 include("precompile.jl")
 
-export zdim_parameterization, guess_infos, guess_lowest_input_precision
+rur = zdim_parameterization
+
+export zdim_parameterization, guess_infos, guess_lowest_input_precision, rur
 
 end # module
