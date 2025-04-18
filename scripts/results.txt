@@ -1,0 +1,76 @@
+=================================
+caprasse
+   D            56
+   d            32
+   sparsity     [0.09, 0.09, 0.08, 0.07]
+   type         general
+
+search_strategy=:current
+    sep. form   [2, 0, -1, 1]
+    coeff size  56 bits
+    sparsity    0.2
+    time        0.17 s
+
+search_strategy=:random
+    sep. form   [26, -10, -5, 41]
+    coeff size  177 bits
+    sparsity    0.24
+    time        0.05 s
+    
+=================================
+No5_sq
+   D            7456
+   d            233
+   sparsity     [0.08, 0.08, 0.07, 0.07, 0.06]
+   type         general
+
+search_strategy=:current
+    sep. form   [5, -3, 0, -1, 1]
+    coeff size  1107 bits
+    sparsity    0.16
+    time        6160.29 s
+
+search_strategy=:random
+    sep. form   [26, -10, -5, 41, 35]
+    coeff size  1610 bits
+    sparsity    0.17
+    time        7376.38 s
+    
+=================================
+Re5_sq
+   D            4608
+   d            144
+   sparsity     [0.29, 0.28, 0.22, 0.21, 0.17]
+   type         general
+
+search_strategy=:current
+    sep. form   [-1, 0, 0, -1, 1]
+    coeff size  363 bits
+    sparsity    0.3
+    time        763.62 s
+
+search_strategy=:random
+    sep. form   [26, -10, -5, 41, 35]
+    coeff size  1093 bits
+    sparsity    0.31
+    time        1379.83 s
+    
+=================================
+Ro5_sq
+   D            3840
+   d            120
+   sparsity     [0.06, 0.04, 0.03, 0.02, 0.01]
+   type         general
+
+search_strategy=:current
+    sep. form   [2, -2, 0, -1, 1]
+    coeff size  193 bits
+    sparsity    0.07
+    time        63.35 s
+
+search_strategy=:random
+    sep. form   [26, -10, -5, 41, 35]
+    coeff size  644 bits
+    sparsity    0.07
+    time        106.9 s
+    
