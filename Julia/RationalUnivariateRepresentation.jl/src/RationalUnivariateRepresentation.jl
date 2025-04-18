@@ -983,17 +983,10 @@ end
 
 function _zdim_modular_RUR_random(de, co, arithm, learn = false)
     nbv = length(de[1][1])
-    ii = nbv
-    sep_lin = [0 for i in 1:nbv]
-    flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(de, co, arithm)
-    if (flag)
-        sep_lin[ii] = 1
-    else
-        rng = Random.Xoshiro(42)  # to fix the sequence of random numbers
-        sep_lin = [rand(rng, -100:100) for i = 1:nbv]
-        dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
-        flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
-    end
+    rng = Random.Xoshiro(42)  # to fix the sequence of random numbers
+    sep_lin = [rand(rng, -100:100) for i = 1:nbv]
+    dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
+    flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
     @assert flag
     if (learn)
         return (flag, sep_lin, zp_param, ltg, q, i_xw, t_xw, t_learn)
@@ -1351,22 +1344,32 @@ function guess_infos(
     verbose::Bool = true,
 )
     @assert 1 <= nn <= 30
-    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) == AbstractAlgebra.QQ
+    @assert AbstractAlgebra.base_ring(AbstractAlgebra.parent(sys_ori[1])) in (AbstractAlgebra.QQ, Nemo.QQ)
     _verbose[] = verbose
     sys = sys_ori .* (map(v -> lcm(map(w -> denominator(w), collect(AbstractAlgebra.coefficients(v)))), sys_ori))
     de = map(p -> collect(AbstractAlgebra.exponent_vectors(p)), sys)
     de = map(u -> map(v -> map(w -> map(h -> Deg(h), w), v), u), de)
-    cco = map(p -> collect(AbstractAlgebra.coefficients(p)), sys)
-
+    cco = map(p -> map(AbstractAlgebra.QQ, collect(AbstractAlgebra.coefficients(p))), sys)
     pr = ModularCoeff(PrevPrime(2^nn - 1))
     rur_print("primes of bitsize ",nn, "\n")
     arithm = ModularArithZp(AccModularCoeff, ModularCoeff, pr)
     co = map(v -> modular_coeffs_vect(v, pr), cco)
-    flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR(de, co, arithm, true)
+    flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_current(de, co, arithm, true)
     rur_print("Dimension of the quotient :",length(q),"\n")
     dd = length(l_zp_param[1][1]) - 1
     rur_print("Degree of the radical :",dd,"\n")
-    return(flag,length(q),dd,sep_lin)
+    cyclic = (dd == length(q))
+    nbv_ori = length(de[1][1])
+    if cyclic
+        if findall(!iszero, sep_lin) == [nbv_ori]
+            type = :shape
+        else
+            type = :cyclic
+        end
+    else
+        type = :general
+    end    
+    return(flag=flag,type=type,quotient=length(q),minpoly=dd,sep_lin=sep_lin)
 end
 
 
@@ -1501,8 +1504,6 @@ end
 using PrecompileTools
 include("precompile.jl")
 
-rur = zdim_parameterization
-
-export zdim_parameterization, guess_infos, guess_lowest_input_precision, rur
+export zdim_parameterization, guess_infos, guess_lowest_input_precision
 
 end # module

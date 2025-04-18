@@ -1,89 +1,86 @@
-using AbstractAlgebra, RationalUnivariateRepresentation
+using Groebner, Nemo, RationalUnivariateRepresentation
+import AbstractAlgebra
+
+function multiplication_matrices(J)
+    J = Groebner.groebner(J)
+    basis = sort(Groebner.quotient_basis(J))
+    dim = length(basis)
+    S = Nemo.matrix_space(Nemo.base_ring(J[1]), dim, dim)
+    matrices = []
+    println("Dim is $dim")
+    for v in gens(parent(first(J)))
+        print(v, ",")
+        M = zero(S)
+        images = Groebner.normalform(J, v .* basis)
+        for i in 1:length(basis)
+            for (j, base_vec) in enumerate(basis)
+                M[i, j] = coeff(images[i], base_vec)
+            end
+        end
+        push!(matrices, M)
+    end
+    println()
+    matrices
+end
+
+sparsity = m -> sum(!iszero, m) / prod(size(m))
+coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) + log2(abs(denominator(c))), f), rur)))
 
 for name in [
-        # non-trivial separating form
+        # "caprasse", 
+        # "fab_4", 
+        # "noon6", 
+        # "reimer6",
+        # "robot",
+        # "chandra10",
+        # "chandra11",
+        # "eco10",
+        # "eco11",
+        # "katsura11",
+        # "Ch6_sq",
+        # "Ka6_sq",
+        "No5_sq",
+        "Re5_sq",
         "Ro5_sq",
-        "caprasse", 
-        "fab_4", 
-        "noon6", 
-        "reimer6",
-        # "root7"   fails for search_strategy=:random
+        # "root7",   fails for search_strategy=:random
     ]
 
     include((@__DIR__) * "/../Data/Systems/$name.jl")
+
+    infos = guess_infos(sys)
+
+    ring_zp, x_zp = polynomial_ring(GF(2^30+3), map(string, gens(R)), internal_ordering=:degrevlex)
+    sys_zp = map(f -> evaluate(map_coefficients(c -> base_ring(ring_zp)(c), f), x_zp), sys)
+    matrices = multiplication_matrices(sys_zp)
     
     time1 = @elapsed rur1, sep1 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:current)
     
     time2 = @elapsed rur2, sep2 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:random)
 
-    coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) + log2(abs(denominator(c))), f), rur)))
-    println("""
+    m1 = sum(sep1 .* matrices)
+    m2 = sum(sep2 .* matrices)
+    
+    results = """
     =================================
     $name
+       D            $(infos.quotient)
+       d            $(infos.minpoly)
+       sparsity     $(map(x -> round(x, digits=2), map(sparsity, matrices)))
+       type         $(infos.type)
 
     search_strategy=:current
         sep. form   $sep1
         coeff size  $(coeff_size(rur1)) bits
+        sparsity    $(round(sparsity(m1), digits=2))
         time        $(round(time1, digits=2)) s
 
     search_strategy=:random
         sep. form   $sep2
         coeff size  $(coeff_size(rur2)) bits
+        sparsity    $(round(sparsity(m2), digits=2))
         time        $(round(time2, digits=2)) s
-        """)
+        """
+    println(results)
+    open((@__DIR__) * "/results.txt", "a") do file println(file, results) end
 end
-
-#=
-=================================
-caprasse
-
-search_strategy=:current
-    sep. form   [2, 0, -1, 1]
-    coeff size  56 bits
-    time        0.01 s
-
-search_strategy=:random
-    sep. form   [26, -10, -5, 41]
-    coeff size  177 bits
-    time        0.01 s
-
-=================================
-fab_4
-
-search_strategy=:current
-    sep. form   [-1, -1, -1, 1]
-    coeff size  28056 bits
-    time        175.3 s
-
-search_strategy=:random
-    sep. form   [26, -10, -5, 41]
-    coeff size  32837 bits
-    time        170.99 s
-
-=================================
-noon6
-
-search_strategy=:current
-    sep. form   [-11, 5, -3, 0, -1, 1]
-    coeff size  4087 bits
-    time        7.88 s
-
-search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67]
-    coeff size  6034 bits
-    time        7.67 s
-
-=================================
-reimer6
-
-search_strategy=:current
-    sep. form   [1, -1, 0, 0, -1, 1]
-    coeff size  1924 bits
-    time        1.89 s
-
-search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67]
-    coeff size  5638 bits
-    time        4.25 s
-=#
 
