@@ -27,6 +27,12 @@ sparsity = m -> sum(!iszero, m) / prod(size(m))
 coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) + log2(abs(denominator(c))), f), rur)))
 
 for name in [
+        "goodwin",
+        "crn",
+        "seir36",
+        # "crauste-1",
+        # "crauste-2",
+        # "crauste-3",
         # "caprasse", 
         # "fab_4", 
         # "noon6", 
@@ -37,10 +43,10 @@ for name in [
         # "eco10",
         # "eco11",
         # "katsura11",
-        "Ch6_sq",
-        "Ka6_sq",
-        "No5_sq",
-        "Re5_sq",
+        # "Ch6_sq",
+        # "Ka6_sq",
+        # "No5_sq",
+        # "Re5_sq",
         # "Ro5_sq",
         # "root7",   fails for search_strategy=:random
     ]
