@@ -951,6 +951,39 @@ function _zdim_modular_RUR_current(de, co, arithm, learn = false)
     end
 end
 
+import Combinatorics: powerset
+
+function _zdim_modular_RUR_l0_norm(de, co, arithm, learn = false)
+    # l0_norm = vec -> sum(!iszero, vec)
+    nbv = length(de[1][1])
+    ii = nbv
+    flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(de, co, arithm)
+    sep_lin = [0 for i in 1:nbv]
+    rng = Random.Xoshiro(42)
+    if (flag)
+        sep_lin[ii] = 1
+    else
+        boot, bound = 5, 100
+        for subset in powerset(collect(1:nbv), 1)
+            _sep_lin = [i in subset ? 1 : 0 for i in 1:nbv]
+            for j in 1:boot
+                sep_lin = _sep_lin .* rand(rng, -bound:bound, nbv)
+                rur_print("try $sep_lin\n")
+                dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
+                flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
+                flag && break
+            end
+            flag && break
+        end
+        !flag && error("search for separating form failed")
+    end
+    if (learn)
+        return (flag, sep_lin, zp_param, ltg, q, i_xw, t_xw, t_learn)
+    else
+        return (flag, sep_lin, zp_param)
+    end
+end
+
 function _zdim_modular_RUR_deterministic(de, co, arithm, learn = false)
     nbv = length(de[1][1])
     ii = nbv
@@ -1196,6 +1229,8 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
         flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_current(de, co, arithm, true)
     elseif search_strategy == :random
         flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_random(de, co, arithm, true)
+    elseif search_strategy == :l0_norm
+        flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_l0_norm(de, co, arithm, true)
     else
         flag, sep_lin, l_zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_deterministic(de, co, arithm, true)
     end
@@ -1482,7 +1517,7 @@ function zdim_parameterization(
     composite = 4,
 )
     @assert 1 <= nn <= 30
-    @assert search_strategy in (:current, :random, :deterministic)
+    @assert search_strategy in (:current, :random, :deterministic, :l0_norm)
     @assert parallelism in (:serial, :multithreading) && 1 <= threads <= nthreads()
     parallelism == :serial && threads > 1 && rur_print("WARN: threads=$threads was ignored\n")
     @assert 1 <= composite && ispow2(composite)
