@@ -963,7 +963,7 @@ function _zdim_modular_RUR_l0_norm(de, co, arithm, learn = false)
     if (flag)
         sep_lin[ii] = 1
     else
-        boot, bound = 5, 100
+        boot, bound = 1, 100
         for subset in powerset(collect(1:nbv), 1)
             _sep_lin = [i in subset ? 1 : 0 for i in 1:nbv]
             for j in 1:boot

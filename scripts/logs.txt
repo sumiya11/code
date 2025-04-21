@@ -1,1218 +1,130 @@
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,4)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (2,3)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (2,3)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :717
-Degree of the radical :717
-Dim is 717
-x1,x2,x3,x4,x5,x6,
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,4)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (2,3)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (2,3)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (3,1)G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :717
-Degree of the radical :717
-Use non trivial separating element
-Separating form: [-11, 5, -3, 0, -1, 1]
-Run Groebner learn
-Test cyclic optimizationBad prime number for parameterization (717,434)
-Switch off cyclic optimization 
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :117
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
+Dim is 2048
+H1,H2,H3,H4,H5,H6,
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :717
-Degree of the radical :717
+Dimension of the quotient :2048
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :77
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
 Use non trivial separating element
 Separating form: [26, -10, -5, 41, 35, -67]
 Run Groebner learn
-Test cyclic optimization
-Apply cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :193
+Nb Primes used :141
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [23, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-32, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-15, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-21, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -69, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -2, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -66, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 24, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -78, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -27, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -61, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -86, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 95, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -30, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -7, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -46, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -4, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 69, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 29, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -28, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -30, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 67, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -20, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -87, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 9]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 89]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 48]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, -74, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [50, -70, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-100, -3, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [82, -10, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [8, 41, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [72, 0, 14, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-5, 0, 43, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [17, 0, -77, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [68, 0, -14, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [12, 0, -87, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [25, 0, 0, 41, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-39, 0, 0, -32, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 82, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [85, 0, 0, -33, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [40, 0, 0, 22, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-74, 0, 0, 0, -78, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [16, 0, 0, 0, 9, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [82, 0, 0, 0, -18, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [22, 0, 0, 0, -87, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [92, 0, 0, 0, -44, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [48, 0, 0, 0, 0, 93]
-G-Q-Pt-FG-LT-LP(U)
-try [74, 0, 0, 0, 0, 96]
-G-Q-Pt-FG-LT-LP(U)
-try [2, 0, 0, 0, 0, -72]
-G-Q-Pt-FG-LT-LP(U)
-try [81, 0, 0, 0, 0, -45]
-G-Q-Pt-FG-LT-LP(U)
-try [-1, 0, 0, 0, 0, 81]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -17, -63, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 86, 65, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 16, -82, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -10, -83, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -74, 51, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -40, 0, 66, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -90, 0, 10, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -6, 0, -44, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 9, 0, 56, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 52, 0, -64, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 78, 0, 0, -12, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 88, 0, 0, 25, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 17, 0, 0, -8, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -51, 0, 0, 95, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -17, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -58, 0, 0, 0, 78]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -48, 0, 0, 0, -78]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -26, 0, 0, 0, -80]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 7, 0, 0, 0, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 26, 0, 0, 0, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -49, -4, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -88, 44, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -66, 53, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 19, -4, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -75, -99, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 40, 0, -30, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 97, 0, 9, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -83, 0, 78, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -25, 0, 11, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -40, 0, 66, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 22, 0, 0, -92]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -74, 0, 0, -67]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -77, 0, 0, -93]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 39, 0, 0, 53]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -99, 0, 0, -61]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 81, -26, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 27, -46, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -76, 97, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 87, 64, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 92, 45, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -45, 0, -43]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 6, 0, 84]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 33, 0, -75]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 20, 0, -50]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -55, 0, -96]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 24, 2]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 23, -58]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 97, 22]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -85, -28]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 35, 68]
-G-Q-Pt-FG-LT-LP(U)
-try [7, -75, -42, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [95, 74, -22, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-36, -50, -3, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [77, -18, 31, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [33, -80, -51, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [56, -84, 0, 64, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-41, 33, 0, 22, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-4, -81, 0, 16, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-84, 93, 0, 52, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [7, 76, 0, 92, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-76, 61, 0, 0, -89, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [17, -27, 0, 0, 23, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [77, 55, 0, 0, 56, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-97, -84, 0, 0, -68, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 57, 0, 0, 14, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-21, -83, 0, 0, 0, 67]
-G-Q-Pt-FG-LT-LP(U)
-try [-98, 2, 0, 0, 0, 18]
-G-Q-Pt-FG-LT-LP(U)
-try [-89, 9, 0, 0, 0, -9]
-G-Q-Pt-FG-LT-LP(U)
-try [8, -9, 0, 0, 0, 94]
-G-Q-Pt-FG-LT-LP(U)
-try [51, 41, 0, 0, 0, -54]
-G-Q-Pt-FG-LT-LP(U)
-try [-73, 0, 5, -70, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-22, 0, -39, 69, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-84, 0, -2, -75, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-49, 0, -16, 7, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-45, 0, 99, -87, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 0, -62, 0, -8, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-96, 0, -7, 0, -19, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [29, 0, 26, 0, 6, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [79, 0, 32, 0, 96, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [77, 0, 2, 0, 29, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [89, 0, 12, 0, 0, -75]
-G-Q-Pt-FG-LT-LP(U)
-try [-54, 0, 43, 0, 0, 35]
-G-Q-Pt-FG-LT-LP(U)
-try [20, 0, 44, 0, 0, 75]
-G-Q-Pt-FG-LT-LP(U)
-try [22, 0, 22, 0, 0, -70]
-G-Q-Pt-FG-LT-LP(U)
-try [63, 0, 3, 0, 0, -8]
-G-Q-Pt-FG-LT-LP(U)
-try [-92, 0, 0, -62, -82, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [95, 0, 0, -14, -53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [19, 0, 0, 100, 5, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 70, -29, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-54, 0, 0, -73, -20, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [99, 0, 0, 6, 0, 8]
-G-Q-Pt-FG-LT-LP(U)
-try [4, 0, 0, -68, 0, 4]
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 84, 0, 30]
-G-Q-Pt-FG-LT-LP(U)
-try [-23, 0, 0, -4, 0, 11]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 75, 0, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [25, 0, 0, 0, 42, -12]
-G-Q-Pt-FG-LT-LP(U)
-try [80, 0, 0, 0, -99, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [44, 0, 0, 0, -22, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 0, 17, 7]
-G-Q-Pt-FG-LT-LP(U)
-try [97, 0, 0, 0, 9, 16]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -66, 8, -29, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -35, 91, -39, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -70, 11, 94, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -4, -11, 52, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -83, -80, -47, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 44, 47, 0, -15, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 74, 57, 0, -33, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 84, 18, 0, -41, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 90, 16, 0, 4, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 41, -51, 0, -70, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 97, -67, 0, 0, -74]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 14, 39, 0, 0, 50]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 10, 8, 0, 0, -30]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 42, -53, 0, 0, -66]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 64, -48, 0, 0, -46]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -57, 0, -83, 68, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -96, 0, 5, -92, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -56, 0, 42, 51, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -98, 0, -47, 81, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -15, 0, -93, -44, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 18, 0, 17, 0, 30]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 97, 0, 39, 0, 96]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -92, 0, 37, 0, 34]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 34, 0, -90, 0, 81]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -10, 0, -35, 0, -80]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -99, 0, 0, -8, -36]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 10, 0, 0, 48, 43]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 55, 0, 0, -31, -78]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -43, 0, 0, -82, 4]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 52, 0, 0, 60, -45]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 48, -2, -6, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -21, 66, -7, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 68, -97, 52, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -12, 61, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -88, 14, -53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 77, -42, 0, -14]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 27, 46, 0, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 58, -87, 0, 36]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 33, 80, 0, 72]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -65, 75, 0, 54]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -20, 0, -4, 82]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 33, 0, 11, 1]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -32, 0, -64, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -29, 0, 47, -33]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 81, 0, 51, 86]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 64, -74, -18]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -74, -19, -7]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -48, -98, -79]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -38, -37, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 70, 85, 27]
-G-Q-Pt-FG-LT-LP(U)
-try [-52, 26, -98, 94, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [96, -92, 98, 63, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [45, 54, -73, -68, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [81, -59, 95, 51, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-4, -13, 80, 24, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [100, -74, -37, 0, 43, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [10, -51, -47, 0, 86, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-54, -60, -90, 0, -98, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [90, -17, 94, 0, -83, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [79, -77, -16, 0, 7, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-33, -4, -41, 0, 0, 92]
-G-Q-Pt-FG-LT-LP(U)
-try [13, -21, 63, 0, 0, 73]
-G-Q-Pt-FG-LT-LP(U)
-try [-90, -13, -67, 0, 0, -29]
-G-Q-Pt-FG-LT-LP(U)
-try [-56, -7, 1, 0, 0, 41]
-G-Q-Pt-FG-LT-LP(U)
-try [93, 83, 83, 0, 0, 35]
-G-Q-Pt-FG-LT-LP(U)
-try [-38, -44, 0, -65, 89, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [21, -31, 0, -30, -25, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [31, 48, 0, 76, 100, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [97, 62, 0, 42, -53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [25, -8, 0, -30, 79, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [58, -90, 0, 22, 0, 76]
-G-Q-Pt-FG-LT-LP(U)
-try [98, -39, 0, 69, 0, -45]
-G-Q-Pt-FG-LT-LP(U)
-try [-12, -97, 0, -3, 0, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [-31, -73, 0, 79, 0, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [-7, -57, 0, 19, 0, -85]
-G-Q-Pt-FG-LT-LP(U)
-try [4, -50, 0, 0, 38, -63]
-G-Q-Pt-FG-LT-LP(U)
-try [61, 53, 0, 0, -31, -97]
-G-Q-Pt-FG-LT-LP(U)
-try [-92, -61, 0, 0, -3, -10]
-G-Q-Pt-FG-LT-LP(U)
-try [-20, 88, 0, 0, 83, 61]
-G-Q-Pt-FG-LT-LP(U)
-try [-15, -40, 0, 0, 85, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [36, 0, 83, 8, -48, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [48, 0, -58, -98, 62, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [25, 0, -8, -8, -40, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-1, 0, 44, 84, 86, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [15, 0, -9, -86, 84, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-27, 0, 37, 3, 0, 54]
-G-Q-Pt-FG-LT-LP(U)
-try [-50, 0, 52, 31, 0, 49]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 0, -82, 6, 0, -39]
-G-Q-Pt-FG-LT-LP(U)
-try [-54, 0, -79, -70, 0, -69]
-G-Q-Pt-FG-LT-LP(U)
-try [48, 0, 94, 66, 0, -85]
-G-Q-Pt-FG-LT-LP(U)
-try [-53, 0, -68, 0, -25, -58]
-G-Q-Pt-FG-LT-LP(U)
-try [-45, 0, 55, 0, 39, 59]
-G-Q-Pt-FG-LT-LP(U)
-try [87, 0, -11, 0, -94, -47]
-G-Q-Pt-FG-LT-LP(U)
-try [12, 0, 76, 0, -100, 14]
-G-Q-Pt-FG-LT-LP(U)
-try [-12, 0, -41, 0, 74, -100]
-G-Q-Pt-FG-LT-LP(U)
-try [-49, 0, 0, 84, 37, 92]
-G-Q-Pt-FG-LT-LP(U)
-try [21, 0, 0, 68, -3, -71]
-G-Q-Pt-FG-LT-LP(U)
-try [-33, 0, 0, -29, 86, 93]
-G-Q-Pt-FG-LT-LP(U)
-try [-65, 0, 0, 8, 26, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [92, 0, 0, -83, 49, 11]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -38, -43, -23, 18, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 62, 91, 42, -3, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -10, 39, -76, 63, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 42, -88, -79, 73, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -48, -30, 74, -51, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -80, -29, 9, 0, -20]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 85, -43, -3, 0, 47]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -56, -12, -29, 0, 68]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 36, -34, 48, 0, -85]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 80, -3, -13, 0, -11]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 69, 77, 0, 59, 84]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -56, 90, 0, 79, -40]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -57, -79, 0, 89, -69]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 41, 93, 0, -51, 77]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -61, -73, 0, -40, -6]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -5, -60, -30]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 52, 0, -82, -31, 5]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 94, 0, 31, 32, 27]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 83, 0, 33, -99, -73]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 46, 0, 84, -66, -24]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -10, -17, -76, 90]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 60, 97, -29, 38]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 66, 75, 11, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -39, -24, -6, -83]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -9, -10, -70, -75]
-G-Q-Pt-FG-LT-LP(U)
-try [23, 70, 73, -89, 91, 0]
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :717
-Degree of the radical :717
-Use non trivial separating element
-Separating form: [23, 70, 73, -89, 91, 0]
+Dimension of the quotient :2048
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
 Run Groebner learn
-Test cyclic optimizationBad prime number for parameterization (717,434)
-Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :213
+Nb Primes used :77
 =================================
-noon6
-   D            717
-   d            717
-   sparsity     [0.04, 0.03, 0.03, 0.03, 0.02, 0.02]
-   type         cyclic
+Ch6_sq
+   D            2048
+   d            32
+   sparsity     [0.37, 0.36, 0.35, 0.32, 0.28, 0.22]
+   type         general
 
 search_strategy=:current
-    sep. form   [-11, 5, -3, 0, -1, 1]
-    coeff size  4087 bits
-    sparsity    0.09
-    time        10.59 s
+    sep. form   [0, 0, 0, 0, 0, 1]
+    coeff size  3577 bits
+    sparsity    0.22
+    time        70.67 s
 
 search_strategy=:random
     sep. form   [26, -10, -5, 41, 35, -67]
-    coeff size  6034 bits
-    sparsity    0.1
-    time        10.02 s
+    coeff size  6556 bits
+    sparsity    0.38
+    time        177.7 s
 
 search_strategy=:l0_norm
-    sep. form   [23, 70, 73, -89, 91, 0]
-    coeff size  6318 bits
-    sparsity    0.09
-    time        34.14 s
+    sep. form   [0, 0, 0, 0, 0, 1]
+    coeff size  3577 bits
+    sparsity    0.22
+    time        72.01 s
     
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,4)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :576
-Degree of the radical :576
-Dim is 576
-x1,x2,x3,x4,x5,x6,
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,4)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :576
-Degree of the radical :576
-Use non trivial separating element
-Separating form: [1, -1, 0, 0, -1, 1]
-Run Groebner learn
-Test cyclic optimizationBad prime number for parameterization (576,92)
-Switch off cyclic optimization 
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :45
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Dim is 8192
+x0,x1,x2,x3,x4,x5,x6,
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :576
-Degree of the radical :576
-Use non trivial separating element
-Separating form: [26, -10, -5, 41, 35, -67]
+Dimension of the quotient :8192
+Degree of the radical :64
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 1]
 Run Groebner learn
-Test cyclic optimization
-Apply cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-
+5-9-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :173
+Nb Primes used :9
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [23, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-32, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-15, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-21, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -69, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -2, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -66, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 24, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -78, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -27, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -61, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -86, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 95, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -30, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -7, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -46, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -4, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 69, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 29, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -28, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -30, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 67, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -20, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -87, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 9]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 89]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 48]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, -74, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [50, -70, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-100, -3, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [82, -10, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [8, 41, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [72, 0, 14, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-5, 0, 43, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [17, 0, -77, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [68, 0, -14, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [12, 0, -87, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [25, 0, 0, 41, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-39, 0, 0, -32, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 82, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [85, 0, 0, -33, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [40, 0, 0, 22, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-74, 0, 0, 0, -78, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [16, 0, 0, 0, 9, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [82, 0, 0, 0, -18, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [22, 0, 0, 0, -87, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [92, 0, 0, 0, -44, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [48, 0, 0, 0, 0, 93]
-G-Q-Pt-FG-LT-LP(U)
-try [74, 0, 0, 0, 0, 96]
-G-Q-Pt-FG-LT-LP(U)
-try [2, 0, 0, 0, 0, -72]
-G-Q-Pt-FG-LT-LP(U)
-try [81, 0, 0, 0, 0, -45]
-G-Q-Pt-FG-LT-LP(U)
-try [-1, 0, 0, 0, 0, 81]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -17, -63, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 86, 65, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 16, -82, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -10, -83, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -74, 51, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -40, 0, 66, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -90, 0, 10, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -6, 0, -44, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 9, 0, 56, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 52, 0, -64, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 78, 0, 0, -12, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 88, 0, 0, 25, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 17, 0, 0, -8, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -51, 0, 0, 95, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -17, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -58, 0, 0, 0, 78]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -48, 0, 0, 0, -78]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -26, 0, 0, 0, -80]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 7, 0, 0, 0, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 26, 0, 0, 0, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -49, -4, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -88, 44, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -66, 53, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 19, -4, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -75, -99, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 40, 0, -30, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 97, 0, 9, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -83, 0, 78, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -25, 0, 11, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -40, 0, 66, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 22, 0, 0, -92]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -74, 0, 0, -67]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -77, 0, 0, -93]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 39, 0, 0, 53]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -99, 0, 0, -61]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 81, -26, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 27, -46, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -76, 97, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 87, 64, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 92, 45, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -45, 0, -43]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 6, 0, 84]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 33, 0, -75]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 20, 0, -50]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -55, 0, -96]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 24, 2]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 23, -58]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 97, 22]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -85, -28]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 35, 68]
-G-Q-Pt-FG-LT-LP(U)
-try [7, -75, -42, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [95, 74, -22, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-36, -50, -3, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [77, -18, 31, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [33, -80, -51, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [56, -84, 0, 64, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-41, 33, 0, 22, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-4, -81, 0, 16, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-84, 93, 0, 52, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [7, 76, 0, 92, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-76, 61, 0, 0, -89, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [17, -27, 0, 0, 23, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [77, 55, 0, 0, 56, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-97, -84, 0, 0, -68, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 57, 0, 0, 14, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-21, -83, 0, 0, 0, 67]
-G-Q-Pt-FG-LT-LP(U)
-try [-98, 2, 0, 0, 0, 18]
-G-Q-Pt-FG-LT-LP(U)
-try [-89, 9, 0, 0, 0, -9]
-G-Q-Pt-FG-LT-LP(U)
-try [8, -9, 0, 0, 0, 94]
-G-Q-Pt-FG-LT-LP(U)
-try [51, 41, 0, 0, 0, -54]
-G-Q-Pt-FG-LT-LP(U)
-try [-73, 0, 5, -70, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-22, 0, -39, 69, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-84, 0, -2, -75, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-49, 0, -16, 7, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-45, 0, 99, -87, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 0, -62, 0, -8, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-96, 0, -7, 0, -19, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [29, 0, 26, 0, 6, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [79, 0, 32, 0, 96, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [77, 0, 2, 0, 29, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [89, 0, 12, 0, 0, -75]
-G-Q-Pt-FG-LT-LP(U)
-try [-54, 0, 43, 0, 0, 35]
-G-Q-Pt-FG-LT-LP(U)
-try [20, 0, 44, 0, 0, 75]
-G-Q-Pt-FG-LT-LP(U)
-try [22, 0, 22, 0, 0, -70]
-G-Q-Pt-FG-LT-LP(U)
-try [63, 0, 3, 0, 0, -8]
-G-Q-Pt-FG-LT-LP(U)
-try [-92, 0, 0, -62, -82, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [95, 0, 0, -14, -53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [19, 0, 0, 100, 5, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 70, -29, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-54, 0, 0, -73, -20, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [99, 0, 0, 6, 0, 8]
-G-Q-Pt-FG-LT-LP(U)
-try [4, 0, 0, -68, 0, 4]
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 84, 0, 30]
-G-Q-Pt-FG-LT-LP(U)
-try [-23, 0, 0, -4, 0, 11]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 75, 0, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [25, 0, 0, 0, 42, -12]
-G-Q-Pt-FG-LT-LP(U)
-try [80, 0, 0, 0, -99, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [44, 0, 0, 0, -22, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 0, 17, 7]
-G-Q-Pt-FG-LT-LP(U)
-try [97, 0, 0, 0, 9, 16]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -66, 8, -29, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -35, 91, -39, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -70, 11, 94, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -4, -11, 52, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -83, -80, -47, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 44, 47, 0, -15, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 74, 57, 0, -33, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 84, 18, 0, -41, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 90, 16, 0, 4, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 41, -51, 0, -70, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 97, -67, 0, 0, -74]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 14, 39, 0, 0, 50]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 10, 8, 0, 0, -30]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 42, -53, 0, 0, -66]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 64, -48, 0, 0, -46]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -57, 0, -83, 68, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -96, 0, 5, -92, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -56, 0, 42, 51, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -98, 0, -47, 81, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -15, 0, -93, -44, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 18, 0, 17, 0, 30]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 97, 0, 39, 0, 96]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -92, 0, 37, 0, 34]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 34, 0, -90, 0, 81]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -10, 0, -35, 0, -80]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -99, 0, 0, -8, -36]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 10, 0, 0, 48, 43]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 55, 0, 0, -31, -78]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -43, 0, 0, -82, 4]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 52, 0, 0, 60, -45]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 48, -2, -6, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -21, 66, -7, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 68, -97, 52, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -12, 61, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -88, 14, -53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 77, -42, 0, -14]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 27, 46, 0, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 58, -87, 0, 36]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 33, 80, 0, 72]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -65, 75, 0, 54]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -20, 0, -4, 82]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 33, 0, 11, 1]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -32, 0, -64, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -29, 0, 47, -33]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 81, 0, 51, 86]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 64, -74, -18]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -74, -19, -7]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -48, -98, -79]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -38, -37, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 70, 85, 27]
-G-Q-Pt-FG-LT-LP(U)
-try [-52, 26, -98, 94, 0, 0]
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :576
-Degree of the radical :576
+Dimension of the quotient :8192
+Degree of the radical :64
 Use non trivial separating element
-Separating form: [-52, 26, -98, 94, 0, 0]
+Separating form: [26, -10, -5, 41, 35, -67, 23]
 Run Groebner learn
-Test cyclic optimization
-Apply cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-
+5-9-13-17-21-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :157
+Nb Primes used :21
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :9
 =================================
-reimer6
-   D            576
-   d            576
-   sparsity     [0.35, 0.36, 0.27, 0.24, 0.17, 0.14]
-   type         cyclic
+Ka6_sq
+   D            8192
+   d            64
+   sparsity     [0.3, 0.3, 0.3, 0.3, 0.28, 0.26, 0.13]
+   type         general
 
 search_strategy=:current
-    sep. form   [1, -1, 0, 0, -1, 1]
-    coeff size  1924 bits
-    sparsity    0.43
-    time        2.27 s
+    sep. form   [0, 0, 0, 0, 0, 0, 1]
+    coeff size  382 bits
+    sparsity    0.13
+    time        982.0 s
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67]
-    coeff size  5638 bits
-    sparsity    0.43
-    time        5.2 s
+    sep. form   [26, -10, -5, 41, 35, -67, 23]
+    coeff size  768 bits
+    sparsity    0.3
+    time        2539.67 s
 
 search_strategy=:l0_norm
-    sep. form   [-52, 26, -98, 94, 0, 0]
-    coeff size  4866 bits
-    sparsity    0.43
-    time        17.52 s
+    sep. form   [0, 0, 0, 0, 0, 0, 1]
+    coeff size  382 bits
+    sparsity    0.13
+    time        988.57 s
     
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -1224,13 +136,21 @@ G-Q-Pt-FG-LT-LP(U)
  (1,3)G-Q-Pt-FG-LT-LP(U)
  (1,1)G-Q-Pt-FG-LT-LP(U)
  (1,1)G-Q-Pt-FG-LT-LP(U)
+ (1,1)G-Q-Pt-FG-LT-LP(U)
+ (1,1)G-Q-Pt-FG-LT-LP(U)
  (2,1)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
  (1,2)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :3840
-Degree of the radical :120
-Dim is 3840
+Dimension of the quotient :7456
+Degree of the radical :233
+Dim is 7456
 x1,x2,x3,x4,x5,
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -1242,315 +162,231 @@ G-Q-Pt-FG-LT-LP(U)
  (1,3)G-Q-Pt-FG-LT-LP(U)
  (1,1)G-Q-Pt-FG-LT-LP(U)
  (1,1)G-Q-Pt-FG-LT-LP(U)
+ (1,1)G-Q-Pt-FG-LT-LP(U)
+ (1,1)G-Q-Pt-FG-LT-LP(U)
  (2,1)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
- (2,2)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(U)
  (1,2)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :3840
-Degree of the radical :120
+Dimension of the quotient :7456
+Degree of the radical :233
 Use non trivial separating element
-Separating form: [2, -2, 0, -1, 1]
-Run Groebner learn
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :9
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :3840
-Degree of the radical :120
-Use non trivial separating element
-Separating form: [26, -10, -5, 41, 35]
-Run Groebner learn
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :25
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-67, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [32, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-82, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-84, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -13, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -69, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 33, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -7, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -29, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 10, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 67, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -27, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -87, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 42, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 90, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -17, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 41, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -7, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 90, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -92]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 35]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -28]
-G-Q-Pt-FG-LT-LP(U)
-try [12, -39, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-30, 89, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-75, 67, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [76, 26, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-51, 35, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [2, 0, 100, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [9, 0, -66, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-7, 0, 56, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-12, 0, -3, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [34, 0, 60, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [64, 0, 0, 28, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 36, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [29, 0, 0, -55, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [4, 0, 0, -3, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [45, 0, 0, 82, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [52, 0, 0, 0, 8]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 0, 0, 0, -20]
-G-Q-Pt-FG-LT-LP(U)
-try [72, 0, 0, 0, -17]
-G-Q-Pt-FG-LT-LP(U)
-try [-53, 0, 0, 0, 46]
-G-Q-Pt-FG-LT-LP(U)
-try [55, 0, 0, 0, -77]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 33, -3, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 56, -95, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -87, 10, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 54, -57, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -39, 69, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -17, 0, 66, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 20, 0, 85, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -33, 0, -72, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 80, 0, 13, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -71, 0, 4, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 16, 0, 0, 18]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -13, 0, 0, -43]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -18, 0, 0, 99]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -26, 0, 0, 92]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -50, 0, 0, 63]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -39, -2, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 94, -57, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 2, 42, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -72, 81, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 96, -45, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -49, 0, 81]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -63, 0, -42]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 86, 0, -10]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 53, 0, -82]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -21, 0, -10]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -25, -27]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -51, 60]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 66, 90]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -52, 10]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -6, 100]
-G-Q-Pt-FG-LT-LP(U)
-try [-44, 98, 29, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [78, 56, -2, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [52, -14, -64, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-45, 78, 84, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [18, -89, 88, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [25, 26, 0, 17, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [55, -8, 0, -27, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [50, -94, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 37, 0, -17, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-98, -58, 0, 29, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [78, 35, 0, 0, -12]
-G-Q-Pt-FG-LT-LP(U)
-try [-50, -78, 0, 0, 74]
-G-Q-Pt-FG-LT-LP(U)
-try [-15, 91, 0, 0, 7]
-G-Q-Pt-FG-LT-LP(U)
-try [-19, -73, 0, 0, 97]
-G-Q-Pt-FG-LT-LP(U)
-try [26, 75, 0, 0, 56]
-G-Q-Pt-FG-LT-LP(U)
-try [4, 0, -49, -4, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-31, 0, 93, -88, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [63, 0, -76, -99, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [53, 0, 87, -59, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [19, 0, -79, 98, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [59, 0, -99, 0, -47]
-G-Q-Pt-FG-LT-LP(U)
-try [-44, 0, 40, 0, -30]
-G-Q-Pt-FG-LT-LP(U)
-try [-44, 0, -47, 0, -53]
-G-Q-Pt-FG-LT-LP(U)
-try [9, 0, -98, 0, -83]
-G-Q-Pt-FG-LT-LP(U)
-try [-6, 0, 22, 0, -18]
-G-Q-Pt-FG-LT-LP(U)
-try [-25, 0, 0, -76, 44]
-G-Q-Pt-FG-LT-LP(U)
-try [-93, 0, 0, 66, 23]
-G-Q-Pt-FG-LT-LP(U)
-try [20, 0, 0, 46, 75]
-G-Q-Pt-FG-LT-LP(U)
-try [-92, 0, 0, -74, -100]
-G-Q-Pt-FG-LT-LP(U)
-try [-65, 0, 0, -58, -77]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 88, -93, 33, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -46, -53, 53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -99, -32, -5, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -25, 46, 81, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 23, 4, 77, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 31, -6, 0, 51]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 97, -61, 0, -5]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 87, 64, 0, 47]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -79, 92, 0, -68]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -30, 66, 0, -12]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 41, 0, -11, 6]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 84, 0, -3, 31]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 36, 0, -64, -59]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 20, 0, -50, -8]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 85, 0, 92, -96]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -34, -69, 24]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -79, 18, -14]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -67, 27, -91]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 22, 68, 4]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -85, -28, 51]
-G-Q-Pt-FG-LT-LP(U)
-try [65, 79, -80, 35, 0]
-G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :3840
-Degree of the radical :120
-Use non trivial separating element
-Separating form: [65, 79, -80, 35, 0]
+Separating form: [5, -3, 0, -1, 1]
 Run Groebner learn
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
 5-9-13-17-21-25-29-33-
 check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :33
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :7456
+Degree of the radical :233
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :53
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+try [26, 0, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 23, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -32, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, -15, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, 0, -21]
+G-Q-Pt-FG-LT-LP(U)
+try [-37, -13, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-36, 0, 45, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-85, 0, 0, 43, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [5, 0, 0, 0, -41]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -29, 47, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -36, 0, 24, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -84, 0, 0, -57]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -27, 70, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -87, 0, 93]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, 59, -86]
+G-Q-Pt-FG-LT-LP(U)
+try [39, -80, 25, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [95, 88, 0, -17, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [18, -30, 0, 0, 12]
+G-Q-Pt-FG-LT-LP(U)
+try [-40, 0, 67, -7, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-10, 0, 59, 0, -46]
+G-Q-Pt-FG-LT-LP(U)
+try [-49, 0, 0, 25, 29]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -63, 60, -51, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 69, 80, 0, 35]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 77, 0, -43, -29]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -48, -37, -28]
+G-Q-Pt-FG-LT-LP(U)
+try [12, -39, 83, -52, 0]
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :7456
+Degree of the radical :233
+Use non trivial separating element
+Separating form: [12, -39, 83, -52, 0]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :61
 =================================
-Ro5_sq
-   D            3840
-   d            120
-   sparsity     [0.06, 0.04, 0.03, 0.02, 0.01]
+No5_sq
+   D            7456
+   d            233
+   sparsity     [0.08, 0.08, 0.07, 0.07, 0.06]
    type         general
 
 search_strategy=:current
-    sep. form   [2, -2, 0, -1, 1]
-    coeff size  193 bits
-    sparsity    0.07
-    time        58.33 s
+    sep. form   [5, -3, 0, -1, 1]
+    coeff size  1107 bits
+    sparsity    0.16
+    time        5393.33 s
 
 search_strategy=:random
     sep. form   [26, -10, -5, 41, 35]
-    coeff size  644 bits
-    sparsity    0.07
-    time        104.76 s
+    coeff size  1610 bits
+    sparsity    0.17
+    time        7006.18 s
 
 search_strategy=:l0_norm
-    sep. form   [65, 79, -80, 35, 0]
-    coeff size  841 bits
-    sparsity    0.07
-    time        470.44 s
+    sep. form   [12, -39, 83, -52, 0]
+    coeff size  1883 bits
+    sparsity    0.16
+    time        10575.79 s
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+ (1,3)G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :4608
+Degree of the radical :144
+Dim is 4608
+x1,x2,x3,x4,x5,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+ (1,3)G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :4608
+Degree of the radical :144
+Use non trivial separating element
+Separating form: [-1, 0, 0, -1, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :13
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :4608
+Degree of the radical :144
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :33
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+try [26, 0, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 23, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -32, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, -15, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, 0, -21]
+G-Q-Pt-FG-LT-LP(U)
+try [-37, -13, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-36, 0, 45, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-85, 0, 0, 43, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [5, 0, 0, 0, -41]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -29, 47, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -36, 0, 24, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -84, 0, 0, -57]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -27, 70, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -87, 0, 93]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, 59, -86]
+G-Q-Pt-FG-LT-LP(U)
+try [39, -80, 25, 0, 0]
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :4608
+Degree of the radical :144
+Use non trivial separating element
+Separating form: [39, -80, 25, 0, 0]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :37
+=================================
+Re5_sq
+   D            4608
+   d            144
+   sparsity     [0.29, 0.28, 0.22, 0.21, 0.17]
+   type         general
+
+search_strategy=:current
+    sep. form   [-1, 0, 0, -1, 1]
+    coeff size  363 bits
+    sparsity    0.3
+    time        972.79 s
+
+search_strategy=:random
+    sep. form   [26, -10, -5, 41, 35]
+    coeff size  1093 bits
+    sparsity    0.31
+    time        1472.73 s
+
+search_strategy=:l0_norm
+    sep. form   [39, -80, 25, 0, 0]
+    coeff size  1112 bits
+    sparsity    0.31
+    time        2101.11 s
     

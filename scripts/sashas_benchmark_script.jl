@@ -29,19 +29,19 @@ coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) 
 for name in [
         # "caprasse", 
         # "fab_4", 
-        "noon6", 
-        "reimer6",
+        # "noon6", 
+        # "reimer6",
         # "robot",
         # "chandra10",
         # "chandra11",
         # "eco10",
         # "eco11",
         # "katsura11",
-        # "Ch6_sq",
-        # "Ka6_sq",
-        # "No5_sq",
-        # "Re5_sq",
-        "Ro5_sq",
+        "Ch6_sq",
+        "Ka6_sq",
+        "No5_sq",
+        "Re5_sq",
+        # "Ro5_sq",
         # "root7",   fails for search_strategy=:random
     ]
 
