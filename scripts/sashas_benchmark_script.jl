@@ -27,16 +27,16 @@ sparsity = m -> sum(!iszero, m) / prod(size(m))
 coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) + log2(abs(denominator(c))), f), rur)))
 
 for name in [
+        "caprasse",
         "goodwin",
-        "crn",
-        "seir36",
+        # "crn",
+        # "seir36",
         # "crauste-1",
-        # "crauste-2",
+        "crauste-2",
         # "crauste-3",
-        # "caprasse", 
         # "fab_4", 
-        # "noon6", 
-        # "reimer6",
+        "noon6", 
+        "reimer6",
         # "robot",
         # "chandra10",
         # "chandra11",
@@ -45,9 +45,9 @@ for name in [
         # "katsura11",
         # "Ch6_sq",
         # "Ka6_sq",
-        # "No5_sq",
-        # "Re5_sq",
-        # "Ro5_sq",
+        "No5_sq",
+        "Re5_sq",
+        "Ro5_sq",
         # "root7",   fails for search_strategy=:random
     ]
 
@@ -65,13 +65,17 @@ for name in [
 
     time3 = @elapsed rur3, sep3 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:l0_norm)
 
+    time4 = @elapsed rur4, sep4 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:mron_0l)
+
     m1 = sum(sep1 .* matrices)
     m2 = sum(sep2 .* matrices)
     m3 = sum(sep3 .* matrices)
+    m4 = sum(sep4 .* matrices)
     
     results = """
     =================================
     $name
+       n            $(length(gens(R)))
        D            $(infos.quotient)
        d            $(infos.minpoly)
        sparsity     $(map(x -> round(x, digits=2), map(sparsity, matrices)))
@@ -94,6 +98,12 @@ for name in [
         coeff size  $(coeff_size(rur3)) bits
         sparsity    $(round(sparsity(m3), digits=2))
         time        $(round(time3, digits=2)) s
+
+    search_strategy=:mron_0l
+        sep. form   $sep4
+        coeff size  $(coeff_size(rur4)) bits
+        sparsity    $(round(sparsity(m4), digits=2))
+        time        $(round(time4, digits=2)) s
         """
     println(results)
     open((@__DIR__) * "/results.txt", "a") do file println(file, results) end
