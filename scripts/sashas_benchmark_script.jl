@@ -1,4 +1,4 @@
-using Groebner, Nemo, RationalUnivariateRepresentation
+using Groebner, Nemo, RationalUnivariateRepresentation, Statistics
 import AbstractAlgebra
 
 function multiplication_matrices(J)
@@ -23,29 +23,63 @@ function multiplication_matrices(J)
     matrices
 end
 
+# from https://github.com/IainNZ/Humanize.jl/blob/master/README.md
+function digitsep(value::Integer; seperator="_", per_separator=3)
+    isnegative = value < zero(value)
+    value = string(abs(value))  # Stringify, no seperators.
+    # Figure out last character index of each group of digits.
+    group_ends = reverse(collect(length(value):-per_separator:1))
+    groups = [value[max(end_index - per_separator + 1, 1):end_index]
+              for end_index in group_ends]
+    return (isnegative ? "-" : "") * join(groups, seperator)
+end
+
 sparsity = m -> sum(!iszero, m) / prod(size(m))
+
 coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) + log2(abs(denominator(c))), f), rur)))
 
+coeff_size2 = rur -> begin
+    rur_z = map(f -> f*lcm(map(denominator, f)), rur)
+    low=Int(round(minimum(f -> minimum(c -> log2(max(abs(numerator(c)),1)), f), rur_z)))
+    med=Int(round(median(map(f -> median(map(c -> log2(abs(numerator(c))), f)), rur_z))))
+    up=Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))), f), rur_z)))
+    tot=Int(round(sum(f -> sum(c -> log2(max(abs(numerator(c)),1)), f), rur_z)))
+    (low, med, up, tot)
+end
+
+function from_template(strat, rur, sep, time, m)
+    """
+search_strategy=:$strat
+    sep. form    $sep
+    coeff size   $(digitsep(coeff_size(rur))) bits
+    coeff size2  $(join(digitsep.(coeff_size2(rur)), ", ")) bits
+    sparsity     $(round(sparsity(m), digits=2))
+    time         $(round(time, digits=2)) s
+    """
+end
+
 for name in [
-        "caprasse",
-        "goodwin",
+        # "caprasse",
+        # "goodwin",
         # "crn",
         # "seir36",
-        # "crauste-1",
+        "crauste-1",
         "crauste-2",
         # "crauste-3",
-        # "fab_4", 
+        "fab_4", 
+
+        
         "noon6", 
         "reimer6",
-        # "robot",
-        # "chandra10",
-        # "chandra11",
-        # "eco10",
-        # "eco11",
-        # "katsura11",
-        # "Ch6_sq",
-        # "Ka6_sq",
-        "No5_sq",
+        "robot",
+        "chandra10",
+        "chandra11",
+        "eco10",
+        "eco11",
+        "katsura11",
+        "Ch6_sq",
+        "Ka6_sq",
+        # "No5_sq",
         "Re5_sq",
         "Ro5_sq",
         # "root7",   fails for search_strategy=:random
@@ -75,35 +109,19 @@ for name in [
     results = """
     =================================
     $name
-       n            $(length(gens(R)))
-       D            $(infos.quotient)
-       d            $(infos.minpoly)
-       sparsity     $(map(x -> round(x, digits=2), map(sparsity, matrices)))
-       type         $(infos.type)
+        n            $(length(gens(R)))
+        D            $(infos.quotient)
+        d            $(infos.minpoly)
+        type         $(infos.type)
+        sparsity     $(map(x -> round(x, digits=2), map(sparsity, matrices)))
 
-    search_strategy=:current
-        sep. form   $sep1
-        coeff size  $(coeff_size(rur1)) bits
-        sparsity    $(round(sparsity(m1), digits=2))
-        time        $(round(time1, digits=2)) s
+    $(from_template(:current, rur1, sep1, time1, m1))
 
-    search_strategy=:random
-        sep. form   $sep2
-        coeff size  $(coeff_size(rur2)) bits
-        sparsity    $(round(sparsity(m2), digits=2))
-        time        $(round(time2, digits=2)) s
+    $(from_template(:random, rur2, sep2, time2, m2))
 
-    search_strategy=:l0_norm
-        sep. form   $sep3
-        coeff size  $(coeff_size(rur3)) bits
-        sparsity    $(round(sparsity(m3), digits=2))
-        time        $(round(time3, digits=2)) s
+    $(from_template(:l0_norm, rur3, sep3, time3, m3))
 
-    search_strategy=:mron_0l
-        sep. form   $sep4
-        coeff size  $(coeff_size(rur4)) bits
-        sparsity    $(round(sparsity(m4), digits=2))
-        time        $(round(time4, digits=2)) s
+    $(from_template(:mron_0l, rur4, sep4, time4, m4))
         """
     println(results)
     open((@__DIR__) * "/results.txt", "a") do file println(file, results) end

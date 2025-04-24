@@ -1,604 +1,100 @@
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :56
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :32
 Degree of the radical :32
-Dim is 56
-x,y,z,t,
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :56
-Degree of the radical :32
-Use non trivial separating element
-Separating form: [2, 0, -1, 1]
-Run Groebner learn
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :5
+Dim is 32
+E_0,E_1,E_2,E_3,E_4,E_5,M_0,M_1,M_2,M_3,M_4,M_5,N_0,N_1,N_2,N_3,N_4,P_0,P_1,P_2,P_3,P_4,P_5,P_6,S_0,S_1,S_2,S_3,S_4,S_5,delta_EL_0,delta_LM_0,delta_NE_0,mu_EE_0,mu_LE_0,mu_LL_0,mu_M_0,mu_N_0,mu_PE_0,mu_PL_0,mu_P_0,rho_E_0,rho_P_0,
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :56
+Dimension of the quotient :32
 Degree of the radical :32
-Use non trivial separating element
-Separating form: [26, -10, -5, 41]
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 Run Groebner learn
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :9
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -67, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 32, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -82]
-G-Q-Pt-FG-LT-LP(U)
-try [-46, -62, 0, 0]
-G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :56
-Degree of the radical :32
-Use non trivial separating element
-Separating form: [-46, -62, 0, 0]
-Run Groebner learn
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :9
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 41]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 23, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -40, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-32, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -15, -3]
-G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :56
-Degree of the radical :32
-Use non trivial separating element
-Separating form: [0, 0, -15, -3]
-Run Groebner learn
-Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-
-check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :5
-=================================
-caprasse
-   n            4
-   D            56
-   d            32
-   sparsity     [0.09, 0.09, 0.08, 0.07]
-   type         general
-
-search_strategy=:current
-    sep. form   [2, 0, -1, 1]
-    coeff size  56 bits
-    sparsity    0.2
-    time        0.16 s
-
-search_strategy=:random
-    sep. form   [26, -10, -5, 41]
-    coeff size  177 bits
-    sparsity    0.24
-    time        0.03 s
-
-search_strategy=:l0_norm
-    sep. form   [-46, -62, 0, 0]
-    coeff size  200 bits
-    sparsity    0.18
-    time        0.07 s
-
-search_strategy=:mron_0l
-    sep. form   [0, 0, -15, -3]
-    coeff size  129 bits
-    sparsity    0.16
-    time        0.07 s
-    
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,20)G-Q-Pt-FG-LT-LP(U)
- (4,1)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :40
-Degree of the radical :40
-Dim is 40
-Ki_0,k1_0,k2_0,k4_0,k5_0,k6_0,x1_0,x1_1,x1_2,x1_3,x1_4,x2_0,x2_1,x2_2,x2_3,x2_4,x3_0,x3_1,x3_2,x3_3,x3_4,x3_5,
-primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,20)G-Q-Pt-FG-LT-LP(U)
- (4,1)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :40
-Degree of the radical :40
-Use non trivial separating element
-Separating form: [-1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1]
-Run Groebner learn
-Test cyclic optimizationBad prime number for parameterization (40,31)
+Test cyclic optimizationBad prime number for parameterization (32,31)
 Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :425
+Nb Primes used :1973
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :40
-Degree of the radical :40
+Dimension of the quotient :32
+Degree of the radical :32
 Use non trivial separating element
-Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32, 28, -32, -47, 3, -82, -46, -62, -15, -3, -84, 3]
+Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32, 28, -32, -47, 3, -82, -46, -62, -15, -3, -84, 3, -61, 20, -21, -37, -13, 72, -36, 13, -36, -69, 45, -26, -94, -85, 33, -2, 43, -67, 5, -7, 71]
 Run Groebner learn
 Test cyclic optimization
 Apply cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-2173-2393-2633-2897-3189-3509-3861-4249-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :1481
+Nb Primes used :4249
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, -91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -52, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -52, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -99, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -80, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88]
-G-Q-Pt-FG-LT-LP(U)
-try [-30, -44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-40, 0, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [33, 0, 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :40
-Degree of the radical :40
-Use non trivial separating element
-Separating form: [33, 0, 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Dimension of the quotient :32
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 Run Groebner learn
-Test cyclic optimizationBad prime number for parameterization (40,31)
+Test cyclic optimizationBad prime number for parameterization (32,31)
 Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :289
+Nb Primes used :1973
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -39, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -29, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -78, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, -70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, -67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 44, -93]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 91, 0, -93]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 27]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, -30]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -64, 0, 0, 0, 0, -50]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 25]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 74]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -72, 0, 0, 0, 0, 0, 0, 0, -89]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 52]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, -87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 76]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -34]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -68]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -31]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7]
-G-Q-Pt-FG-LT-LP(U)
-try [97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 89, -10, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -51, 0, -70, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, 0, 0, -53, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 20, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 78, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -39, 0, 0, 0, 0, 0, -77, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, -36, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, -7, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 77, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -64, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, -79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -52, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -48, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -90, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -15, -40, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 35, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -50, 0, 0, 31, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 69, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 14, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 0, -29, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0, 0, 0, 62, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -79, 0, 0, 0, 0, 0, 0, 0, -10, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, -57, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, -95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, -81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -98, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -79, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -64, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -79, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 61, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, -98, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 0, 86, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -77, 0, 0, 0, 23, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 36, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -91, 0, 0, 0, 0, 0, -26, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -94, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -37, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, -89, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -29, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -77, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -82, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -67, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 21, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 0, 57, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 58, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, -47, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81, 0, 0, 0, 0, 42, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -24, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, -38, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -34, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -78, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -89, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 96, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -33, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 89, -91, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, 0, -57, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, -35, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -52, 0, 0, 0, 39, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 0, -48, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 0, -64, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 0, 39, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0, 57, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 2, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -69, 0, 92, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88, 0, 0, -19, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, -64, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -76, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, -42, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, 0, -23, 0, 0, 0, 0, 0, 0, -90, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 0, -41, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 99, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 0, -60, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0]
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :40
-Degree of the radical :40
-Use non trivial separating element
-Separating form: [-46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0]
+Dimension of the quotient :32
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 Run Groebner learn
-Test cyclic optimizationBad prime number for parameterization (40,31)
+Test cyclic optimizationBad prime number for parameterization (32,31)
 Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :469
+Nb Primes used :1973
 =================================
-goodwin
-   n            22
-   D            40
-   d            40
-   sparsity     [0.03, 0.05, 0.05, 0.05, 0.02, 0.05, 0.02, 0.02, 0.02, 0.02, 0.04, 0.05, 0.05, 0.05, 0.05, 0.04, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
-   type         cyclic
+crauste-1
+    n            43
+    D            32
+    d            32
+    type         shape
+    sparsity     [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.83, 0.83, 0.83, 0.83, 0.82, 0.84, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.91, 0.82, 0.83, 0.83, 0.83, 0.82, 0.83, 0.03, 0.91, 0.03, 0.03, 0.91, 0.91, 0.83, 0.03, 0.74, 0.6, 0.61, 0.03, 0.58]
 
 search_strategy=:current
-    sep. form   [-1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1]
-    coeff size  19652 bits
-    sparsity    0.08
-    time        1.31 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   88_276 bits
+    coeff size2  0, 23_835, 44_260, 40_109_430 bits
+    sparsity     0.58
+    time         10.12 s
+    
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32, 28, -32, -47, 3, -82, -46, -62, -15, -3, -84, 3]
-    coeff size  69139 bits
-    sparsity    0.1
-    time        4248.19 s
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32, 28, -32, -47, 3, -82, -46, -62, -15, -3, -84, 3, -61, 20, -21, -37, -13, 72, -36, 13, -36, -69, 45, -26, -94, -85, 33, -2, 43, -67, 5, -7, 71]
+    coeff size   206_775 bits
+    coeff size2  101_985, 102_574, 103_578, 144_551_834 bits
+    sparsity     0.96
+    time         22.25 s
+    
 
 search_strategy=:l0_norm
-    sep. form   [33, 0, 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    coeff size  11664 bits
-    sparsity    0.08
-    time        1.11 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   88_276 bits
+    coeff size2  0, 23_835, 44_260, 40_109_430 bits
+    sparsity     0.58
+    time         8.64 s
+    
 
 search_strategy=:mron_0l
-    sep. form   [-46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0]
-    coeff size  20867 bits
-    sparsity    0.06
-    time        1.07 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   88_276 bits
+    coeff size2  0, 23_835, 44_260, 40_109_430 bits
+    sparsity     0.58
+    time         8.71 s
+    
     
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -1466,35 +962,205 @@ check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :5141
 =================================
 crauste-2
-   n            43
-   D            128
-   d            128
-   sparsity     [0.01, 0.01, 0.01, 0.01, 0.26, 0.26, 0.39, 0.38, 0.38, 0.38, 0.44, 0.44, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.43, 0.39, 0.38, 0.38, 0.38, 0.44, 0.45, 0.26, 0.44, 0.26, 0.26, 0.45, 0.44, 0.41, 0.01, 0.36, 0.32, 0.36, 0.26, 0.34]
-   type         cyclic
+    n            43
+    D            128
+    d            128
+    type         cyclic
+    sparsity     [0.01, 0.01, 0.01, 0.01, 0.26, 0.26, 0.39, 0.38, 0.38, 0.38, 0.44, 0.44, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.43, 0.39, 0.38, 0.38, 0.38, 0.44, 0.45, 0.26, 0.44, 0.26, 0.26, 0.45, 0.44, 0.41, 0.01, 0.36, 0.32, 0.36, 0.26, 0.34]
 
 search_strategy=:current
-    sep. form   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 1]
-    coeff size  317536 bits
-    sparsity    0.36
-    time        136.49 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 1]
+    coeff size   317_536 bits
+    coeff size2  124_394, 125_447, 158_973, 750_496_335 bits
+    sparsity     0.36
+    time         180.5 s
+    
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32, 28, -32, -47, 3, -82, -46, -62, -15, -3, -84, 3, -61, 20, -21, -37, -13, 72, -36, 13, -36, -69, 45, -26, -94, -85, 33, -2, 43, -67, 5, -7, 71]
-    coeff size  774967 bits
-    sparsity    0.48
-    time        474.11 s
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32, 28, -32, -47, 3, -82, -46, -62, -15, -3, -84, 3, -61, 20, -21, -37, -13, 72, -36, 13, -36, -69, 45, -26, -94, -85, 33, -2, 43, -67, 5, -7, 71]
+    coeff size   774_967 bits
+    coeff size2  384_649, 386_816, 388_275, 2_178_031_092 bits
+    sparsity     0.48
+    time         584.54 s
+    
 
 search_strategy=:l0_norm
-    sep. form   [0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -76, 0, 0, 0, 0, 0]
-    coeff size  218377 bits
-    sparsity    0.4
-    time        170.79 s
+    sep. form    [0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -76, 0, 0, 0, 0, 0]
+    coeff size   218_377 bits
+    coeff size2  73_449, 74_393, 109_610, 447_541_004 bits
+    sparsity     0.4
+    time         214.13 s
+    
 
 search_strategy=:mron_0l
-    sep. form   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22, 0, 0, 0, 0, 5]
-    coeff size  263662 bits
-    sparsity    0.35
-    time        116.0 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22, 0, 0, 0, 0, 5]
+    coeff size   263_662 bits
+    coeff size2  97_680, 98_555, 132_360, 599_590_875 bits
+    sparsity     0.35
+    time         143.42 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1296
+Degree of the radical :1056
+Dim is 1296
+x1,x2,x3,x4,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+G-Q-Pt-FG-LT-LP(U)
+ (1,2)G-Q-Pt-FG-LT-LP(U)
+ (2,1)G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1296
+Degree of the radical :1056
+Use non trivial separating element
+Separating form: [-1, -1, -1, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1009
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1296
+Degree of the radical :1056
+Use non trivial separating element
+Separating form: [26, -10, -5, 41]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1009
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+try [26, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -67, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 32, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, -82]
+G-Q-Pt-FG-LT-LP(U)
+try [-46, -62, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-84, 0, -61, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-21, 0, 0, 72]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 13, -36, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -26, 0, -85]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 43, -67]
+G-Q-Pt-FG-LT-LP(U)
+try [5, -7, 71, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-41, 100, 0, 47]
+G-Q-Pt-FG-LT-LP(U)
+try [52, 0, -44, -36]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 24, -31, -78]
+G-Q-Pt-FG-LT-LP(U)
+try [-84, 67, 91, -57]
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1296
+Degree of the radical :1056
+Use non trivial separating element
+Separating form: [-84, 67, 91, -57]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1009
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 0, 41]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, 23, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -40, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-32, 0, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 0, -15, -3]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 3, 0, 20]
+G-Q-Pt-FG-LT-LP(U)
+try [-21, 0, 0, 72]
+G-Q-Pt-FG-LT-LP(U)
+try [0, 13, -36, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [45, 0, -94, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [33, -2, 0, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [0, -7, 71, -66]
+G-Q-Pt-FG-LT-LP(U)
+try [-41, 0, -29, 47]
+G-Q-Pt-FG-LT-LP(U)
+try [52, 24, 0, -36]
+G-Q-Pt-FG-LT-LP(U)
+try [10, 24, -31, 0]
+G-Q-Pt-FG-LT-LP(U)
+try [-84, 67, 91, -57]
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1296
+Degree of the radical :1056
+Use non trivial separating element
+Separating form: [-84, 67, 91, -57]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1009
+=================================
+fab_4
+    n            4
+    D            1296
+    d            1056
+    type         general
+    sparsity     [0.23, 0.23, 0.21, 0.1]
+
+search_strategy=:current
+    sep. form    [-1, -1, -1, 1]
+    coeff size   28_056 bits
+    coeff size2  13_175, 14_420, 14_881, 75_531_650 bits
+    sparsity     0.24
+    time         222.94 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41]
+    coeff size   32_837 bits
+    coeff size2  13_115, 16_988, 19_724, 88_935_542 bits
+    sparsity     0.24
+    time         206.49 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [-84, 67, 91, -57]
+    coeff size   34_503 bits
+    coeff size2  13_173, 17_817, 21_333, 93_326_326 bits
+    sparsity     0.24
+    time         199.48 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [-84, 67, 91, -57]
+    coeff size   34_503 bits
+    coeff size2  13_173, 17_817, 21_333, 93_326_326 bits
+    sparsity     0.24
+    time         199.62 s
+    
     
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -1868,35 +1534,43 @@ check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :213
 =================================
 noon6
-   n            6
-   D            717
-   d            717
-   sparsity     [0.04, 0.03, 0.03, 0.03, 0.02, 0.02]
-   type         cyclic
+    n            6
+    D            717
+    d            717
+    type         cyclic
+    sparsity     [0.04, 0.03, 0.03, 0.03, 0.02, 0.02]
 
 search_strategy=:current
-    sep. form   [-11, 5, -3, 0, -1, 1]
-    coeff size  4087 bits
-    sparsity    0.09
-    time        7.68 s
+    sep. form    [-11, 5, -3, 0, -1, 1]
+    coeff size   4_087 bits
+    coeff size2  1_171, 2_634, 3_543, 12_799_012 bits
+    sparsity     0.09
+    time         9.1 s
+    
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67]
-    coeff size  6034 bits
-    sparsity    0.1
-    time        7.22 s
+    sep. form    [26, -10, -5, 41, 35, -67]
+    coeff size   6_034 bits
+    coeff size2  1_227, 3_674, 5_545, 18_049_255 bits
+    sparsity     0.1
+    time         8.83 s
+    
 
 search_strategy=:l0_norm
-    sep. form   [-67, 86, 65, -10, 33, 0]
-    coeff size  6463 bits
-    sparsity    0.09
-    time        11.83 s
+    sep. form    [-67, 86, 65, -10, 33, 0]
+    coeff size   6_463 bits
+    coeff size2  1_220, 3_851, 6_005, 18_986_419 bits
+    sparsity     0.09
+    time         14.23 s
+    
 
 search_strategy=:mron_0l
-    sep. form   [0, 86, 65, -10, 33, -91]
-    coeff size  6529 bits
-    sparsity    0.09
-    time        12.29 s
+    sep. form    [0, 86, 65, -10, 33, -91]
+    coeff size   6_529 bits
+    coeff size2  1_220, 3_912, 6_074, 19_232_537 bits
+    sparsity     0.09
+    time         14.74 s
+    
     
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -2144,261 +1818,811 @@ check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :157
 =================================
 reimer6
-   n            6
-   D            576
-   d            576
-   sparsity     [0.35, 0.36, 0.27, 0.24, 0.17, 0.14]
-   type         cyclic
+    n            6
+    D            576
+    d            576
+    type         cyclic
+    sparsity     [0.35, 0.36, 0.27, 0.24, 0.17, 0.14]
 
 search_strategy=:current
-    sep. form   [1, -1, 0, 0, -1, 1]
-    coeff size  1924 bits
-    sparsity    0.43
-    time        1.8 s
+    sep. form    [1, -1, 0, 0, -1, 1]
+    coeff size   1_924 bits
+    coeff size2  0, 1_150, 1_215, 3_503_189 bits
+    sparsity     0.43
+    time         2.18 s
+    
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35, -67]
-    coeff size  5638 bits
-    sparsity    0.43
-    time        3.95 s
+    sep. form    [26, -10, -5, 41, 35, -67]
+    coeff size   5_638 bits
+    coeff size2  1_374, 3_208, 4_487, 12_604_980 bits
+    sparsity     0.43
+    time         4.6 s
+    
 
 search_strategy=:l0_norm
-    sep. form   [-39, 69, -98, -32, 0, 0]
-    coeff size  5905 bits
-    sparsity    0.43
-    time        5.93 s
+    sep. form    [-39, 69, -98, -32, 0, 0]
+    coeff size   5_905 bits
+    coeff size2  1_191, 3_292, 4_765, 12_957_301 bits
+    sparsity     0.43
+    time         7.03 s
+    
 
 search_strategy=:mron_0l
-    sep. form   [0, 0, -98, -32, 10, -17]
-    coeff size  5057 bits
-    sparsity    0.34
-    time        5.72 s
+    sep. form    [0, 0, -98, -32, 10, -17]
+    coeff size   5_057 bits
+    coeff size2  1_063, 2_970, 4_240, 11_683_388 bits
+    sparsity     0.34
+    time         6.77 s
+    
     
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :7456
-Degree of the radical :233
-Dim is 7456
-x1,x2,x3,x4,x5,
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :40
+Degree of the radical :40
+Dim is 40
+t1,t2,t3,a,b,c,
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
-G-Q-Pt-FG-LT-LP(U)
- (1,3)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (1,1)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(U)
- (2,1)G-Q-Pt-FG-LT-LP(U)
- (1,2)G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :7456
-Degree of the radical :233
-Use non trivial separating element
-Separating form: [5, -3, 0, -1, 1]
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :40
+Degree of the radical :40
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
 Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :385
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :40
+Degree of the radical :40
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :425
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :40
+Degree of the radical :40
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :385
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :40
+Degree of the radical :40
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :385
+=================================
+robot
+    n            6
+    D            40
+    d            40
+    type         shape
+    sparsity     [0.76, 0.76, 0.76, 0.71, 0.65, 0.52]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   16_103 bits
+    coeff size2  0, 2_799, 8_117, 1_418_705 bits
+    sparsity     0.52
+    time         0.32 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67]
+    coeff size   17_676 bits
+    coeff size2  8_473, 8_962, 9_200, 2_507_379 bits
+    sparsity     0.8
+    time         0.53 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   16_103 bits
+    coeff size2  0, 2_799, 8_117, 1_418_705 bits
+    sparsity     0.52
+    time         0.45 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   16_103 bits
+    coeff size2  0, 2_799, 8_117, 1_418_705 bits
+    sparsity     0.52
+    time         0.32 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Dim is 512
+H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1345
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-2173-2393-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :2393
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1345
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :1345
+=================================
+chandra10
+    n            10
+    D            512
+    d            512
+    type         shape
+    sparsity     [0.28, 0.28, 0.28, 0.28, 0.27, 0.25, 0.21, 0.17, 0.16, 0.16]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   62_987 bits
+    coeff size2  0, 33_022, 34_673, 184_252_740 bits
+    sparsity     0.16
+    time         35.22 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40]
+    coeff size   114_277 bits
+    coeff size2  52_342, 58_157, 62_155, 326_106_277 bits
+    sparsity     0.28
+    time         62.76 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   62_987 bits
+    coeff size2  0, 33_022, 34_673, 184_252_740 bits
+    sparsity     0.16
+    time         35.2 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   62_987 bits
+    coeff size2  0, 33_022, 34_673, 184_252_740 bits
+    sparsity     0.16
+    time         33.74 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Dim is 1024
+H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-2173-2393-2633-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :2633
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-2173-2393-2633-2897-3189-3509-3861-4249-4673-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :4673
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-2173-2393-2633-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :2633
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-517-569-625-689-757-833-917-1009-1109-1221-1345-1481-1629-1793-1973-2173-2393-2633-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :2633
+=================================
+chandra11
+    n            11
+    D            1024
+    d            1024
+    type         shape
+    sparsity     [0.24, 0.24, 0.24, 0.24, 0.24, 0.23, 0.2, 0.17, 0.14, 0.14, 0.13]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   123_457 bits
+    coeff size2  0, 65_553, 69_325, 797_323_208 bits
+    sparsity     0.13
+    time         409.84 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32]
+    coeff size   224_701 bits
+    coeff size2  102_155, 114_408, 123_051, 1_399_440_885 bits
+    sparsity     0.24
+    time         1663.7 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   123_457 bits
+    coeff size2  0, 65_553, 69_325, 797_323_208 bits
+    sparsity     0.13
+    time         1084.18 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   123_457 bits
+    coeff size2  0, 65_553, 69_325, 797_323_208 bits
+    sparsity     0.13
+    time         810.34 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :256
+Degree of the radical :256
+Dim is 256
+x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :256
+Degree of the radical :256
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimizationBad prime number for parameterization (256,23)
+Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
 5-9-13-17-21-25-29-33-
 check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :33
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :7456
-Degree of the radical :233
+Dimension of the quotient :256
+Degree of the radical :256
 Use non trivial separating element
-Separating form: [26, -10, -5, 41, 35]
+Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40]
 Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :53
+Nb Primes used :105
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [26, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 23, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -32, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -15, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, -21]
-G-Q-Pt-FG-LT-LP(U)
-try [-37, -13, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-36, 0, 45, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-85, 0, 0, 43, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [5, 0, 0, 0, -41]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -29, 47, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -36, 0, 24, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -84, 0, 0, -57]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -27, 70, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -87, 0, 93]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 59, -86]
-G-Q-Pt-FG-LT-LP(U)
-try [39, -80, 25, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [95, 88, 0, -17, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [18, -30, 0, 0, 12]
-G-Q-Pt-FG-LT-LP(U)
-try [-40, 0, 67, -7, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-10, 0, 59, 0, -46]
-G-Q-Pt-FG-LT-LP(U)
-try [-49, 0, 0, 25, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -63, 60, -51, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 69, 80, 0, 35]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 77, 0, -43, -29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -48, -37, -28]
-G-Q-Pt-FG-LT-LP(U)
-try [12, -39, 83, -52, 0]
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :7456
-Degree of the radical :233
-Use non trivial separating element
-Separating form: [12, -39, 83, -52, 0]
+Dimension of the quotient :256
+Degree of the radical :256
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 Run Groebner learn
+Test cyclic optimizationBad prime number for parameterization (256,23)
+Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-
+5-9-13-17-21-25-29-33-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :61
+Nb Primes used :33
 primes of bitsize 28
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, 0, 35]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -9, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, -32, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -46, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-84, 0, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 0, -36, 13]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 45, 0, -94]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 33, 0, 0, -67]
-G-Q-Pt-FG-LT-LP(U)
-try [5, 0, 0, 0, -41]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 47, 52, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -36, 0, 24, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-78, 0, 0, 91, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -44, -27, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [40, 0, -87, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [-28, 56, 0, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 0, 25, 90, -13]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 88, 0, -17, 55]
-G-Q-Pt-FG-LT-LP(U)
-try [18, 0, 0, 41, 12]
-G-Q-Pt-FG-LT-LP(U)
-try [0, 7, 67, 0, -77]
-G-Q-Pt-FG-LT-LP(U)
-try [-10, 0, 59, 0, -46]
-G-Q-Pt-FG-LT-LP(U)
-try [-49, 76, 0, 0, 29]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -63, 60, -51, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [9, 0, 80, 38, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [64, 77, 0, -43, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [19, -32, -48, 0, 0]
-G-Q-Pt-FG-LT-LP(U)
-try [0, -39, 83, -52, 36]
 G-Q-Pt-FG-LT-LP(C)
-Dimension of the quotient :7456
-Degree of the radical :233
-Use non trivial separating element
-Separating form: [0, -39, 83, -52, 36]
+Dimension of the quotient :256
+Degree of the radical :256
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 Run Groebner learn
+Test cyclic optimizationBad prime number for parameterization (256,23)
+Switch off cyclic optimization 
 Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
-5-9-13-17-21-25-29-33-37-41-45-49-53-61-
+5-9-13-17-21-25-29-33-
 check-G-Q-Pt-FG-LT-LP(C)
-Nb Primes used :61
+Nb Primes used :33
 =================================
-No5_sq
-   n            5
-   D            7456
-   d            233
-   sparsity     [0.08, 0.08, 0.07, 0.07, 0.06]
-   type         general
+eco10
+    n            10
+    D            256
+    d            256
+    type         shape
+    sparsity     [0.34, 0.47, 0.52, 0.53, 0.5, 0.48, 0.43, 0.38, 0.19, 0.15]
 
 search_strategy=:current
-    sep. form   [5, -3, 0, -1, 1]
-    coeff size  1107 bits
-    sparsity    0.16
-    time        5480.14 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   815 bits
+    coeff size2  0, 528, 819, 1_389_725 bits
+    sparsity     0.15
+    time         0.83 s
+    
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35]
-    coeff size  1610 bits
-    sparsity    0.17
-    time        7036.02 s
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40]
+    coeff size   3_087 bits
+    coeff size2  406, 1_712, 2_793, 4_733_074 bits
+    sparsity     0.61
+    time         1.49 s
+    
 
 search_strategy=:l0_norm
-    sep. form   [12, -39, 83, -52, 0]
-    coeff size  1883 bits
-    sparsity    0.16
-    time        11049.17 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   815 bits
+    coeff size2  0, 528, 819, 1_389_725 bits
+    sparsity     0.15
+    time         0.75 s
+    
 
 search_strategy=:mron_0l
-    sep. form   [0, -39, 83, -52, 36]
-    coeff size  1878 bits
-    sparsity    0.15
-    time        12961.19 s
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   815 bits
+    coeff size2  0, 528, 819, 1_389_725 bits
+    sparsity     0.15
+    time         0.73 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Dim is 512
+x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimizationBad prime number for parameterization (512,24)
+Switch off cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :69
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :213
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimizationBad prime number for parameterization (512,24)
+Switch off cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :69
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :512
+Degree of the radical :512
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimizationBad prime number for parameterization (512,24)
+Switch off cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :69
+=================================
+eco11
+    n            11
+    D            512
+    d            512
+    type         shape
+    sparsity     [0.34, 0.45, 0.5, 0.51, 0.49, 0.46, 0.43, 0.39, 0.37, 0.2, 0.14]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   1_705 bits
+    coeff size2  0, 1_103, 1_708, 6_318_650 bits
+    sparsity     0.14
+    time         7.4 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32]
+    coeff size   6_369 bits
+    coeff size2  822, 3_460, 5_599, 20_858_813 bits
+    sparsity     0.58
+    time         12.97 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   1_705 bits
+    coeff size2  0, 1_103, 1_708, 6_318_650 bits
+    sparsity     0.14
+    time         7.64 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   1_705 bits
+    coeff size2  0, 1_103, 1_708, 6_318_650 bits
+    sparsity     0.14
+    time         7.41 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Dim is 1024
+x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :157
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-173-193-213-237-261-289-317-349-385-425-469-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :469
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :157
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :1024
+Degree of the radical :1024
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Test cyclic optimization
+Apply cyclic optimization 
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-157-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :157
+=================================
+katsura11
+    n            11
+    D            1024
+    d            1024
+    type         shape
+    sparsity     [0.63, 0.55, 0.58, 0.57, 0.56, 0.56, 0.55, 0.54, 0.49, 0.36, 0.26]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   9_799 bits
+    coeff size2  0, 4_690, 5_847, 56_556_803 bits
+    sparsity     0.26
+    time         46.77 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67, 23, 34, -9, -40, 32]
+    coeff size   19_581 bits
+    coeff size2  7_689, 10_615, 11_922, 127_695_316 bits
+    sparsity     0.63
+    time         106.82 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   9_799 bits
+    coeff size2  0, 4_690, 5_847, 56_556_803 bits
+    sparsity     0.26
+    time         48.9 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   9_799 bits
+    coeff size2  0, 4_690, 5_847, 56_556_803 bits
+    sparsity     0.26
+    time         48.61 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
+Dim is 2048
+H1,H2,H3,H4,H5,H6,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :77
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-85-93-105-117-129-141-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :141
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :77
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :2048
+Degree of the radical :32
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-25-29-33-37-41-45-49-53-61-69-77-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :77
+=================================
+Ch6_sq
+    n            6
+    D            2048
+    d            32
+    type         general
+    sparsity     [0.37, 0.36, 0.35, 0.32, 0.28, 0.22]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   3_577 bits
+    coeff size2  0, 1_845, 1_895, 408_904 bits
+    sparsity     0.22
+    time         123.64 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67]
+    coeff size   6_556 bits
+    coeff size2  3_066, 3_315, 3_486, 743_306 bits
+    sparsity     0.38
+    time         292.24 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   3_577 bits
+    coeff size2  0, 1_845, 1_895, 408_904 bits
+    sparsity     0.22
+    time         120.57 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   3_577 bits
+    coeff size2  0, 1_845, 1_895, 408_904 bits
+    sparsity     0.22
+    time         121.47 s
+    
+    
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Dim is 8192
+x0,x1,x2,x3,x4,x5,x6,
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :9
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Use non trivial separating element
+Separating form: [26, -10, -5, 41, 35, -67, 23]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-13-17-21-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :21
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :9
+primes of bitsize 28
+G-Q-Pt-FG-LT-LP(C)
+Dimension of the quotient :8192
+Degree of the radical :64
+Use last variable as separating element
+Separating form: [0, 0, 0, 0, 0, 0, 1]
+Run Groebner learn
+Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
+5-9-
+check-G-Q-Pt-FG-LT-LP(C)
+Nb Primes used :9
+=================================
+Ka6_sq
+    n            7
+    D            8192
+    d            64
+    type         general
+    sparsity     [0.3, 0.3, 0.3, 0.3, 0.28, 0.26, 0.13]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 1]
+    coeff size   382 bits
+    coeff size2  0, 177, 249, 87_418 bits
+    sparsity     0.13
+    time         1131.07 s
+    
+
+search_strategy=:random
+    sep. form    [26, -10, -5, 41, 35, -67, 23]
+    coeff size   768 bits
+    coeff size2  254, 433, 514, 214_724 bits
+    sparsity     0.3
+    time         4492.57 s
+    
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 1]
+    coeff size   382 bits
+    coeff size2  0, 177, 249, 87_418 bits
+    sparsity     0.13
+    time         1250.94 s
+    
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 1]
+    coeff size   382 bits
+    coeff size2  0, 177, 249, 87_418 bits
+    sparsity     0.13
+    time         1104.72 s
+    
     
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -2528,35 +2752,43 @@ check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :37
 =================================
 Re5_sq
-   n            5
-   D            4608
-   d            144
-   sparsity     [0.29, 0.28, 0.22, 0.21, 0.17]
-   type         general
+    n            5
+    D            4608
+    d            144
+    type         general
+    sparsity     [0.29, 0.28, 0.22, 0.21, 0.17]
 
 search_strategy=:current
-    sep. form   [-1, 0, 0, -1, 1]
-    coeff size  363 bits
-    sparsity    0.3
-    time        834.16 s
+    sep. form    [-1, 0, 0, -1, 1]
+    coeff size   363 bits
+    coeff size2  140, 240, 255, 199_773 bits
+    sparsity     0.3
+    time         1571.01 s
+    
 
 search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35]
-    coeff size  1093 bits
-    sparsity    0.31
-    time        1255.25 s
+    sep. form    [26, -10, -5, 41, 35]
+    coeff size   1_093 bits
+    coeff size2  206, 630, 888, 528_645 bits
+    sparsity     0.31
+    time         1770.52 s
+    
 
 search_strategy=:l0_norm
-    sep. form   [39, -80, 25, 0, 0]
-    coeff size  1112 bits
-    sparsity    0.31
-    time        1637.07 s
+    sep. form    [39, -80, 25, 0, 0]
+    coeff size   1_112 bits
+    coeff size2  178, 649, 979, 544_496 bits
+    sparsity     0.31
+    time         2052.33 s
+    
 
 search_strategy=:mron_0l
-    sep. form   [0, 0, 25, 90, -13]
-    coeff size  1018 bits
-    sparsity    0.25
-    time        1824.01 s
+    sep. form    [0, 0, 25, 90, -13]
+    coeff size   1_018 bits
+    coeff size2  182, 649, 974, 546_506 bits
+    sparsity     0.25
+    time         1794.38 s
+    
     
 primes of bitsize 28
 G-Q-Pt-FG-LT-LP(U)
@@ -2736,35 +2968,3 @@ Multi-modular computation (1 threads): G-Q-Pt-FG-LT-LP(C)
 5-9-13-17-21-25-29-
 check-G-Q-Pt-FG-LT-LP(C)
 Nb Primes used :29
-=================================
-Ro5_sq
-   n            5
-   D            3840
-   d            120
-   sparsity     [0.06, 0.04, 0.03, 0.02, 0.01]
-   type         general
-
-search_strategy=:current
-    sep. form   [2, -2, 0, -1, 1]
-    coeff size  193 bits
-    sparsity    0.07
-    time        171.67 s
-
-search_strategy=:random
-    sep. form   [26, -10, -5, 41, 35]
-    coeff size  644 bits
-    sparsity    0.07
-    time        298.46 s
-
-search_strategy=:l0_norm
-    sep. form   [12, -39, 83, -52, 0]
-    coeff size  807 bits
-    sparsity    0.07
-    time        467.04 s
-
-search_strategy=:mron_0l
-    sep. form   [0, -39, 83, -52, 36]
-    coeff size  799 bits
-    sparsity    0.05
-    time        414.78 s
-    
