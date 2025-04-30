@@ -436,7 +436,7 @@ function mul_var_quo(v, ii, t_v, i_xw, arithm::ModularArithmetic{Accum,Coeff}, v
     return r
 end
 
-function learn_compute_table!(t_v, t_xw, i_xw, quo, arithm)
+TimerOutputs.@timeit to "Learn Table" function learn_compute_table!(t_v, t_xw, i_xw, quo, arithm)
     nb = 1
     t_learn = Int32[]
     buf = Vector{AccModularCoeff}()
@@ -1045,10 +1045,13 @@ function _zdim_modular_RUR_deterministic(de, co, arithm, learn = false)
     end
 end
 
+const _BOUND = Ref(10)
+
 function _zdim_modular_RUR_random(de, co, arithm, learn = false)
     nbv = length(de[1][1])
     rng = Random.Xoshiro(42)  # to fix the sequence of random numbers
-    sep_lin = [rand(rng, -100:100) for i = 1:nbv]
+    bound = _BOUND[]
+    sep_lin = [rand(rng, setdiff(collect(-bound:bound), 0)) for i = 1:nbv]
     dde, cco = extend_system_with_sepform(de, co, ModularCoeff(1), modular_coeffs_vect(map(u -> -u, sep_lin), ModularPrime(arithm)))
     flag, zp_param, ltg, q, i_xw, t_xw, t_learn, uu = _zdim_modular_RUR_LV(dde, cco, arithm)
     @assert flag

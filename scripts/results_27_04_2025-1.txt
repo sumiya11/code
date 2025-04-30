@@ -1,0 +1,420 @@
+=================================
+caprasse
+    n            4
+    D            56
+    d            32
+    type         general
+    sparsity     [0.09, 0.09, 0.08, 0.07]
+
+search_strategy=:current
+    sep. form    [2, 0, -1, 1]
+    coeff size   56 bits
+    coeff size2  -1, 9, 53, 2_921 bits
+    sparsity     0.2
+    time         0.01 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5]
+    coeff size   87 bits
+    coeff size2  -1, 10, 86, 4_429 bits
+    sparsity     0.24
+    time         0.01 s
+
+search_strategy=:l0_norm
+    sep. form    [-46, -62, 0, 0]
+    coeff size   200 bits
+    coeff size2  -1, 13, 201, 9_240 bits
+    sparsity     0.18
+    time         0.01 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, -15, -3]
+    coeff size   129 bits
+    coeff size2  -1, 7, 129, 6_337 bits
+    sparsity     0.16
+    time         0.27 s
+    
+=================================
+seir36
+    n            68
+    D            14
+    d            14
+    type         cyclic
+    sparsity     [0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 1.0, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.85, 0.85, 0.85, 0.85, 0.85, 0.85, 0.93, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.07, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.93, 0.93, 0.94, 0.69, 0.69, 0.69, 0.87, 0.07, 0.0, 0.0, 0.0, 0.0, 0.87, 0.93, 0.07, 0.0, 0.0, 0.0, 0.0, 0.0, 0.87, 0.07]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+    coeff size   136_990 bits
+    coeff size2  -1, 28_816, 68_520, 32_006_409 bits
+    sparsity     0.87
+    time         10.45 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4, -7, 3, 4, -1, -5, 4, 3, -4, -5, 1, -9, -5, -7, -2, -1, -9, 1, -7, 3, -3, -4, -2, 8, -4, 2, -4, -7, 5, -3, -10, -9, 4, -1, 5, -7, 1, -1, 8, -7, -5, 10, -3, 5, 6, 3, -5, -4, 1, 3, -4, -8, -9, 7, 10, -6, 4, -5, -3, 7, 4, 4, -3, -9]
+    coeff size   221_191 bits
+    coeff size2  -1, 109_671, 110_633, 84_646_477 bits
+    sparsity     1.0
+    time         17.91 s
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    coeff size   144_071 bits
+    coeff size2  -1, 42_381, 72_093, 42_137_873 bits
+    sparsity     1.0
+    time         11.97 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0]
+    coeff size   136_965 bits
+    coeff size2  -1, 28_923, 68_537, 32_015_718 bits
+    sparsity     0.87
+    time         9.4 s
+    
+=================================
+crauste-2
+    n            43
+    D            128
+    d            128
+    type         cyclic
+    sparsity     [0.01, 0.01, 0.01, 0.01, 0.26, 0.26, 0.39, 0.38, 0.38, 0.38, 0.44, 0.44, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.43, 0.39, 0.38, 0.38, 0.38, 0.44, 0.45, 0.26, 0.44, 0.26, 0.26, 0.45, 0.44, 0.41, 0.01, 0.36, 0.32, 0.36, 0.26, 0.34]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 1]
+    coeff size   317_536 bits
+    coeff size2  -1, 125_447, 158_973, 750_496_335 bits
+    sparsity     0.36
+    time         136.62 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4, -7, 3, 4, -1, -5, 4, 3, -4, -5, 1, -9, -5, -7, -2, -1, -9, 1, -7, 3, -3, -4, -2, 8, -4, 2, -4, -7, 5, -3, -10, -9, 4, -1, 5, -7, 1, -1, 8]
+    coeff size   774_747 bits
+    coeff size2  -1, 386_708, 387_943, 2_177_393_297 bits
+    sparsity     0.48
+    time         474.43 s
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -76, 0, 0, 0, 0, 0]
+    coeff size   218_377 bits
+    coeff size2  -1, 74_393, 109_610, 447_541_004 bits
+    sparsity     0.4
+    time         171.9 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22, 0, 0, 0, 0, 5]
+    coeff size   263_662 bits
+    coeff size2  -1, 98_555, 132_360, 599_590_875 bits
+    sparsity     0.35
+    time         116.83 s
+    
+=================================
+fab_4
+    n            4
+    D            1296
+    d            1056
+    type         general
+    sparsity     [0.23, 0.23, 0.21, 0.1]
+
+search_strategy=:current
+    sep. form    [-1, -1, -1, 1]
+    coeff size   28_056 bits
+    coeff size2  -1, 14_420, 14_881, 75_531_650 bits
+    sparsity     0.24
+    time         161.7 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5]
+    coeff size   29_736 bits
+    coeff size2  -1, 15_410, 16_561, 80_606_397 bits
+    sparsity     0.24
+    time         160.97 s
+
+search_strategy=:l0_norm
+    sep. form    [-84, 67, 91, -57]
+    coeff size   34_503 bits
+    coeff size2  -1, 17_817, 21_333, 93_326_326 bits
+    sparsity     0.24
+    time         164.6 s
+
+search_strategy=:mron_0l
+    sep. form    [-84, 67, 91, -57]
+    coeff size   34_503 bits
+    coeff size2  -1, 17_817, 21_333, 93_326_326 bits
+    sparsity     0.24
+    time         164.68 s
+    
+=================================
+noon6
+    n            6
+    D            717
+    d            717
+    type         cyclic
+    sparsity     [0.04, 0.03, 0.03, 0.03, 0.02, 0.02]
+
+search_strategy=:current
+    sep. form    [-11, 5, -3, 0, -1, 1]
+    coeff size   4_087 bits
+    coeff size2  -1, 2_634, 3_543, 12_799_012 bits
+    sparsity     0.09
+    time         7.77 s
+
+search_strategy=:random
+    FAILED
+
+search_strategy=:l0_norm
+    sep. form    [-67, 86, 65, -10, 33, 0]
+    coeff size   6_463 bits
+    coeff size2  -1, 3_851, 6_005, 18_986_419 bits
+    sparsity     0.09
+    time         12.03 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 86, 65, -10, 33, -91]
+    coeff size   6_529 bits
+    coeff size2  -1, 3_912, 6_074, 19_232_537 bits
+    sparsity     0.09
+    time         12.55 s
+    
+=================================
+reimer6
+    n            6
+    D            576
+    d            576
+    type         cyclic
+    sparsity     [0.35, 0.36, 0.27, 0.24, 0.17, 0.14]
+
+search_strategy=:current
+    sep. form    [1, -1, 0, 0, -1, 1]
+    coeff size   1_924 bits
+    coeff size2  -1, 1_150, 1_215, 3_503_189 bits
+    sparsity     0.43
+    time         1.8 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4, -7]
+    coeff size   3_940 bits
+    coeff size2  -1, 2_284, 2_653, 8_865_936 bits
+    sparsity     0.43
+    time         2.72 s
+
+search_strategy=:l0_norm
+    sep. form    [-39, 69, -98, -32, 0, 0]
+    coeff size   5_905 bits
+    coeff size2  -1, 3_292, 4_765, 12_957_301 bits
+    sparsity     0.43
+    time         6.08 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, -98, -32, 10, -17]
+    coeff size   5_057 bits
+    coeff size2  -1, 2_970, 4_240, 11_683_388 bits
+    sparsity     0.34
+    time         5.85 s
+    
+=================================
+katsura11
+    n            11
+    D            1024
+    d            1024
+    type         shape
+    sparsity     [0.63, 0.55, 0.58, 0.57, 0.56, 0.56, 0.55, 0.54, 0.49, 0.36, 0.26]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   9_799 bits
+    coeff size2  -1, 4_690, 5_847, 56_556_803 bits
+    sparsity     0.26
+    time         27.08 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4, -7, 3, 4, -1, -5, 4]
+    coeff size   16_140 bits
+    coeff size2  -1, 8_744, 8_962, 105_783_738 bits
+    sparsity     0.63
+    time         44.47 s
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   9_799 bits
+    coeff size2  -1, 4_690, 5_847, 56_556_803 bits
+    sparsity     0.26
+    time         26.48 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    coeff size   9_799 bits
+    coeff size2  -1, 4_690, 5_847, 56_556_803 bits
+    sparsity     0.26
+    time         26.87 s
+    
+=================================
+Ch6_sq
+    n            6
+    D            2048
+    d            32
+    type         general
+    sparsity     [0.37, 0.36, 0.35, 0.32, 0.28, 0.22]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   3_577 bits
+    coeff size2  -1, 1_845, 1_895, 408_904 bits
+    sparsity     0.22
+    time         69.17 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4, -7]
+    coeff size   6_503 bits
+    coeff size2  -1, 3_258, 3_418, 732_750 bits
+    sparsity     0.38
+    time         189.75 s
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   3_577 bits
+    coeff size2  -1, 1_845, 1_895, 408_904 bits
+    sparsity     0.22
+    time         77.06 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 1]
+    coeff size   3_577 bits
+    coeff size2  -1, 1_845, 1_895, 408_904 bits
+    sparsity     0.22
+    time         76.95 s
+    
+=================================
+Ka6_sq
+    n            7
+    D            8192
+    d            64
+    type         general
+    sparsity     [0.3, 0.3, 0.3, 0.3, 0.28, 0.26, 0.13]
+
+search_strategy=:current
+    sep. form    [0, 0, 0, 0, 0, 0, 1]
+    coeff size   382 bits
+    coeff size2  -1, 177, 249, 87_418 bits
+    sparsity     0.13
+    time         1008.98 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4, -7, 3]
+    coeff size   631 bits
+    coeff size2  -1, 348, 369, 175_116 bits
+    sparsity     0.3
+    time         2156.5 s
+
+search_strategy=:l0_norm
+    sep. form    [0, 0, 0, 0, 0, 0, 1]
+    coeff size   382 bits
+    coeff size2  -1, 177, 249, 87_418 bits
+    sparsity     0.13
+    time         1010.66 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 0, 0, 0, 0, 1]
+    coeff size   382 bits
+    coeff size2  -1, 177, 249, 87_418 bits
+    sparsity     0.13
+    time         1011.05 s
+    
+=================================
+No5_sq
+    n            5
+    D            7456
+    d            233
+    type         general
+    sparsity     [0.08, 0.08, 0.07, 0.07, 0.06]
+
+search_strategy=:current
+    sep. form    [5, -3, 0, -1, 1]
+    coeff size   1_107 bits
+    coeff size2  -1, 700, 827, 932_808 bits
+    sparsity     0.16
+    time         5420.69 s
+
+search_strategy=:random
+    FAILED
+
+search_strategy=:l0_norm
+    sep. form    [12, -39, 83, -52, 0]
+    coeff size   1_883 bits
+    coeff size2  -1, 1_185, 1_739, 1_611_204 bits
+    sparsity     0.16
+    time         9034.43 s
+
+search_strategy=:mron_0l
+    sep. form    [0, -39, 83, -52, 36]
+    coeff size   1_878 bits
+    coeff size2  -1, 1_186, 1_800, 1_618_271 bits
+    sparsity     0.15
+    time         9322.54 s
+    
+=================================
+Re5_sq
+    n            5
+    D            4608
+    d            144
+    type         general
+    sparsity     [0.29, 0.28, 0.22, 0.21, 0.17]
+
+search_strategy=:current
+    sep. form    [-1, 0, 0, -1, 1]
+    coeff size   363 bits
+    coeff size2  -1, 240, 255, 199_773 bits
+    sparsity     0.3
+    time         676.19 s
+
+search_strategy=:random
+    sep. form    [3, -1, -1, 5, 4]
+    coeff size   599 bits
+    coeff size2  -1, 374, 428, 307_833 bits
+    sparsity     0.31
+    time         692.35 s
+
+search_strategy=:l0_norm
+    sep. form    [39, -80, 25, 0, 0]
+    coeff size   1_112 bits
+    coeff size2  -1, 649, 979, 544_496 bits
+    sparsity     0.31
+    time         1609.43 s
+
+search_strategy=:mron_0l
+    sep. form    [0, 0, 25, 90, -13]
+    coeff size   1_018 bits
+    coeff size2  -1, 649, 974, 546_506 bits
+    sparsity     0.25
+    time         1627.39 s
+    
+=================================
+Ro5_sq
+    n            5
+    D            3840
+    d            120
+    type         general
+    sparsity     [0.06, 0.04, 0.03, 0.02, 0.01]
+
+search_strategy=:current
+    sep. form    [2, -2, 0, -1, 1]
+    coeff size   193 bits
+    coeff size2  -1, 0, 193, 14_642 bits
+    sparsity     0.07
+    time         53.86 s
+
+search_strategy=:random
+    FAILED
+
+search_strategy=:l0_norm
+    sep. form    [12, -39, 83, -52, 0]
+    coeff size   807 bits
+    coeff size2  -1, 0, 807, 62_720 bits
+    sparsity     0.07
+    time         148.64 s
+
+search_strategy=:mron_0l
+    sep. form    [0, -39, 83, -52, 36]
+    coeff size   799 bits
+    coeff size2  -1, 0, 799, 63_373 bits
+    sparsity     0.05
+    time         135.76 s
+    
