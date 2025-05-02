@@ -72,70 +72,72 @@ end
 
 for name in [
         "caprasse",
-        "goodwin",
+        "phuoc1",
+        # "goodwin",
         # "crn", 	# shape
-        "seir36",
+        # "seir36",
         # "crauste-1",	# shape
-        "crauste-2",
-        "fab_4", 
-        "noon6", 
-        "reimer6",
+        # "crauste-2",
+        # "fab_4", 
+        # "noon6", 
+        # "reimer6",
         # "robot",	# shape
         # "chandra10",	# shape
         # "chandra11",	# shape
         # "eco10",	# shape
         # "eco11",	# shape
         # "katsura11",
-        "Ch6_sq",
-        "Ka6_sq",
-        "No5_sq",
-        "Re5_sq",
-        "Ro5_sq",
-        "root7",
-        "crauste-3",	# too large
+        # "Ch6_sq",
+        # "Ka6_sq",
+        # "No5_sq",
+        # "Re5_sq",
+        # "Ro5_sq",
+        # "root7",
+        # "crauste-3",	# too large
     ]
 
     include((@__DIR__) * "/../Data/Systems/$name.jl")
 
     infos = guess_infos(sys)
 
-    ring_zp, (x_zp..., T) = polynomial_ring(AbstractAlgebra.GF(2^30+3), vcat(map(string, gens(R)), "T"), internal_ordering=:degrevlex)
+    # ring_zp, (x_zp..., T) = polynomial_ring(AbstractAlgebra.GF(2^30+3), vcat(map(string, gens(R)), "T"), internal_ordering=:degrevlex)
+    ring_zp, x_zp = polynomial_ring(AbstractAlgebra.GF(2^30+3), map(string, gens(R)), internal_ordering=:degrevlex)
     sys_zp = map(f -> evaluate(map_coefficients(c -> base_ring(ring_zp)(BigInt(numerator(c))) // base_ring(ring_zp)(BigInt(denominator(c))), f), x_zp), sys)
-    sep1 = rand(1:100, length(vcat(x_zp, T)))
-    sys_zp = vcat(sys_zp, sum(sep1 .* vcat(x_zp, T)))
-    # matrices = multiplication_matrices(sys_zp)
-
-    reset_timer!(RationalUnivariateRepresentation.to)
-    time1 = @elapsed flag1, rur1 = RationalUnivariateRepresentation.rur_core(sys_zp)
-    to1 = deepcopy(RationalUnivariateRepresentation.to)
-    
- #    reset_timer!(RationalUnivariateRepresentation.to)
- #    time1 = @elapsed rur1, sep1 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:current)
- #    to1 = deepcopy(RationalUnivariateRepresentation.to)
-
- #    reset_timer!(RationalUnivariateRepresentation.to)
- #    RationalUnivariateRepresentation._BOUND[] = 10
- #    sep2 = zeros(Int, length(matrices))
- #    time2, rur2 = nothing, nothing
- #    try
- #    	time2 = @elapsed rur2, sep2 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:random)
- #    catch e
-	# bound = RationalUnivariateRepresentation._BOUND[]
-	# @info "RUR failed with random linear form -$(bound)..$(bound) \\ 0"
- #    end
- #    to2 = deepcopy(RationalUnivariateRepresentation.to)
+    # sep1 = rand(1:100, length(vcat(x_zp, T)))
+    # sys_zp = vcat(sys_zp, sum(sep1 .* vcat(x_zp, T)))
+    matrices = multiplication_matrices(sys_zp)
 
     # reset_timer!(RationalUnivariateRepresentation.to)
-    # RationalUnivariateRepresentation._BOUND[] = 100
-    # sep3 = zeros(Int, length(matrices))
-    # time3, rur3 = nothing, nothing
-    # try
-    #     time3 = @elapsed rur3, sep3 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:random)
-    # catch e
-    #     bound = RationalUnivariateRepresentation._BOUND[]
-    #     @info "RUR failed with random linear form -$(bound)..$(bound) \\ 0"
-    # end
-    # to3 = deepcopy(RationalUnivariateRepresentation.to)
+    # time1 = @elapsed flag1, rur1 = RationalUnivariateRepresentation.rur_core(sys_zp)
+    # to1 = deepcopy(RationalUnivariateRepresentation.to)
+    
+    reset_timer!(RationalUnivariateRepresentation.to)
+    time1 = @elapsed rur1, sep1 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:current)
+    to1 = deepcopy(RationalUnivariateRepresentation.to)
+
+    reset_timer!(RationalUnivariateRepresentation.to)
+    RationalUnivariateRepresentation._BOUND[] = 10
+    sep2 = zeros(Int, length(matrices))
+    time2, rur2 = nothing, nothing
+    try
+    	time2 = @elapsed rur2, sep2 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:random)
+    catch e
+	bound = RationalUnivariateRepresentation._BOUND[]
+	@info "RUR failed with random linear form -$(bound)..$(bound) \\ 0"
+    end
+    to2 = deepcopy(RationalUnivariateRepresentation.to)
+
+    reset_timer!(RationalUnivariateRepresentation.to)
+    RationalUnivariateRepresentation._BOUND[] = 100
+    sep3 = zeros(Int, length(matrices))
+    time3, rur3 = nothing, nothing
+    try
+        time3 = @elapsed rur3, sep3 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:random)
+    catch e
+        bound = RationalUnivariateRepresentation._BOUND[]
+        @info "RUR failed with random linear form -$(bound)..$(bound) \\ 0"
+    end
+    to3 = deepcopy(RationalUnivariateRepresentation.to)
 
     # reset_timer!(RationalUnivariateRepresentation.to)
     # time4 = @elapsed rur4, sep4 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:l0_norm)
@@ -145,46 +147,48 @@ for name in [
     # time5 = @elapsed rur5, sep5 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:mron_0l)
     # to5 = deepcopy(RationalUnivariateRepresentation.to)
     
-    m1 = zeros(length(sep1), length(sep1)) 
+    # m1 = zeros(length(sep1), length(sep1)) 
     # sum(sep1 .* matrices)
-    # m2 = sum(sep2 .* matrices)
-    # m3 = sum(sep3 .* matrices)
+    m1 = sum(sep1 .* matrices)
+    m2 = sum(sep2 .* matrices)
+    m3 = sum(sep3 .* matrices)
     # m4 = sum(sep4 .* matrices)
     # m5 = sum(sep5 .* matrices)
-
-    results = """
-    =================================
-    $name
-        n            $(length(gens(R)))
-        K            $(base_ring(ring_zp))
-        D            $(infos.quotient)
-        d            $(infos.minpoly)
-        type         $(infos.type)
-
-    $(from_template(:random100, rur1, sep1, time1, m1, to1))
-    """
-
-    #         sparsity M_x $(map(x -> round(x, digits=2), map(sparsity, matrices)))
 
     # results = """
     # =================================
     # $name
     #     n            $(length(gens(R)))
+    #     K            $(base_ring(ring_zp))
     #     D            $(infos.quotient)
     #     d            $(infos.minpoly)
     #     type         $(infos.type)
-    #     sparsity     $(map(x -> round(x, digits=2), map(sparsity, matrices)))
 
-    # $(from_template(:current, rur1, sep1, time1, m1, to1))
+    # $(from_template(:random100, rur1, sep1, time1, m1, to1))
+    # """
 
-    # $(from_template(:random10, rur2, sep2, time2, m2, to2))
+    #         sparsity M_x $(map(x -> round(x, digits=2), map(sparsity, matrices)))
 
-    # $(from_template(:random100, rur3, sep3, time3, m3, to3))
+    results = """
+    =================================
+    $name
+        n            $(length(gens(R)))
+        D            $(infos.quotient)
+        d            $(infos.minpoly)
+        type         $(infos.type)
+        sparsity M_x $(map(x -> round(x, digits=2), map(sparsity, matrices)))
+
+    $(from_template(:current, rur1, sep1, time1, m1, to1))
+
+    $(from_template(:random10, rur2, sep2, time2, m2, to2))
+
+    $(from_template(:random100, rur3, sep3, time3, m3, to3))
+        """
+    #  
 
     # $(from_template(:l0_norm, rur4, sep4, time4, m4, to4))
 
     # $(from_template(:mron_0l, rur5, sep5, time5, m5, to5))
-    #     """
     println(results)
     open((@__DIR__) * "/results.txt", "a") do file println(file, results) end
 end
