@@ -534,3 +534,623 @@ MM loop                   1    1.25h  100.0%
 
     
     
+=================================
+caprasse
+    n             4
+    K             Rational field
+    D             56
+    d             32
+    type          general
+    sparsity M_x  [0.09, 0.09, 0.08, 0.07]
+
+search_strategy=:current
+    sep. form     [2, 0, -1, 1]   3 / 4
+    coeff sz qq   -1, 0, 56, 1_575 bits
+    coeff sz zz   -1, 0, 53, 1_417 bits
+    sparsity M_t  0.2
+    time          1.29 s
+    
+--------------------------------------------
+Section              ncalls     time    %tot
+--------------------------------------------
+MM loop                   1    465ms  100.0%
+  Groebner learn          1   71.4ms   15.4%
+  Groebner Apply          1   40.6ms    8.7%
+  Groebner Classic       11   36.3ms    7.8%
+  Biv Lex                36   23.1ms    5.0%
+    Gauss Reduct        476    359μs    0.1%
+    Mul Var Quo         476    239μs    0.1%
+  crt+rat.rec.            1   2.53ms    0.5%
+  First Variable         15    912μs    0.2%
+    Mul Var Quo         547    276μs    0.1%
+    Gauss Reduct        547    257μs    0.1%
+  Learn Table            11    514μs    0.1%
+    Mul Var Quo         835    367μs    0.1%
+  Apply Table             4    190μs    0.0%
+    Mul Var Quo         364    140μs    0.0%
+--------------------------------------------
+
+    
+
+search_strategy=:random10
+    sep. form     [3, -1, -1, 5]   4 / 4
+    coeff sz qq   -1, 0, 87, 2_354 bits
+    coeff sz zz   -1, 0, 86, 2_235 bits
+    sparsity M_t  0.24
+    time          0.04 s
+    
+--------------------------------------------
+Section              ncalls     time    %tot
+--------------------------------------------
+MM loop                   1   40.0ms  100.0%
+  Groebner Classic        3   3.63ms    9.1%
+  Groebner learn          1   1.48ms    3.7%
+  crt+rat.rec.            1   1.43ms    3.6%
+  Groebner Apply          1   1.13ms    2.8%
+  Biv Lex                28    625μs    1.6%
+    Gauss Reduct        280    242μs    0.6%
+    Mul Var Quo         280    133μs    0.3%
+  First Variable          7    574μs    1.4%
+    Mul Var Quo         329    180μs    0.4%
+    Gauss Reduct        329    163μs    0.4%
+  Apply Table             4    207μs    0.5%
+    Mul Var Quo         364    152μs    0.4%
+  Learn Table             3    171μs    0.4%
+    Mul Var Quo         273    125μs    0.3%
+--------------------------------------------
+
+    
+
+search_strategy=:random100
+    sep. form     [26, -10, -5, 41]   4 / 4
+    coeff sz qq   -1, 0, 176, 4_032 bits
+    coeff sz zz   -1, 0, 179, 3_958 bits
+    sparsity M_t  0.24
+    time          0.08 s
+    
+--------------------------------------------
+Section              ncalls     time    %tot
+--------------------------------------------
+MM loop                   1   79.4ms  100.0%
+  Groebner Classic        3   54.3ms   68.4%
+  Groebner Apply          2   12.5ms   15.7%
+  crt+rat.rec.            2   1.65ms    2.1%
+  Groebner learn          1   1.44ms    1.8%
+  Biv Lex                44    981μs    1.2%
+    Gauss Reduct        440    382μs    0.5%
+    Mul Var Quo         440    205μs    0.3%
+  First Variable         11    887μs    1.1%
+    Mul Var Quo         517    270μs    0.3%
+    Gauss Reduct        517    256μs    0.3%
+  Apply Table             8    416μs    0.5%
+    Mul Var Quo         728    308μs    0.4%
+  Learn Table             3    178μs    0.2%
+    Mul Var Quo         273    133μs    0.2%
+--------------------------------------------
+
+    
+
+search_strategy=:mron_0l
+    sep. form     [0, 0, -15, -3]   2 / 4
+    coeff sz qq   -1, 0, 128, 2_876 bits
+    coeff sz zz   -1, 0, 128, 2_876 bits
+    sparsity M_t  0.16
+    time          0.22 s
+    
+--------------------------------------------
+Section              ncalls     time    %tot
+--------------------------------------------
+MM loop                   1    218ms  100.0%
+  Groebner Classic        8   6.89ms    3.2%
+  Groebner learn          1   1.09ms    0.5%
+  Biv Lex                34    925μs    0.4%
+    Gauss Reduct        455    322μs    0.1%
+    Mul Var Quo         455    227μs    0.1%
+  crt+rat.rec.            1    896μs    0.4%
+  Groebner Apply          1    889μs    0.4%
+  First Variable         12    699μs    0.3%
+    Mul Var Quo         418    216μs    0.1%
+    Gauss Reduct        418    196μs    0.1%
+  Learn Table             8    386μs    0.2%
+    Mul Var Quo         735    268μs    0.1%
+  Apply Table             4    191μs    0.1%
+    Mul Var Quo         372    139μs    0.1%
+--------------------------------------------
+
+    
+    
+=================================
+caprasse
+    n             4
+    K             Rational field
+    D             56
+    d             32
+    type          general
+    sparsity M_x  [0.09, 0.09, 0.08, 0.07]
+
+search_strategy=:current
+    sep. form     [2, 0, -1, 1]   3 / 4
+    coeff sz qq   -1, 0, 56, 1_575 bits
+    coeff sz zz   -1, 0, 53, 1_417 bits
+    sparsity M_t  0.2
+    time          1.2 s
+    
+-----------------------------------------------------
+Section                       ncalls     time    %tot
+-----------------------------------------------------
+MM loop                            1    461ms  100.0%
+  Groebner learn                   1   71.5ms   15.5%
+  Groebner Apply                   1   42.0ms    9.1%
+  _zdim_modular_RUR_current        1   36.2ms    7.9%
+    Groebner Classic               9   27.4ms    5.9%
+    Biv Lex                       12    494μs    0.1%
+      Gauss Reduct               248    158μs    0.0%
+      Mul Var Quo                248    132μs    0.0%
+    First Variable                 9    440μs    0.1%
+      Mul Var Quo                265    132μs    0.0%
+      Gauss Reduct               265    113μs    0.0%
+    Learn Table                    9    384μs    0.1%
+      Mul Var Quo                653    280μs    0.1%
+  Groebner Classic                 2   28.1ms    6.1%
+  crt_and_ratrec!                  1   2.59ms    0.6%
+  Biv Lex                         24    496μs    0.1%
+    Gauss Reduct                 228    192μs    0.0%
+    Mul Var Quo                  228    100μs    0.0%
+  First Variable                   6    481μs    0.1%
+    Mul Var Quo                  282    149μs    0.0%
+    Gauss Reduct                 282    140μs    0.0%
+  Apply Table                      4    202μs    0.0%
+    Mul Var Quo                  364    149μs    0.0%
+  Learn Table                      2    113μs    0.0%
+    Mul Var Quo                  182   82.0μs    0.0%
+-----------------------------------------------------
+
+    
+
+search_strategy=:random10
+    sep. form     [3, -1, -1, 5]   4 / 4
+    coeff sz qq   -1, 0, 87, 2_354 bits
+    coeff sz zz   -1, 0, 86, 2_235 bits
+    sparsity M_t  0.24
+    time          0.06 s
+    
+----------------------------------------------------
+Section                      ncalls     time    %tot
+----------------------------------------------------
+MM loop                           1   62.5ms  100.0%
+  _zdim_modular_RUR_random        1   2.82ms    4.5%
+    Groebner Classic              1   1.30ms    2.1%
+    Biv Lex                       4   94.0μs    0.2%
+      Gauss Reduct               40   35.2μs    0.1%
+      Mul Var Quo                40   19.7μs    0.0%
+    First Variable                1   84.5μs    0.1%
+      Gauss Reduct               47   25.2μs    0.0%
+      Mul Var Quo                47   24.7μs    0.0%
+    Learn Table                   1   58.6μs    0.1%
+      Mul Var Quo                91   43.0μs    0.1%
+  Groebner Classic                2   2.27ms    3.6%
+  Groebner learn                  1   1.45ms    2.3%
+  Groebner Apply                  1   1.16ms    1.9%
+  crt_and_ratrec!                 1   1.12ms    1.8%
+  Biv Lex                        24    524μs    0.8%
+    Gauss Reduct                240    206μs    0.3%
+    Mul Var Quo                 240    113μs    0.2%
+  First Variable                  6    470μs    0.8%
+    Mul Var Quo                 282    148μs    0.2%
+    Gauss Reduct                282    138μs    0.2%
+  Apply Table                     4    205μs    0.3%
+    Mul Var Quo                 364    154μs    0.2%
+  Learn Table                     2    109μs    0.2%
+    Mul Var Quo                 182   79.6μs    0.1%
+----------------------------------------------------
+
+    
+
+search_strategy=:random100
+    sep. form     [26, -10, -5, 41]   4 / 4
+    coeff sz qq   -1, 0, 176, 4_032 bits
+    coeff sz zz   -1, 0, 179, 3_958 bits
+    sparsity M_t  0.24
+    time          0.08 s
+    
+----------------------------------------------------
+Section                      ncalls     time    %tot
+----------------------------------------------------
+MM loop                           1   78.7ms  100.0%
+  Groebner Classic                2   53.1ms   67.4%
+  Groebner Apply                  2   12.2ms   15.6%
+  _zdim_modular_RUR_random        1   2.46ms    3.1%
+    Groebner Classic              1   1.13ms    1.4%
+    Biv Lex                       4   91.5μs    0.1%
+      Gauss Reduct               40   35.4μs    0.0%
+      Mul Var Quo                40   19.3μs    0.0%
+    First Variable                1   83.7μs    0.1%
+      Mul Var Quo                47   25.1μs    0.0%
+      Gauss Reduct               47   24.1μs    0.0%
+    Learn Table                   1   53.8μs    0.1%
+      Mul Var Quo                91   38.7μs    0.0%
+  crt_and_ratrec!                 2   1.58ms    2.0%
+  Groebner learn                  1   1.43ms    1.8%
+  Biv Lex                        40    869μs    1.1%
+    Gauss Reduct                400    341μs    0.4%
+    Mul Var Quo                 400    189μs    0.2%
+  First Variable                 10    781μs    1.0%
+    Mul Var Quo                 470    245μs    0.3%
+    Gauss Reduct                470    227μs    0.3%
+  Apply Table                     8    409μs    0.5%
+    Mul Var Quo                 728    307μs    0.4%
+  Learn Table                     2    114μs    0.1%
+    Mul Var Quo                 182   83.9μs    0.1%
+----------------------------------------------------
+
+    
+
+search_strategy=:mron_0l
+    sep. form     [0, 0, -15, -3]   2 / 4
+    coeff sz qq   -1, 0, 128, 2_876 bits
+    coeff sz zz   -1, 0, 128, 2_876 bits
+    sparsity M_t  0.16
+    time          0.25 s
+    
+-----------------------------------------------------
+Section                       ncalls     time    %tot
+-----------------------------------------------------
+MM loop                            1    249ms  100.0%
+  _zdim_modular_RUR_mron_0l        1   11.2ms    4.5%
+    Groebner Classic               6   4.91ms    2.0%
+    Biv Lex                       10    394μs    0.2%
+      Gauss Reduct               215    114μs    0.0%
+      Mul Var Quo                215    107μs    0.0%
+    Learn Table                    6    278μs    0.1%
+      Mul Var Quo                549    190μs    0.1%
+    First Variable                 6    226μs    0.1%
+      Mul Var Quo                136   63.6μs    0.0%
+      Gauss Reduct               136   55.2μs    0.0%
+  Groebner Classic                 2   1.85ms    0.7%
+  Groebner learn                   1   1.09ms    0.4%
+  Groebner Apply                   1    928μs    0.4%
+  crt_and_ratrec!                  1    906μs    0.4%
+  Biv Lex                         24    515μs    0.2%
+    Gauss Reduct                 240    200μs    0.1%
+    Mul Var Quo                  240    113μs    0.0%
+  First Variable                   6    471μs    0.2%
+    Mul Var Quo                  282    149μs    0.1%
+    Gauss Reduct                 282    138μs    0.1%
+  Apply Table                      4    184μs    0.1%
+    Mul Var Quo                  372    134μs    0.1%
+  Learn Table                      2    100μs    0.0%
+    Mul Var Quo                  186   71.4μs    0.0%
+-----------------------------------------------------
+
+    
+    
+=================================
+caprasse
+    n             4
+    K             Rational field
+    D             56
+    d             32
+    type          general
+    sparsity M_x  [0.09, 0.09, 0.08, 0.07]
+
+search_strategy=:current
+    sep. form     [2, 0, -1, 1]   3 / 4
+    coeff sz qq   -1, 0, 56, 1_575 bits
+    coeff sz zz   -1, 0, 53, 1_417 bits
+    sparsity M_t  0.2
+    time          1.22 s
+    
+-----------------------------------------------------
+Section                       ncalls     time    %tot
+-----------------------------------------------------
+MM loop                            1    447ms  100.0%
+  Groebner learn                   1   72.1ms   16.1%
+  Groebner Apply                   1   42.7ms    9.6%
+  Groebner Classic                 2   27.8ms    6.2%
+  _zdim_modular_RUR_current        1   17.0ms    3.8%
+    Groebner Classic               9   8.12ms    1.8%
+    Biv Lex                       12    498μs    0.1%
+      Gauss Reduct               248    159μs    0.0%
+      Mul Var Quo                248    134μs    0.0%
+    First Variable                 9    448μs    0.1%
+      Mul Var Quo                265    135μs    0.0%
+      Gauss Reduct               265    115μs    0.0%
+    Learn Table                    9    388μs    0.1%
+      Mul Var Quo                653    282μs    0.1%
+  crt_and_ratrec!                  1   2.61ms    0.6%
+  Biv Lex                         24    493μs    0.1%
+    Gauss Reduct                 228    194μs    0.0%
+    Mul Var Quo                  228   98.1μs    0.0%
+  First Variable                   6    476μs    0.1%
+    Mul Var Quo                  282    146μs    0.0%
+    Gauss Reduct                 282    139μs    0.0%
+  Apply Table                      4    196μs    0.0%
+    Mul Var Quo                  364    146μs    0.0%
+  Learn Table                      2    112μs    0.0%
+    Mul Var Quo                  182   80.6μs    0.0%
+-----------------------------------------------------
+
+    
+
+search_strategy=:random10
+    sep. form     [3, -1, -1, 5]   4 / 4
+    coeff sz qq   -1, 0, 87, 2_354 bits
+    coeff sz zz   -1, 0, 86, 2_235 bits
+    sparsity M_t  0.24
+    time          0.07 s
+    
+----------------------------------------------------
+Section                      ncalls     time    %tot
+----------------------------------------------------
+MM loop                           1   65.8ms  100.0%
+  _zdim_modular_RUR_random        1   2.84ms    4.3%
+    Groebner Classic              1   1.32ms    2.0%
+    Biv Lex                       4   92.5μs    0.1%
+      Gauss Reduct               40   34.5μs    0.1%
+      Mul Var Quo                40   19.6μs    0.0%
+    First Variable                1   82.3μs    0.1%
+      Mul Var Quo                47   24.8μs    0.0%
+      Gauss Reduct               47   23.8μs    0.0%
+    Learn Table                   1   58.0μs    0.1%
+      Mul Var Quo                91   42.7μs    0.1%
+  Groebner Classic                2   2.29ms    3.5%
+  Groebner learn                  1   1.48ms    2.2%
+  Groebner Apply                  1   1.17ms    1.8%
+  crt_and_ratrec!                 1   1.12ms    1.7%
+  Biv Lex                        24    520μs    0.8%
+    Gauss Reduct                240    205μs    0.3%
+    Mul Var Quo                 240    113μs    0.2%
+  First Variable                  6    477μs    0.7%
+    Mul Var Quo                 282    155μs    0.2%
+    Gauss Reduct                282    138μs    0.2%
+  Apply Table                     4    204μs    0.3%
+    Mul Var Quo                 364    152μs    0.2%
+  Learn Table                     2    118μs    0.2%
+    Mul Var Quo                 182   88.0μs    0.1%
+----------------------------------------------------
+
+    
+
+search_strategy=:random100
+    sep. form     [26, -10, -5, 41]   4 / 4
+    coeff sz qq   -1, 0, 176, 4_032 bits
+    coeff sz zz   -1, 0, 179, 3_958 bits
+    sparsity M_t  0.24
+    time          0.08 s
+    
+----------------------------------------------------
+Section                      ncalls     time    %tot
+----------------------------------------------------
+MM loop                           1   79.7ms  100.0%
+  Groebner Classic                2   53.4ms   67.0%
+  Groebner Apply                  2   12.5ms   15.7%
+  _zdim_modular_RUR_random        1   2.50ms    3.1%
+    Groebner Classic              1   1.12ms    1.4%
+    Biv Lex                       4   92.2μs    0.1%
+      Gauss Reduct               40   36.1μs    0.0%
+      Mul Var Quo                40   20.3μs    0.0%
+    First Variable                1   82.5μs    0.1%
+      Mul Var Quo                47   25.5μs    0.0%
+      Gauss Reduct               47   23.2μs    0.0%
+    Learn Table                   1   55.6μs    0.1%
+      Mul Var Quo                91   41.0μs    0.1%
+  crt_and_ratrec!                 2   1.61ms    2.0%
+  Groebner learn                  1   1.44ms    1.8%
+  Biv Lex                        40    874μs    1.1%
+    Gauss Reduct                400    340μs    0.4%
+    Mul Var Quo                 400    189μs    0.2%
+  First Variable                 10    800μs    1.0%
+    Mul Var Quo                 470    245μs    0.3%
+    Gauss Reduct                470    244μs    0.3%
+  Apply Table                     8    423μs    0.5%
+    Mul Var Quo                 728    317μs    0.4%
+  Learn Table                     2    114μs    0.1%
+    Mul Var Quo                 182   83.2μs    0.1%
+----------------------------------------------------
+
+    
+
+search_strategy=:mron_0l
+    sep. form     [0, 0, -15, -3]   2 / 4
+    coeff sz qq   -1, 0, 128, 2_876 bits
+    coeff sz zz   -1, 0, 128, 2_876 bits
+    sparsity M_t  0.16
+    time          0.28 s
+    
+-----------------------------------------------------
+Section                       ncalls     time    %tot
+-----------------------------------------------------
+MM loop                            1    280ms  100.0%
+  Biv Lex                         24   31.3ms   11.2%
+    Gauss Reduct                 240    211μs    0.1%
+    Mul Var Quo                  240    125μs    0.0%
+  _zdim_modular_RUR_mron_0l        1   11.4ms    4.1%
+    Groebner Classic               6   4.97ms    1.8%
+    Biv Lex                       10    396μs    0.1%
+      Gauss Reduct               215    114μs    0.0%
+      Mul Var Quo                215    106μs    0.0%
+    Learn Table                    6    275μs    0.1%
+      Mul Var Quo                549    189μs    0.1%
+    First Variable                 6    228μs    0.1%
+      Mul Var Quo                136   64.1μs    0.0%
+      Gauss Reduct               136   55.0μs    0.0%
+  Groebner Classic                 2   2.44ms    0.9%
+  Groebner learn                   1   1.07ms    0.4%
+  crt_and_ratrec!                  1    981μs    0.4%
+  Groebner Apply                   1    897μs    0.3%
+  First Variable                   6    480μs    0.2%
+    Mul Var Quo                  282    149μs    0.1%
+    Gauss Reduct                 282    142μs    0.1%
+  Apply Table                      4    199μs    0.1%
+    Mul Var Quo                  372    144μs    0.1%
+  Learn Table                      2    102μs    0.0%
+    Mul Var Quo                  186   72.4μs    0.0%
+-----------------------------------------------------
+
+    
+    
+=================================
+robot
+    n             6
+    K             Rational field
+    D             40
+    d             40
+    type          shape
+    sparsity M_x  [0.76, 0.76, 0.76, 0.71, 0.65, 0.52]
+
+search_strategy=:current
+    sep. form     [0, 0, 0, 0, 0, 1]   1 / 6
+    coeff sz qq   -1, 5_462, 16_103, 2_136_996 bits
+    coeff sz zz   -1, 2_752, 8_117, 768_467 bits
+    sparsity M_t  0.52
+    time          1.12 s
+    
+-----------------------------------------------------
+Section                       ncalls     time    %tot
+-----------------------------------------------------
+MM loop                            1    1.12s  100.0%
+  Groebner Apply                  96    510ms   45.4%
+  crt_and_ratrec!                 32    105ms    9.3%
+  First Variable                 387   30.1ms    2.7%
+    Mul Var Quo                15.1k   11.3ms    1.0%
+    Gauss Reduct               15.1k   9.33ms    0.8%
+  Groebner Classic                 2   10.0ms    0.9%
+  Groebner learn                   1   7.58ms    0.7%
+  _zdim_modular_RUR_current        1   6.09ms    0.5%
+    Groebner Classic               1   5.18ms    0.5%
+    First Variable                 1    102μs    0.0%
+      Mul Var Quo                 39   36.0μs    0.0%
+      Gauss Reduct                39   33.0μs    0.0%
+    Learn Table                    1   37.8μs    0.0%
+      Mul Var Quo                 28   29.5μs    0.0%
+    Biv Lex                        5   18.6μs    0.0%
+      Gauss Reduct                 5   6.49μs    0.0%
+      Mul Var Quo                  5   1.62μs    0.0%
+  Biv Lex                      1.94k   5.79ms    0.5%
+    Gauss Reduct               1.94k   2.24ms    0.2%
+    Mul Var Quo                1.94k    641μs    0.1%
+  Apply Table                    384    108μs    0.0%
+  Learn Table                      2   71.6μs    0.0%
+    Mul Var Quo                   56   54.8μs    0.0%
+-----------------------------------------------------
+
+    
+
+search_strategy=:random10
+    sep. form     [3, -1, -1, 5, 4, -7]   6 / 6
+    coeff sz qq   -1, 16_031, 17_542, 3_521_958 bits
+    coeff sz zz   -1, 8_514, 9_077, 1_291_946 bits
+    sparsity M_t  0.8
+    time          1.11 s
+    
+----------------------------------------------------
+Section                      ncalls     time    %tot
+----------------------------------------------------
+MM loop                           1    1.11s  100.0%
+  Groebner Apply                106    672ms   60.4%
+  crt_and_ratrec!                33    135ms   12.1%
+  First Variable                427   33.6ms    3.0%
+    Mul Var Quo               16.7k   12.6ms    1.1%
+    Gauss Reduct              16.7k   10.6ms    1.0%
+  Groebner Classic                2   11.2ms    1.0%
+  Groebner learn                  1   9.30ms    0.8%
+  Biv Lex                     2.56k   7.64ms    0.7%
+    Gauss Reduct              2.56k   3.06ms    0.3%
+    Mul Var Quo               2.56k    802μs    0.1%
+  _zdim_modular_RUR_random        1   7.12ms    0.6%
+    Groebner Classic              1   5.97ms    0.5%
+    First Variable                1    105μs    0.0%
+      Mul Var Quo                39   36.7μs    0.0%
+      Gauss Reduct               39   34.0μs    0.0%
+    Learn Table                   1   63.4μs    0.0%
+      Mul Var Quo                67   48.4μs    0.0%
+    Biv Lex                       6   20.8μs    0.0%
+      Gauss Reduct                6   7.25μs    0.0%
+      Mul Var Quo                 6   2.01μs    0.0%
+  Apply Table                   424   1.54ms    0.1%
+    Mul Var Quo               2.97k    953μs    0.1%
+  Learn Table                     2    120μs    0.0%
+    Mul Var Quo                 134   91.6μs    0.0%
+  Mul Var Quo                     7   4.22μs    0.0%
+----------------------------------------------------
+
+    
+
+search_strategy=:random100
+    sep. form     [26, -10, -5, 41, 35, -67]   6 / 6
+    coeff sz qq   -1, 15_987, 17_676, 3_569_438 bits
+    coeff sz zz   -1, 8_508, 9_200, 1_337_986 bits
+    sparsity M_t  0.8
+    time          1.11 s
+    
+----------------------------------------------------
+Section                      ncalls     time    %tot
+----------------------------------------------------
+MM loop                           1    1.11s  100.0%
+  Groebner Apply                106    653ms   58.9%
+  crt_and_ratrec!                33    132ms   11.9%
+  First Variable                427   33.2ms    3.0%
+    Mul Var Quo               16.7k   12.4ms    1.1%
+    Gauss Reduct              16.7k   10.4ms    0.9%
+  Groebner Classic                2   11.3ms    1.0%
+  Groebner learn                  1   9.10ms    0.8%
+  Biv Lex                     2.56k   7.55ms    0.7%
+    Gauss Reduct              2.56k   2.98ms    0.3%
+    Mul Var Quo               2.56k    793μs    0.1%
+  _zdim_modular_RUR_random        1   6.96ms    0.6%
+    Groebner Classic              1   5.80ms    0.5%
+    First Variable                1   90.9μs    0.0%
+      Mul Var Quo                39   32.1μs    0.0%
+      Gauss Reduct               39   27.3μs    0.0%
+    Learn Table                   1   61.8μs    0.0%
+      Mul Var Quo                67   45.9μs    0.0%
+    Biv Lex                       6   21.0μs    0.0%
+      Gauss Reduct                6   7.36μs    0.0%
+      Mul Var Quo                 6   2.13μs    0.0%
+  Apply Table                   424   1.59ms    0.1%
+    Mul Var Quo               2.97k    967μs    0.1%
+  Learn Table                     2    117μs    0.0%
+    Mul Var Quo                 134   88.0μs    0.0%
+  Mul Var Quo                     7   3.64μs    0.0%
+----------------------------------------------------
+
+    
+
+search_strategy=:mron_0l
+    sep. form     [0, 0, 0, 0, 0, 1]   1 / 6
+    coeff sz qq   -1, 5_462, 16_103, 2_136_996 bits
+    coeff sz zz   -1, 2_752, 8_117, 768_467 bits
+    sparsity M_t  0.52
+    time          0.87 s
+    
+-----------------------------------------------------
+Section                       ncalls     time    %tot
+-----------------------------------------------------
+MM loop                            1    875ms  100.0%
+  Groebner Apply                  96    554ms   63.3%
+  crt_and_ratrec!                 32    109ms   12.5%
+  First Variable                 387   30.2ms    3.5%
+    Mul Var Quo                15.1k   11.3ms    1.3%
+    Gauss Reduct               15.1k   9.45ms    1.1%
+  Groebner Classic                 2   9.55ms    1.1%
+  Groebner learn                   1   7.27ms    0.8%
+  _zdim_modular_RUR_mron_0l        1   6.84ms    0.8%
+    Groebner Classic               1   5.86ms    0.7%
+    First Variable                 1   97.9μs    0.0%
+      Mul Var Quo                 39   39.1μs    0.0%
+      Gauss Reduct                39   25.5μs    0.0%
+    Learn Table                    1   40.9μs    0.0%
+      Mul Var Quo                 28   30.2μs    0.0%
+    Biv Lex                        5   16.9μs    0.0%
+      Gauss Reduct                 5   4.93μs    0.0%
+      Mul Var Quo                  5   1.57μs    0.0%
+  Biv Lex                      1.94k   5.79ms    0.7%
+    Gauss Reduct               1.94k   2.26ms    0.3%
+    Mul Var Quo                1.94k    628μs    0.1%
+  Apply Table                    384    111μs    0.0%
+  Learn Table                      2   67.2μs    0.0%
+    Mul Var Quo                   56   52.8μs    0.0%
+-----------------------------------------------------
+
+    
+    

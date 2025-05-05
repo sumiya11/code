@@ -1,4 +1,4 @@
-using Revise, Groebner, Nemo, RationalUnivariateRepresentation, Statistics, TimerOutputs
+using Revise, Groebner, Nemo, RationalUnivariateRepresentation, Statistics, TimerOutputs, Dates, JLD2, PrettyTables
 import AbstractAlgebra
 
 function multiplication_matrices(J)
@@ -36,15 +36,24 @@ end
 
 sparsity = m -> sum(!iszero, m) / prod(size(m))
 
-coeff_size = rur -> Int(round(maximum(f -> maximum(c -> log2(abs(numerator(c))) + log2(abs(denominator(c))), f; init=-1), rur; init=-1)))
+bitsize_zz(c) = (@assert denominator(c) == 1; log2(abs(max(1, numerator(c)))))
+bitsize_qq(c) = log2(abs(max(1, numerator(c)))) + log2(abs(denominator(c)))
 
-coeff_size2 = rur -> begin
+coeff_size_qq = rur -> begin
+    low=Int(round(minimum(f -> minimum(bitsize_qq, f; init=-1), rur; init=-1)))
+    med=Int(round(median(map(f -> length(f) == 0 ? -1 : median(map(bitsize_qq, f)), rur))))
+    up=Int(round(maximum(f -> maximum(bitsize_qq, f; init=-1), rur; init=-1)))
+    tot=Int(round(sum(f -> sum(bitsize_qq, f; init=0), rur; init=0)))
+    (min=low, med=med, max=up, tot=tot)
+end
+
+coeff_size_zz = rur -> begin
     rur_z = map(f -> f*lcm(map(denominator, f)), rur)
-    low=Int(round(minimum(f -> minimum(c -> log2(max(abs(numerator(c)),1)), f; init=-1), rur_z; init=-1)))
-    med=Int(round(median(map(f -> length(f) == 0 ? -1 : median(map(c -> log2(max(abs(numerator(c)),1)), f)), rur_z))))
-    up=Int(round(maximum(f -> maximum(c -> log2(max(abs(numerator(c)),1)), f; init=-1), rur_z; init=-1)))
-    tot=Int(round(sum(f -> sum(c -> log2(max(abs(numerator(c)),1)), f; init=0), rur_z; init=0)))
-    (low, med, up, tot)
+    low=Int(round(minimum(f -> minimum(bitsize_zz, f; init=-1), rur_z; init=-1)))
+    med=Int(round(median(map(f -> length(f) == 0 ? -1 : median(map(bitsize_zz, f)), rur_z))))
+    up=Int(round(maximum(f -> maximum(bitsize_zz, f; init=-1), rur_z; init=-1)))
+    tot=Int(round(sum(f -> sum(bitsize_zz, f; init=0), rur_z; init=0)))
+    (min=low, med=med, max=up, tot=tot)
 end
 
 function from_template(strat, rur, sep, time, m, to)
@@ -59,58 +68,75 @@ function from_template(strat, rur, sep, time, m, to)
     
     """
 search_strategy=:$strat
-    sep. form    $sep   $(sum(!iszero, sep)) / $(length(sep))
-    coeff size   $(digitsep(coeff_size(rur))) bits
-    coeff size2  $(join(digitsep.(coeff_size2(rur)), ", ")) bits
-    sparsity     $(round(sparsity(m), digits=2))
-    time         $(round(time, digits=2)) s
+    sep. form     $sep   $(sum(!iszero, sep)) / $(length(sep))
+    coeff sz qq   $(join(string.(keys(coeff_size_qq(rur))) .* "=" .* digitsep.(values(coeff_size_qq(rur))), ", ")) bits
+    coeff sz zz   $(join(string.(keys(coeff_size_zz(rur))) .* "=" .* digitsep.(values(coeff_size_zz(rur))), ", ")) bits
+    sparsity M_t  $(round(sparsity(m), digits=2))
+    time          $(round(time, digits=2)) s
     
 $(String(take!(io)))
 
     """
 end
 
+function main()
+mkpath(joinpath(@__DIR__, "results"))
+ID = Dates.format(now(), "yyyy_mm_dd") * "-" * string(length(filter(file -> endswith(file, r"-[0-9]+"), readdir(joinpath(@__DIR__, "results")))))
+mkpath(joinpath(@__DIR__, "results", ID))
+
+@info "Writing results to $(joinpath(@__DIR__, "results", ID))"
+
+table = []
+
 for name in [
+        # ============= From files =============
         "caprasse",
-        "phuoc1",
-        # "goodwin",
-        # "crn", 	# shape
-        # "seir36",
-        # "crauste-1",	# shape
-        # "crauste-2",
-        # "fab_4", 
-        # "noon6", 
-        # "reimer6",
-        # "robot",	# shape
-        # "chandra10",	# shape
-        # "chandra11",	# shape
-        # "eco10",	# shape
-        # "eco11",	# shape
-        # "katsura11",
-        # "Ch6_sq",
-        # "Ka6_sq",
-        # "No5_sq",
-        # "Re5_sq",
-        # "Ro5_sq",
-        # "root7",
+        # "phuoc1",
+        "goodwin",
+        "crn", 	        # shape
+        "seir36",
+        "crauste-1",	# shape
+        "crauste-2",
+        "schwarz11",
         # "crauste-3",	# too large
+        "fab_4", 
+        "robot",	    # shape
+        "Ch6_sq",
+        "Ka6_sq",
+        "No5_sq",
+        "Re5_sq",
+        "Ro5_sq",
+        # ============= From Groebner =============
+        "Noon_5" => Groebner.Examples.noonn(5),
+        "Noon_6" => Groebner.Examples.noonn(6),
+        "Noon_7" => Groebner.Examples.noonn(7),
+        "Chandra_9" => Groebner.Examples.chandran(9),
+        "Chandra_10" => Groebner.Examples.chandran(10),
+        "Chandra_11" => Groebner.Examples.chandran(11),
+        "Katsura_10" => Groebner.Examples.katsuran(9),
+        "Katsura_11" => Groebner.Examples.katsuran(10),
+        "Katsura_12" => Groebner.Examples.katsuran(11),
+        "Reimer_6" => Groebner.Examples.reimern(6),
+        "Reimer_7" => Groebner.Examples.reimern(7),
+        "Eco_11" => Groebner.Examples.econ(11),
+        "Eco_12" => Groebner.Examples.econ(12),
+        "Eco_13" => Groebner.Examples.econ(13),
+        "Henrion_6" => Groebner.Examples.henrion6(),
     ]
 
-    include((@__DIR__) * "/../Data/Systems/$name.jl")
-
+    if !(name isa Pair)
+        sys = include(joinpath(@__DIR__, "../Data/Systems/$name.jl"))
+    else
+        name, sys = name
+    end
+    
     infos = guess_infos(sys)
 
-    # ring_zp, (x_zp..., T) = polynomial_ring(AbstractAlgebra.GF(2^30+3), vcat(map(string, gens(R)), "T"), internal_ordering=:degrevlex)
-    ring_zp, x_zp = polynomial_ring(AbstractAlgebra.GF(2^30+3), map(string, gens(R)), internal_ordering=:degrevlex)
+    ring_zp, x_zp = polynomial_ring(AbstractAlgebra.GF(2^30+3), map(string, gens(parent(sys[1]))), internal_ordering=:degrevlex)
     sys_zp = map(f -> evaluate(map_coefficients(c -> base_ring(ring_zp)(BigInt(numerator(c))) // base_ring(ring_zp)(BigInt(denominator(c))), f), x_zp), sys)
-    # sep1 = rand(1:100, length(vcat(x_zp, T)))
-    # sys_zp = vcat(sys_zp, sum(sep1 .* vcat(x_zp, T)))
+    
     matrices = multiplication_matrices(sys_zp)
 
-    # reset_timer!(RationalUnivariateRepresentation.to)
-    # time1 = @elapsed flag1, rur1 = RationalUnivariateRepresentation.rur_core(sys_zp)
-    # to1 = deepcopy(RationalUnivariateRepresentation.to)
-    
     reset_timer!(RationalUnivariateRepresentation.to)
     time1 = @elapsed rur1, sep1 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:current)
     to1 = deepcopy(RationalUnivariateRepresentation.to)
@@ -143,53 +169,48 @@ for name in [
     # time4 = @elapsed rur4, sep4 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:l0_norm)
     # to4 = deepcopy(RationalUnivariateRepresentation.to)
 
-    # reset_timer!(RationalUnivariateRepresentation.to)
-    # time5 = @elapsed rur5, sep5 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:mron_0l)
-    # to5 = deepcopy(RationalUnivariateRepresentation.to)
-    
-    # m1 = zeros(length(sep1), length(sep1)) 
-    # sum(sep1 .* matrices)
+    reset_timer!(RationalUnivariateRepresentation.to)
+    time4 = @elapsed rur4, sep4 = zdim_parameterization(sys, get_separating_element=true, search_strategy=:mron_0l)
+    to4 = deepcopy(RationalUnivariateRepresentation.to)
+
     m1 = sum(sep1 .* matrices)
     m2 = sum(sep2 .* matrices)
     m3 = sum(sep3 .* matrices)
-    # m4 = sum(sep4 .* matrices)
+    m4 = sum(sep4 .* matrices)
     # m5 = sum(sep5 .* matrices)
-
-    # results = """
-    # =================================
-    # $name
-    #     n            $(length(gens(R)))
-    #     K            $(base_ring(ring_zp))
-    #     D            $(infos.quotient)
-    #     d            $(infos.minpoly)
-    #     type         $(infos.type)
-
-    # $(from_template(:random100, rur1, sep1, time1, m1, to1))
-    # """
-
-    #         sparsity M_x $(map(x -> round(x, digits=2), map(sparsity, matrices)))
 
     results = """
     =================================
     $name
-        n            $(length(gens(R)))
-        D            $(infos.quotient)
-        d            $(infos.minpoly)
-        type         $(infos.type)
-        sparsity M_x $(map(x -> round(x, digits=2), map(sparsity, matrices)))
+        n             $(length(gens(parent(sys[1]))))
+        K             $(base_ring(parent(sys[1])))
+        D             $(infos.quotient)
+        d             $(infos.minpoly)
+        type          $(infos.type)
+        sparsity M_x  $(map(x -> round(x, digits=2), map(sparsity, matrices)))
 
     $(from_template(:current, rur1, sep1, time1, m1, to1))
 
     $(from_template(:random10, rur2, sep2, time2, m2, to2))
 
     $(from_template(:random100, rur3, sep3, time3, m3, to3))
+
+    $(from_template(:mron_0l, rur4, sep4, time4, m4, to4))
         """
-    #  
-
     # $(from_template(:l0_norm, rur4, sep4, time4, m4, to4))
-
     # $(from_template(:mron_0l, rur5, sep5, time5, m5, to5))
+    
     println(results)
-    open((@__DIR__) * "/results.txt", "a") do file println(file, results) end
+    mkpath(joinpath(@__DIR__, "results", ID, name))
+    open(joinpath(@__DIR__, "results", ID, name, "results.txt"), "w") do file println(file, results) end
+    for (strategy, rur, sep, time) in [(:current, rur1, sep1, time1), (:random10, rur2, sep2, time2), (:random100, rur3, sep3, time3), (:mron_0l, rur4, sep4, time4)]
+        jldsave(joinpath(@__DIR__, "results", ID, name, "rur_$strategy.jld2"); rur=rur, sep=sep)
+        push!(table, [name, infos.quotient, infos.minpoly, infos.type, strategy, time])
+    end
 end
+
+pretty_table(permutedims(reduce(hcat, table)), title="Summary", header=["Name", "D", "d", "Type", "Strategy", "Time"], limit_printing=false)
+end
+
+main()
 

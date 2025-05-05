@@ -905,7 +905,7 @@ function extend_system_with_sepform(de, co, lt, minus_sep_lin)
     return (dde, cco)
 end
 
-function _zdim_modular_RUR_current(de, co, arithm, learn = false)
+TimerOutputs.@timeit to function _zdim_modular_RUR_current(de, co, arithm, learn = false)
     nbv = length(de[1][1])
     ii = nbv
     flag, zp_param, ltg, q, i_xw, t_xw, t_learn = _zdim_modular_RUR_LV(de, co, arithm)
@@ -953,7 +953,7 @@ end
 
 import Combinatorics: powerset
 
-function _zdim_modular_RUR_l0_norm(de, co, arithm, learn = false)
+TimerOutputs.@timeit to function _zdim_modular_RUR_l0_norm(de, co, arithm, learn = false)
     # l0_norm = vec -> sum(!iszero, vec)
     nbv = length(de[1][1])
     ii = nbv
@@ -984,7 +984,7 @@ function _zdim_modular_RUR_l0_norm(de, co, arithm, learn = false)
     end
 end
 
-function _zdim_modular_RUR_mron_0l(de, co, arithm, learn = false)
+TimerOutputs.@timeit to function _zdim_modular_RUR_mron_0l(de, co, arithm, learn = false)
     # l0_norm = vec -> sum(!iszero, vec)
     nbv = length(de[1][1])
     ii = nbv
@@ -1015,7 +1015,7 @@ function _zdim_modular_RUR_mron_0l(de, co, arithm, learn = false)
     end
 end
 
-function _zdim_modular_RUR_deterministic(de, co, arithm, learn = false)
+TimerOutputs.@timeit to function _zdim_modular_RUR_deterministic(de, co, arithm, learn = false)
     nbv = length(de[1][1])
     ii = nbv
     sep_lin = [0 for i in 1:nbv]
@@ -1047,7 +1047,7 @@ end
 
 const _BOUND = Ref(10)
 
-function _zdim_modular_RUR_random(de, co, arithm, learn = false)
+TimerOutputs.@timeit to function _zdim_modular_RUR_random(de, co, arithm, learn = false)
     nbv = length(de[1][1])
     rng = Random.Xoshiro(42)  # to fix the sequence of random numbers
     bound = _BOUND[]
@@ -1166,7 +1166,7 @@ function ratrec_try!(zz, den, nemo_modulo, nemo_N, nemo_D, zp, p)
 end
 
 # Uses Groebner and Nemo
-function crt_and_ratrec!(
+TimerOutputs.@timeit to function crt_and_ratrec!(
     table_qq::Vector{Vector{Rational{BigInt}}},
     table_zz::Vector{Vector{BigInt}},
     tables_zp::Vector{Vector{Vector{ModularCoeff}}},
@@ -1365,7 +1365,7 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
 
         rur_print(length(t_pr), "-")
 
-        TimerOutputs.@timeit to "crt+rat.rec." flag, den = crt_and_ratrec!(qq_m, zz_m, t_param, t_pr, rur_mod_p, prpr, idx_prev, den)
+        flag, den = crt_and_ratrec!(qq_m, zz_m, t_param, t_pr, rur_mod_p, prpr, idx_prev, den)
         continuer = !flag
         if !continuer
             rur_print("\ncheck-")
