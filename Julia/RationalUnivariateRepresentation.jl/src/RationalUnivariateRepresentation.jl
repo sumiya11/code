@@ -1245,6 +1245,12 @@ TimerOutputs.@timeit to function crt_and_ratrec!(
     success, den
 end
 
+# align x to n
+function align_to(x::Integer, n::Integer)
+    @assert x >= 0 && n > 0
+    n * round(Int, Float64(x) / n, RoundUp)
+end
+
 TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     de,
     cco,
@@ -1322,7 +1328,6 @@ TimerOutputs.@timeit to "MM loop" function _zdim_multi_modular_RUR!(
     zz_m = [[BigInt(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
     qq_m = [[Rational{BigInt}(0) for _ in 1:length(l_zp_param[1][j])] for j in 1:length(l_zp_param[1])]
 
-    align_to(x, n) = (x + (n - 1)) & (~(n - 1))
     BLOC_ALIGNMENT = 1 * composite
 
     if parallelism != :serial
