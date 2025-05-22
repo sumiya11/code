@@ -23,6 +23,9 @@ If you use this result, the right way to cite it is currently :
 
 See https://newrur.gitlabpages.inria.fr/RationalUnivariateRepresentation.jl/ for installation instructions, source code and examples of use.
 
+The package can be combined with RS.jl (see https://pace.gitlabpages.inria.fr/rs.jl/) which exports 
+some few functions of RS C-Library used by the Maple function Isolate (see section Maple below) or can be access 
+from PACE.jl (https://pace.gitlabpages.inria.fr/pace.jl/) in a general framework for solving systems of algebraic equations.
 
 ## Maple
 
