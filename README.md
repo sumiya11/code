@@ -21,32 +21,8 @@ If you use this result, the right way to cite it is currently :
 
 ## Julia 
 
-**Warning** : if you want to get better performances with our Julia package, please aviod running several large examples simultanously on the same machine in order to avoid cache effects that might sensibly affect the computation times.
+See https://newrur.gitlabpages.inria.fr/RationalUnivariateRepresentation.jl/ for installation instructions, source code and examples of use.
 
-Our package is based on the Gröbner engine [Groebner.jl](https://github.com/sumiya11/Groebner.jl), you might need to update it if it is already installed on your system.
-
-Install the package RationalUnivariateRepresentation.jl with
-
-```julia
-using Pkg; Pkg.develop(path="Julia/RationalUnivariateRepresentation.jl/")
-```
-
-<!-- Please first get a fresh version of the [development version of Groebner.jl package](https://github.com/sumiya11/Groebner.jl) -->
-
-<!-- **Warning : the package does not pre-compile anything so that the first run might be slow.** -->
-
-Then you should be able to do
-
-```julia
-using RationalUnivariateRepresentation
-
-# Create a zero-dimensional system
-include("Data/Systems/caprasse.jl")
-
-# Find a RUR of solutions
-rur = zdim_parameterization(sys)
-```
-The polynomials of the RUR are given as vectors of coefficients to allow conversions in your favorite package.
 
 ## Maple
 
