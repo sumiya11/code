@@ -9,13 +9,14 @@ The present source codes are basically proposed to reproduce the results of an [
 If you use this result, the right way to cite it is currently :
 
 ````
-@misc{demin2024reading,
+@misc{demin2025readingrationalunivariaterepresentations,
       title={Reading Rational Univariate Representations on lexicographic Groebner bases}, 
       author={Alexander Demin and Fabrice Rouillier and Joao Ruiz},
-      year={2024},
+      year={2025},
       eprint={2402.07141},
       archivePrefix={arXiv},
-      primaryClass={cs.SC}
+      primaryClass={cs.SC},
+      url={https://arxiv.org/abs/2402.07141}, 
 }
 ````
 
